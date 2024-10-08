@@ -1,0 +1,1562 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > QuoteServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: QuoteServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QuoteServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/311)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/896)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import com.github.pagehelper.page.PageMethod;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import com.itextpdf.html2pdf.HtmlConverter;
+&nbsp;import freemarker.template.Configuration;
+&nbsp;import freemarker.template.Template;
+&nbsp;import freemarker.template.TemplateException;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.BenefitCategoryMap.OptionalBenefits;
+&nbsp;import ke.co.apollo.health.common.domain.model.QuoteQuestion.Members;
+&nbsp;import ke.co.apollo.health.common.domain.model.QuoteQuestion.Members.Questions;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.AddBenefitsToPolicyRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.AddBenefitsToPolicyRequest.BenefitCategoriesBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.AddBenefitsToPolicyRequest.BenefitCategoriesBean.BenefitsBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.ApiResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.ApiResponse.ErrorsBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.CreatePolicyRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.CreatePolicyResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddBusinessSourceToIndividualPolicyRequest.BusinessSourceBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddBusinessSourceToIndividualPolicyRequest.BusinessSourceBean.InterestedPartiesBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddBusinessSourceToIndividualPolicyRequest.BusinessSourceBean.InterestedPartiesBean.CommissionBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddIndividualPolicyBeneficiaryUWQuestionsRequest.BeneficiaryUWQuestions;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddIndividualPolicyBeneficiaryUWQuestionsRequest.BeneficiaryUWQuestions.UnderwritingQuestions;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.ApplicationQuoteListResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.HealthQuoteListResponse;
+&nbsp;import ke.co.apollo.health.common.enums.*;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.common.utils.EncodeUtils;
+&nbsp;import ke.co.apollo.health.common.utils.HealthDateUtils;
+&nbsp;import ke.co.apollo.health.config.MdcConfig;
+&nbsp;import ke.co.apollo.health.config.NotificationMessageBuilder;
+&nbsp;import ke.co.apollo.health.config.QuestionConfig;
+&nbsp;import ke.co.apollo.health.domain.ApplicationQuoteListSearchFilter;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary.Beneficiary;
+&nbsp;import ke.co.apollo.health.domain.QuoteListSearchFilter;
+&nbsp;import ke.co.apollo.health.domain.entity.AgentBranchEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.HealthStepEntity;
+&nbsp;import ke.co.apollo.health.domain.request.PolicyAdditionalInfoList;
+&nbsp;import ke.co.apollo.health.domain.request.PolicyAdditionalInfoRequest;
+&nbsp;import ke.co.apollo.health.domain.request.*;
+&nbsp;import ke.co.apollo.health.domain.response.*;
+&nbsp;import ke.co.apollo.health.enums.HealthQuoteStepsEnum;
+&nbsp;import ke.co.apollo.health.enums.QuoteStatusEnum;
+&nbsp;import ke.co.apollo.health.event.PolicyNotificationEventPublisher;
+&nbsp;import ke.co.apollo.health.event.ReminderEventPublisher;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.remote.NotificationRemote;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.repository.HealthAgentBranchRepository;
+&nbsp;import ke.co.apollo.health.repository.HealthStepRepository;
+&nbsp;import ke.co.apollo.health.service.*;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.collections4.MapUtils;
+&nbsp;import org.apache.commons.lang3.BooleanUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.time.DateFormatUtils;
+&nbsp;import org.apache.commons.lang3.time.DateUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.scheduling.annotation.EnableAsync;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.text.SimpleDateFormat;
+&nbsp;import java.util.*;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@Service
+&nbsp;@EnableAsync
+&nbsp;public class QuoteServiceImpl implements QuoteService {
+&nbsp;
+&nbsp;  public static final String BEFORE_PREMIUM = &quot;before premium:{}&quot;;
+&nbsp;  public static final String TRAVEL_INSURANCE_PREMIUM = &quot;travelInsurancePremium : {}&quot;;
+<b class="nc">&nbsp;  private final Logger logger = LoggerFactory.getLogger(getClass());</b>
+&nbsp;
+<b class="nc">&nbsp;  private static final Map&lt;String, String&gt; sortTypeMap = Map.of(&quot;createdDate&quot;, &quot;create_time&quot;, &quot;name&quot;, &quot;name&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;  private static final Map&lt;String, String&gt; applicationQuoteSortTypeMap = Map.of(&quot;createdTime&quot;, &quot;quote.create_time&quot;, &quot;policyNumber&quot;, &quot;quote.ext_policy_number&quot;);</b>
+&nbsp;
+&nbsp;  public static final String  AGENT_NAME = &quot;agentName&quot;;
+&nbsp;  public static final String  AGENT_BRANCH=&quot;agentBranch&quot;;
+&nbsp;  @Autowired
+&nbsp;  PolicyRemote policyRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  NotificationRemote notificationRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  BenefitCategoryMap benefitCategoryMap;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteMapper quoteMapper;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  ProductService productService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerService customerService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  BeneficiaryService beneficiaryService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuestionService questionService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  IntermediaryService intermediaryService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyNotificationEventPublisher policySMSEventPublisher;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  ReminderEventPublisher reminderEventPublisher;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  NotificationMessageBuilder notificationMessageBuilder;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PremiumService premiumService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuestionConfig questionConfig;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  HealthStepRepository stepRepository;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  HealthAgentBranchRepository agentBranchRepository;
+&nbsp;
+&nbsp;  private final Configuration configuration;
+&nbsp;
+<b class="nc">&nbsp;  public QuoteServiceImpl(Configuration configuration) {</b>
+<b class="nc">&nbsp;    this.configuration = configuration;</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;  @Override
+&nbsp;  public boolean updateQuoteStatus(QuoteStatusUpdateRequest request) {
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    String agentId = request.getAgentId();</b>
+<b class="nc">&nbsp;    String quoteId = request.getQuoteId();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;update quote status, QuoteStatusUpdateRequest: {}&quot;, request);</b>
+&nbsp;
+<b class="nc">&nbsp;    Quote quote = getQuote(quoteId, customerId, agentId);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (!PolicyStatus.APPLICATION.getValue().equals(quote.getStatus())) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t update the quote status, status: &quot; + quote.getStatus());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    quote.setStatus(request.getStatus());</b>
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;    return quoteMapper.update(quote) != 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean updateQuoteBalance(QuoteBalanceUpdateRequest request) {
+<b class="nc">&nbsp;    boolean result = false;</b>
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    String agentId = request.getAgentId();</b>
+<b class="nc">&nbsp;    String quoteId = request.getQuoteId();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;update quote balance, QuoteStatusUpdateRequest: {}&quot;, request);</b>
+&nbsp;
+<b class="nc">&nbsp;    Quote quote = getQuote(quoteId, customerId, agentId);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (!PolicyStatus.APPLICATION.getValue().equals(quote.getStatus())) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t update the quote balance, status: &quot; + quote.getStatus());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal balance = quote.getBalance().subtract(request.getPaidAmount());</b>
+<b class="nc">&nbsp;    if (balance.intValue() &lt;= 0) {</b>
+<b class="nc">&nbsp;      quote.setStatus(PolicyStatus.UNDERWRITING.getValue());</b>
+<b class="nc">&nbsp;      ReminderRequest reminderRequest = ReminderRequest.builder().customerId(customerId)</b>
+<b class="nc">&nbsp;              .quoteId(quoteId).policyNumber(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;              .effectiveDate(DateFormatUtils.format(quote.getEffectiveDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;              .type(&quot;health_quote&quot;)</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;send quote reminder&quot;);</b>
+<b class="nc">&nbsp;      reminderEventPublisher.publishReminder(reminderRequest);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    quote.setBalance(balance);</b>
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;    result = quoteMapper.update(quote) == 1;</b>
+<b class="nc">&nbsp;    if (balance.intValue() &lt;= 0 &amp;&amp; result) {</b>
+<b class="nc">&nbsp;      Customer customer = customerService.getCustomer(customerId);</b>
+<b class="nc">&nbsp;      if (customer != null) {</b>
+<b class="nc">&nbsp;        String text = notificationMessageBuilder</b>
+<b class="nc">&nbsp;                .getMessage(&quot;SMS_MESSAGE_POLICY_PAID&quot;, quote.getCode());</b>
+<b class="nc">&nbsp;        Date today = new Date();</b>
+<b class="nc">&nbsp;        PolicyNotificationTask task = PolicyNotificationTask.builder().text(text)</b>
+<b class="nc">&nbsp;                .destination(customer.getPhoneNumber()).type(NotificationType.SMS.getValue())</b>
+<b class="nc">&nbsp;                .subtype(SMSTaskTypeEnum.PAY.getValue())</b>
+<b class="nc">&nbsp;                .status(TaskStatusEnum.PENDING.getValue()).failureNumber(0)</b>
+<b class="nc">&nbsp;                .policyNumber(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;                .scheduleTime(today).createTime(today).build();</b>
+<b class="nc">&nbsp;        policySMSEventPublisher.publishTask(task);</b>
+<b class="nc">&nbsp;        PolicyNotificationTask nextTask = PolicyNotificationTask.builder().build();</b>
+<b class="nc">&nbsp;        BeanUtils.copyProperties(task, nextTask);</b>
+<b class="nc">&nbsp;        task.setStatus(TaskStatusEnum.CANCEL.getValue());</b>
+<b class="nc">&nbsp;        policySMSEventPublisher.publishTask(nextTask);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private CreatePolicyResponse createBasePolicy(Quote quote) {
+<b class="nc">&nbsp;    String policyStartDate = DateFormatUtils.format(quote.getStartDate(), GlobalConstant.YYYYMMDD);</b>
+<b class="nc">&nbsp;    String policyRenewalDate = DateFormatUtils</b>
+<b class="nc">&nbsp;            .format(HealthDateUtils.nextYear(quote.getStartDate()), GlobalConstant.YYYYMMDD);</b>
+<b class="nc">&nbsp;    Integer productId = quote.getProductId();</b>
+<b class="nc">&nbsp;    logger.info(&quot;====== Product id is {} ========&quot;, productId);</b>
+<b class="nc">&nbsp;    if (quote.getProductId() == 52) {</b>
+<b class="nc">&nbsp;      logger.info(&quot;Change product ID to 49 to create Shared Policy in Actisure &quot;);</b>
+<b class="nc">&nbsp;      productId = ProductEnum.JAMIIPLUS.getId();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;====== Product id is now {} ========&quot;, quote.getProductId());</b>
+<b class="nc">&nbsp;    CreatePolicyRequest createPolicyRequest = CreatePolicyRequest.builder()</b>
+<b class="nc">&nbsp;            .productName(ProductEnum.getById(productId).getValue())</b>
+<b class="nc">&nbsp;            .policyHolderEntityId(quote.getEntityId())</b>
+<b class="nc">&nbsp;            .policyStartDate(policyStartDate)</b>
+<b class="nc">&nbsp;            .policyEffectiveDate(policyStartDate)</b>
+<b class="nc">&nbsp;            .policyRenewalDate(policyRenewalDate)</b>
+<b class="nc">&nbsp;            .policyStatus(quote.getStatus())</b>
+<b class="nc">&nbsp;            .policyAmount(BigDecimal.ZERO)</b>
+<b class="nc">&nbsp;            .externalRef(quote.getCode())</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;    CreatePolicyResponse createPolicyResponse = policyRemote.createPolicy(createPolicyRequest);</b>
+<b class="nc">&nbsp;    if (createPolicyResponse != null) {</b>
+<b class="nc">&nbsp;      logger.debug(&quot;create new policy response: {}&quot;, createPolicyResponse);</b>
+<b class="nc">&nbsp;      if (!createPolicyResponse.isSuccess()) {</b>
+<b class="nc">&nbsp;        List&lt;String&gt; msg = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        createPolicyResponse.getErrors().stream().forEach(t -&gt; {</b>
+<b class="nc">&nbsp;                  logger.error(&quot;create new policy error detail: {}&quot;, t.getDescription());</b>
+<b class="nc">&nbsp;                  msg.add(t.getDescription());</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;        );
+<b class="nc">&nbsp;        throw new BusinessException(&quot;create policy exception: &quot; + msg.toString());</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return createPolicyResponse;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void addBenefitToPolicy(Quote quote, Integer policyId) {
+&nbsp;
+<b class="nc">&nbsp;    if (quote.getBenefit() != null) {</b>
+<b class="nc">&nbsp;      AddBenefitsToPolicyRequest addBenefitsToPolicyRequest = AddBenefitsToPolicyRequest.builder()</b>
+<b class="nc">&nbsp;              .policyId(policyId)</b>
+<b class="nc">&nbsp;              .policyEffectiveDate(</b>
+<b class="nc">&nbsp;                      DateFormatUtils.format(quote.getStartDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;              .benefitCategories(this.buildBenefitRequest(quote.getBenefit(), quote.getProductId(), quote.isChildrenOnly()))</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      ApiResponse response = policyRemote.addBenefitsToPolicy(addBenefitsToPolicyRequest);</b>
+<b class="nc">&nbsp;      String msg = this.checkApiResponse(response);</b>
+<b class="nc">&nbsp;      if (StringUtils.isNotBlank(msg)) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;add benefit to policy exception: &quot; + msg);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private String checkApiResponse(ApiResponse response) {
+<b class="nc">&nbsp;    StringBuilder msg = new StringBuilder();</b>
+<b class="nc">&nbsp;    if (response == null) {</b>
+<b class="nc">&nbsp;      msg = msg.append(&quot;response is empty&quot;);</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      if (!response.isSuccess()) {</b>
+<b class="nc">&nbsp;        for (ErrorsBean errorsBean : response.getErrors()) {</b>
+<b class="nc">&nbsp;          msg = msg.append(errorsBean.getDescription());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return msg.toString();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void addBusinessSourceToPolicy(Quote quote, Integer agentEntityId) {
+&nbsp;
+<b class="nc">&nbsp;    if (quote.getBenefit() != null) {</b>
+<b class="nc">&nbsp;      List&lt;InterestedPartiesBean&gt; interestedPartiesBeanList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty1 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;&quot;, agentEntityId, &quot;10&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty2 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;WHT&quot;, agentEntityId, &quot;1&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty3 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;Africa Reinsurance&quot;, 1108, &quot;20&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty4 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;Africa Reinsurance Commission&quot;, 1108, &quot;4.455&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty5 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;Underwriter&quot;, 190, &quot;BALANCE&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty6 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;East Africa Reinsurance&quot;, 1110, &quot;2&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty7 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;East Africa Reinsurance Commission&quot;, 1110, &quot;0.4455&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty8 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;Kenya Reinsurance&quot;, 1109, &quot;10&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty9 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;Kenya Reinsurance Commission&quot;, 1109, &quot;2.2275&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty10 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;PTA Reinsurance&quot;, 1111, &quot;8&quot;);</b>
+<b class="nc">&nbsp;      InterestedPartiesBean interestedParty11 = this</b>
+<b class="nc">&nbsp;              .buildInterestedPartiesBean(&quot;PTA Reinsurance Commission&quot;, 1111, &quot;1.782&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty1);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty2);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty3);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty4);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty5);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty6);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty7);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty8);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty9);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty10);</b>
+<b class="nc">&nbsp;      interestedPartiesBeanList.add(interestedParty11);</b>
+<b class="nc">&nbsp;      BusinessSourceBean businessSourceBean = BusinessSourceBean.builder()</b>
+<b class="nc">&nbsp;              .policyId(quote.getExtPolicyId())</b>
+<b class="nc">&nbsp;              .policyEffectiveDate(DateFormatUtils.format(quote.getStartDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;              .binderDetailWebName(String.valueOf(HealthDateUtils.getCurrentYear()))</b>
+<b class="nc">&nbsp;              .disbursementBasis(&quot;Payment Received&quot;)</b>
+<b class="nc">&nbsp;              .interestedParties(interestedPartiesBeanList)</b>
+<b class="nc">&nbsp;              .build();</b>
+&nbsp;      AddBusinessSourceToIndividualPolicyRequest policyRequest = AddBusinessSourceToIndividualPolicyRequest
+<b class="nc">&nbsp;              .builder()</b>
+<b class="nc">&nbsp;              .businessSource(businessSourceBean)</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      ApiResponse response = policyRemote.addBusinessSourceToIndividualPolicy(policyRequest);</b>
+<b class="nc">&nbsp;      String msg = this.checkApiResponse(response);</b>
+<b class="nc">&nbsp;      if (StringUtils.isNotBlank(msg)) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;add business source to policy exception: &quot; + msg);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private InterestedPartiesBean buildInterestedPartiesBean(String role, Integer entityId,
+&nbsp;                                                           String amount) {
+<b class="nc">&nbsp;    CommissionBean commission = CommissionBean.builder().applySalesTax(true).amount(amount)</b>
+<b class="nc">&nbsp;            .fixed(true).indemnity(true).build();</b>
+<b class="nc">&nbsp;    return InterestedPartiesBean.builder().role(role)</b>
+<b class="nc">&nbsp;            .entityId(entityId).initialCommission(commission</b>
+<b class="nc">&nbsp;            ).renewalCommission(commission).build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;BenefitCategoriesBean&gt; buildBenefitRequest(Benefit benefit, Integer productId, boolean isChildrenOnly) {
+<b class="nc">&nbsp;    List&lt;BenefitCategoriesBean&gt; benefitCategoriesBeans = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Integer inpatientLimit = benefit.getInpatientLimit();</b>
+<b class="nc">&nbsp;    if (inpatientLimit != null &amp;&amp; inpatientLimit &gt; 0) {</b>
+<b class="nc">&nbsp;      BenefitCategoriesBean inpatientBenefit = getInpatientBenefit(inpatientLimit, productId, isChildrenOnly);</b>
+<b class="nc">&nbsp;      benefitCategoriesBeans.add(inpatientBenefit);</b>
+<b class="nc">&nbsp;      BenefitCategoriesBean optionalBenefit = getOptionalBenefit(benefit, productId, isChildrenOnly);</b>
+<b class="nc">&nbsp;      if (optionalBenefit != null) {</b>
+<b class="nc">&nbsp;        benefitCategoriesBeans.add(optionalBenefit);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return benefitCategoriesBeans;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private BenefitCategoriesBean getInpatientBenefit(Integer inpatientLimit, Integer productId, boolean isChildrenOnly) {
+<b class="nc">&nbsp;    BenefitsBean benefitsBean = BenefitsBean.builder()</b>
+<b class="nc">&nbsp;            .webName(getWebName(BenefitEnum.INPATIENT.getValue(), &quot;&quot;, inpatientLimit, productId, isChildrenOnly)).build();</b>
+<b class="nc">&nbsp;    return BenefitCategoriesBean.builder()</b>
+<b class="nc">&nbsp;            .webName(BenefitEnum.INPATIENT.getValue()).benefits(Arrays.asList(benefitsBean)).build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private BenefitCategoriesBean getOptionalBenefit(Benefit coverLimit, Integer productId, boolean isChildrenOnly) {
+<b class="nc">&nbsp;    BenefitCategoriesBean benefitCategoriesBean = null;</b>
+<b class="nc">&nbsp;    List&lt;BenefitsBean&gt; benefitsBeans = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Integer outpatientLimit = coverLimit.getOutpatientLimit();</b>
+<b class="nc">&nbsp;    if (outpatientLimit != null &amp;&amp; outpatientLimit &gt; 0) {</b>
+<b class="nc">&nbsp;      BenefitsBean benefitsBean = BenefitsBean.builder()</b>
+<b class="nc">&nbsp;              .webName(</b>
+<b class="nc">&nbsp;                      getWebName(BenefitEnum.OPTIONALBENEFITS.getValue(), BenefitEnum.OUTPATIENT.getValue(),</b>
+<b class="nc">&nbsp;                              outpatientLimit, productId, isChildrenOnly)).build();</b>
+<b class="nc">&nbsp;      benefitsBeans.add(benefitsBean);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Integer detalLimit = coverLimit.getDentalLimit();</b>
+<b class="nc">&nbsp;    if (detalLimit != null &amp;&amp; detalLimit &gt; 0) {</b>
+<b class="nc">&nbsp;      BenefitsBean benefitsBean = BenefitsBean.builder()</b>
+<b class="nc">&nbsp;              .webName(</b>
+<b class="nc">&nbsp;                      getWebName(BenefitEnum.OPTIONALBENEFITS.getValue(), BenefitEnum.DENTAL.getValue(),</b>
+<b class="nc">&nbsp;                              detalLimit, productId, isChildrenOnly))</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      benefitsBeans.add(benefitsBean);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Integer maternityLimit = coverLimit.getMaternityLimit();</b>
+<b class="nc">&nbsp;    if (maternityLimit != null &amp;&amp; maternityLimit &gt; 0) {</b>
+<b class="nc">&nbsp;      BenefitsBean benefitsBean = BenefitsBean.builder()</b>
+<b class="nc">&nbsp;              .webName(</b>
+<b class="nc">&nbsp;                      getWebName(BenefitEnum.OPTIONALBENEFITS.getValue(), BenefitEnum.MATERNITY.getValue(),</b>
+<b class="nc">&nbsp;                              maternityLimit, productId, false))</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      benefitsBeans.add(benefitsBean);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Integer opticalLimit = coverLimit.getOpticalLimit();</b>
+<b class="nc">&nbsp;    if (opticalLimit != null &amp;&amp; opticalLimit &gt; 0) {</b>
+<b class="nc">&nbsp;      BenefitsBean benefitsBean = BenefitsBean.builder()</b>
+<b class="nc">&nbsp;              .webName(</b>
+<b class="nc">&nbsp;                      getWebName(BenefitEnum.OPTIONALBENEFITS.getValue(), BenefitEnum.OPTICAL.getValue(),</b>
+<b class="nc">&nbsp;                              opticalLimit, productId, isChildrenOnly))</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      benefitsBeans.add(benefitsBean);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (!CollectionUtils.isEmpty(benefitsBeans)) {</b>
+<b class="nc">&nbsp;      benefitCategoriesBean = BenefitCategoriesBean.builder()</b>
+<b class="nc">&nbsp;              .webName(BenefitEnum.OPTIONALBENEFITS.getValue()).benefits(benefitsBeans).build();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return benefitCategoriesBean;</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private String getWebName(String type, String subType, int limit, Integer productId, boolean isChildrenOnly) {
+<b class="nc">&nbsp;    String name = &quot;&quot;;</b>
+<b class="nc">&nbsp;    if (BenefitEnum.INPATIENT.getValue().equals(type)) {</b>
+<b class="nc">&nbsp;      if (productId == 52) {</b>
+<b class="nc">&nbsp;        name = benefitCategoryMap.getInpatient().getFamily().get(limit);</b>
+<b class="nc">&nbsp;      } else if (productId == 49) {</b>
+<b class="nc">&nbsp;        if (isChildrenOnly)</b>
+<b class="nc">&nbsp;          name = benefitCategoryMap.getInpatient().getChildOnly().get(limit);</b>
+&nbsp;        else
+<b class="nc">&nbsp;          name = benefitCategoryMap.getInpatient().getPerson().get(limit);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;    else
+<b class="nc">&nbsp;      name = checkOptionalBenefits(type, subType, limit, isChildrenOnly);</b>
+<b class="nc">&nbsp;    return name;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String checkOptionalBenefits(String type, String subType, int limit, boolean isChildrenOnly) {
+<b class="nc">&nbsp;    String name = &quot;&quot;;</b>
+<b class="nc">&nbsp;    if (BenefitEnum.OPTIONALBENEFITS.getValue().equals(type)) {</b>
+<b class="nc">&nbsp;      OptionalBenefits optionalBenefits = benefitCategoryMap.getOptionalBenefits();</b>
+<b class="nc">&nbsp;      if (BenefitEnum.DENTAL.getValue().equals(subType)) {</b>
+<b class="nc">&nbsp;        name = optionalBenefits.getDental().get(limit);</b>
+<b class="nc">&nbsp;      } else if (BenefitEnum.OPTICAL.getValue().equals(subType)) {</b>
+<b class="nc">&nbsp;        name = optionalBenefits.getOptical().get(limit);</b>
+<b class="nc">&nbsp;      } else if (BenefitEnum.MATERNITY.getValue().equals(subType)) {</b>
+<b class="nc">&nbsp;        name = optionalBenefits.getMaternity().get(limit);</b>
+<b class="nc">&nbsp;      } else if (BenefitEnum.OUTPATIENT.getValue().equals(subType)) {</b>
+<b class="nc">&nbsp;        if (isChildrenOnly)</b>
+<b class="nc">&nbsp;          name = optionalBenefits.getOutpatient().getChildOnly().get(limit);</b>
+&nbsp;        else
+<b class="nc">&nbsp;          name = optionalBenefits.getOutpatient().getPerson().get(limit);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return name;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Quote getAndValidateQuote(String quoteId, String customerId, String agentId) {
+<b class="nc">&nbsp;    Quote quote = this.getQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    if (!PolicyStatus.NEW.getValue().equals(quote.getStatus())</b>
+<b class="nc">&nbsp;            &amp;&amp; !PolicyStatus.VIEWED.getValue().equals(quote.getStatus())</b>
+<b class="nc">&nbsp;            &amp;&amp; !PolicyStatus.ENQUIRY.getValue().equals(quote.getStatus())) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t update finished quote&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (PolicyStatus.NEW.getValue().equals(quote.getStatus())) {</b>
+<b class="nc">&nbsp;      quote.setStatus(PolicyStatus.ENQUIRY.getValue());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return quote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private PolicyBeneficiary getPolicyBeneficiary(List&lt;Customer&gt; customerList, String quoteId) {
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = PolicyBeneficiary.builder().id(quoteId).build();</b>
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Date startDate = new Date();</b>
+<b class="nc">&nbsp;    for (Customer dependant : customerList) {</b>
+<b class="nc">&nbsp;      Date dob = dependant.getDateOfBirth();</b>
+<b class="nc">&nbsp;      String gender = dependant.getGender();</b>
+<b class="nc">&nbsp;      String relationship = dependant.getRelationshipDesc();</b>
+<b class="nc">&nbsp;      String name = dependant.getFirstName() + &quot; &quot; + dependant.getLastName();</b>
+<b class="nc">&nbsp;      if (DependantRelationship.POLICY_HOLDER.getValue().equals(relationship)) {</b>
+<b class="nc">&nbsp;        Beneficiary beneficiary = Beneficiary.builder()</b>
+<b class="nc">&nbsp;                .customerId(dependant.getCustomerId()).entityId(dependant.getEntityId())</b>
+<b class="nc">&nbsp;                .name(name).relationship(relationship)</b>
+<b class="nc">&nbsp;                .age(HealthDateUtils.calculateAge(dob, startDate)).gender(gender).build();</b>
+<b class="nc">&nbsp;        policyBeneficiary.setPrincipal(beneficiary);</b>
+<b class="nc">&nbsp;      } else if (DependantRelationship.SPOUSE.getValue().equals(relationship)</b>
+<b class="nc">&nbsp;              || DependantRelationship.PARTNER.getValue().equals(relationship)) {</b>
+<b class="nc">&nbsp;        Beneficiary beneficiary = Beneficiary.builder()</b>
+<b class="nc">&nbsp;                .customerId(dependant.getCustomerId()).entityId(dependant.getEntityId())</b>
+<b class="nc">&nbsp;                .name(name).relationship(relationship)</b>
+<b class="nc">&nbsp;                .age(HealthDateUtils.calculateAge(dob, startDate)).gender(gender).build();</b>
+<b class="nc">&nbsp;        policyBeneficiary.setSpouse(beneficiary);</b>
+<b class="nc">&nbsp;      } else if (</b>
+<b class="nc">&nbsp;              DependantRelationship.UNMARRIED_CHILD.getValue().equals(relationship)</b>
+<b class="nc">&nbsp;                      || DependantRelationship.MARRIED_CHILD.getValue()</b>
+<b class="nc">&nbsp;                      .equals(relationship)) {</b>
+<b class="nc">&nbsp;        Beneficiary beneficiary = Beneficiary.builder()</b>
+<b class="nc">&nbsp;                .customerId(dependant.getCustomerId()).entityId(dependant.getEntityId())</b>
+<b class="nc">&nbsp;                .name(name).relationship(relationship)</b>
+<b class="nc">&nbsp;                .age(HealthDateUtils.calculateAge(dob, startDate)).gender(gender).build();</b>
+<b class="nc">&nbsp;        list.add(beneficiary);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    policyBeneficiary.setChildren(list);</b>
+<b class="nc">&nbsp;    return policyBeneficiary;</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private PolicyBeneficiary getPolicyBeneficiary(CustomerDetailResponse customerDetail,
+&nbsp;                                                 boolean isChildrenOnly) {
+<b class="nc">&nbsp;    Beneficiary principal = null;</b>
+<b class="nc">&nbsp;    Beneficiary spouse = null;</b>
+<b class="nc">&nbsp;    if (!isChildrenOnly) {</b>
+<b class="nc">&nbsp;      principal = this</b>
+<b class="nc">&nbsp;              .getBeneficiary(customerDetail, DependantRelationship.POLICY_HOLDER);</b>
+<b class="nc">&nbsp;      spouse = this.getBeneficiary(customerDetail, DependantRelationship.SPOUSE);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; children = this.getChildrenBeneficiary(customerDetail);</b>
+<b class="nc">&nbsp;    return PolicyBeneficiary.builder().id(customerDetail.getCustomerId()).principal(principal)</b>
+<b class="nc">&nbsp;            .spouse(spouse).children(children)</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private Beneficiary getBeneficiary(CustomerDetailResponse customerDetail,
+&nbsp;                                     DependantRelationship dependantRelationship) {
+<b class="nc">&nbsp;    Date dob = null;</b>
+<b class="nc">&nbsp;    String gender = &quot;&quot;;</b>
+<b class="nc">&nbsp;    String relationship = dependantRelationship.getValue();</b>
+<b class="nc">&nbsp;    String name = &quot;&quot;;</b>
+<b class="nc">&nbsp;    String customerId = &quot;&quot;;</b>
+<b class="nc">&nbsp;    Long entityId = null;</b>
+<b class="nc">&nbsp;    if (DependantRelationship.POLICY_HOLDER.getValue().equals(relationship)) {</b>
+<b class="nc">&nbsp;      Principal principal = customerDetail.getPrincipal();</b>
+<b class="nc">&nbsp;      if (principal == null) {</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;      }
+<b class="nc">&nbsp;      entityId = principal.getEntityId();</b>
+<b class="nc">&nbsp;      customerId = principal.getCustomerId();</b>
+<b class="nc">&nbsp;      dob = principal.getDateOfBirth();</b>
+<b class="nc">&nbsp;      gender = principal.getGender();</b>
+<b class="nc">&nbsp;      name = principal.getFirstName() + &quot; &quot; + principal.getLastName();</b>
+<b class="nc">&nbsp;    } else if (DependantRelationship.SPOUSE.getValue().equals(relationship)) {</b>
+<b class="nc">&nbsp;      Dependant spouse = customerDetail.getSpouse();</b>
+<b class="nc">&nbsp;      if (spouse == null) {</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;      }
+<b class="nc">&nbsp;      entityId = spouse.getEntityId();</b>
+<b class="nc">&nbsp;      customerId = spouse.getDependantCode();</b>
+<b class="nc">&nbsp;      dob = spouse.getDateOfBirth();</b>
+<b class="nc">&nbsp;      gender = spouse.getGender();</b>
+<b class="nc">&nbsp;      name = spouse.getFirstName() + &quot; &quot; + spouse.getLastName();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    int age = HealthDateUtils.calculateAge(dob, new Date());</b>
+<b class="nc">&nbsp;    return Beneficiary.builder().customerId(customerId).entityId(entityId)</b>
+<b class="nc">&nbsp;            .name(name).relationship(relationship).age(age).gender(gender).build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;Beneficiary&gt; getChildrenBeneficiary(CustomerDetailResponse customerDetail) {
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; list = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    Children children = customerDetail.getChildren();</b>
+<b class="nc">&nbsp;    if (children == null) {</b>
+<b class="nc">&nbsp;      return list;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    int childNumber = children.getCount();</b>
+<b class="nc">&nbsp;    List&lt;Dependant&gt; childrenDetail = children.getDetail();</b>
+<b class="nc">&nbsp;    int childrenDetailSize = CollectionUtils.size(childrenDetail);</b>
+<b class="nc">&nbsp;    if (childNumber &gt; 0) {</b>
+<b class="nc">&nbsp;      for (int i = 0; i &lt; childNumber; i++) {</b>
+<b class="nc">&nbsp;        Date dob = DateUtils.addYears(new Date(), -1);</b>
+<b class="nc">&nbsp;        String customerId = &quot;&quot;;</b>
+<b class="nc">&nbsp;        Long entityId = null;</b>
+<b class="nc">&nbsp;        String name = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (childrenDetailSize &gt; i) {</b>
+<b class="nc">&nbsp;          Dependant dependant = childrenDetail.get(i);</b>
+<b class="nc">&nbsp;          dob = dependant.getDateOfBirth();</b>
+<b class="nc">&nbsp;          customerId = dependant.getDependantCode();</b>
+<b class="nc">&nbsp;          entityId = dependant.getEntityId();</b>
+<b class="nc">&nbsp;          name = dependant.getFirstName() + &quot; &quot; + dependant.getLastName();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int age = HealthDateUtils.calculateAge(dob, new Date());</b>
+<b class="nc">&nbsp;        list.add(</b>
+<b class="nc">&nbsp;                Beneficiary.builder().customerId(customerDetail.getCustomerId()).customerId(customerId)</b>
+<b class="nc">&nbsp;                        .entityId(entityId).name(name)</b>
+<b class="nc">&nbsp;                        .relationship(DependantRelationship.UNMARRIED_CHILD.getValue()).age(age)</b>
+<b class="nc">&nbsp;                        .build());</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return list;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Quote updateQuoteBenefit(QuoteBenefitUpdateRequest request) {
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    String agentId = request.getAgentId();</b>
+<b class="nc">&nbsp;    String quoteId = request.getQuoteId();</b>
+<b class="nc">&nbsp;    Benefit benefit = request.getBenefit();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;update quote benefit, QuoteBenefitUpdateRequest: {}&quot;, request);</b>
+&nbsp;
+<b class="nc">&nbsp;    Quote quote = this.getAndValidateQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    List&lt;Customer&gt; customerList = beneficiaryService.getQuoteBeneficiary(customerId, quoteId);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;update quote benefit, customerList: {}&quot;, customerList);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.getPolicyBeneficiary(customerList, quoteId);</b>
+&nbsp;
+<b class="nc">&nbsp;    if(null != policyBeneficiary.getSpouse()){</b>
+<b class="nc">&nbsp;      if(policyBeneficiary.getPrincipal().getGender().equalsIgnoreCase(&quot;Male&quot;))</b>
+<b class="nc">&nbsp;        policyBeneficiary.getSpouse().setGender(&quot;Female&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;      if(policyBeneficiary.getPrincipal().getGender().equalsIgnoreCase(&quot;Female&quot;))</b>
+<b class="nc">&nbsp;        policyBeneficiary.getSpouse().setGender(&quot;Male&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal newPremium = productService.calculatePremium(policyBeneficiary, quote.getProductId(), benefit, false);</b>
+&nbsp;    // itl and phcf
+<b class="nc">&nbsp;    Premium premium = productService.calculateTotalPremium(newPremium, true);</b>
+&nbsp;
+<b class="nc">&nbsp;    if(ProductEnum.JAMIIPLUS.getId() == quote.getProductId()){</b>
+<b class="nc">&nbsp;      BigDecimal travelInsurancePremium =  productService.getTravelInsurancePremium(policyBeneficiary,benefit);</b>
+<b class="nc">&nbsp;      logger.info(TRAVEL_INSURANCE_PREMIUM, travelInsurancePremium);</b>
+<b class="nc">&nbsp;      premium.setPremium(premium.getPremium().add(travelInsurancePremium));</b>
+<b class="nc">&nbsp;      premium.setTotalPremium(premium.getTotalPremium().add(travelInsurancePremium));</b>
+<b class="nc">&nbsp;      logger.info(&quot;TotalPremium include travelInsurancePremium :{}&quot;, premium.getTotalPremium());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;ProductId: {}&quot;, quote.getProductId());</b>
+<b class="nc">&nbsp;    String log = new Gson().toJson(premium);</b>
+<b class="nc">&nbsp;    logger.info(BEFORE_PREMIUM, log);</b>
+&nbsp;
+<b class="nc">&nbsp;    quote.setBenefit(benefit);</b>
+<b class="nc">&nbsp;    quote.setPremium(premium);</b>
+<b class="nc">&nbsp;    quote.setBalance(premium.getTotalPremium());</b>
+&nbsp;
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;    if (!this.updateQuotePremium(quote, policyBeneficiary)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Update quote benefit failed!&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    stepRepository.save(HealthStepEntity</b>
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .step(HealthQuoteStepsEnum.UPDATE_QUOTE_BENEFIT)</b>
+<b class="nc">&nbsp;            .quoteOrPolicyId(quoteId)</b>
+<b class="nc">&nbsp;            .agentId(agentId)</b>
+<b class="nc">&nbsp;            .customerId(customerId)</b>
+<b class="nc">&nbsp;            .build());</b>
+&nbsp;
+<b class="nc">&nbsp;    return quote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean updateQuotePremiumByCustomer(String quoteId, String customerId, String agentId) {
+<b class="nc">&nbsp;    Quote quote = this.getAndValidateQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    List&lt;Customer&gt; customerList = beneficiaryService.getQuoteBeneficiary(customerId, quoteId);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.getPolicyBeneficiary(customerList, quoteId);</b>
+<b class="nc">&nbsp;    policyBeneficiary.setId(quoteId);</b>
+<b class="nc">&nbsp;    BigDecimal newPremium = productService.calculatePremium(policyBeneficiary, quote.getProductId(), quote.getBenefit(), false);</b>
+<b class="nc">&nbsp;    Premium premium = productService.calculateTotalPremium(newPremium, true);</b>
+<b class="nc">&nbsp;    String log = new Gson().toJson(premium);</b>
+<b class="nc">&nbsp;    logger.info(BEFORE_PREMIUM, log);</b>
+&nbsp;
+<b class="nc">&nbsp;    if(ProductEnum.JAMIIPLUS.getId() == quote.getProductId()){</b>
+<b class="nc">&nbsp;      BigDecimal travelInsurancePremium =  productService.getTravelInsurancePremium(policyBeneficiary,quote.getBenefit());</b>
+<b class="nc">&nbsp;      logger.info(TRAVEL_INSURANCE_PREMIUM, travelInsurancePremium);</b>
+<b class="nc">&nbsp;      premium.setPremium(premium.getPremium().add(travelInsurancePremium));</b>
+<b class="nc">&nbsp;      premium.setTotalPremium(premium.getTotalPremium().add(travelInsurancePremium));</b>
+&nbsp;    }
+<b class="nc">&nbsp;    String logPremium = new Gson().toJson(premium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;totalPremium (balance) {}&quot;, logPremium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;ProductId {}&quot;, quote.getProductId());</b>
+&nbsp;
+<b class="nc">&nbsp;    quote.setPremium(premium);</b>
+<b class="nc">&nbsp;    quote.setBalance(premium.getTotalPremium());</b>
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;    return this.updateQuotePremium(quote, policyBeneficiary);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Quote updateQuoteStartDate(QuoteStartDateUpdateRequest request) {
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    String agentId = request.getAgentId();</b>
+<b class="nc">&nbsp;    String quoteId = request.getQuoteId();</b>
+<b class="nc">&nbsp;    Date startDate = request.getStartDate();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;update quote, QuoteStartDateUpdateRequest: {}&quot;, request);</b>
+&nbsp;
+<b class="nc">&nbsp;    Quote quote = this.getAndValidateQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    quote.setStartDate(startDate);</b>
+<b class="nc">&nbsp;    quote.setEffectiveDate(startDate);</b>
+<b class="nc">&nbsp;    quote.setRenewalDate(HealthDateUtils.nextYear(startDate));</b>
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;    if (quoteMapper.update(quote) != 1) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Update quote start date failed!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public Quote finishQuote(QuoteFinishRequest request) {
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    String agentId = request.getAgentId();</b>
+<b class="nc">&nbsp;    String quoteId = request.getQuoteId();</b>
+<b class="nc">&nbsp;    logger.info(&quot;finish quote, QuoteFinishRequest: {}&quot;, request);</b>
+&nbsp;
+<b class="nc">&nbsp;    Quote quote = this.getQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    if (!PolicyStatus.NEW.getValue().equals(quote.getStatus()) &amp;&amp; !PolicyStatus.VIEWED.getValue()</b>
+<b class="nc">&nbsp;            .equals(quote.getStatus()) &amp;&amp; StringUtils.isNotBlank(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;            &amp;&amp; quote.getExtPolicyId() != null) {</b>
+<b class="nc">&nbsp;      return quote;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    Long entityId = customerService.addClientAndDependantToBase(quote.getCustomerId(), quote.getId());</b>
+<b class="nc">&nbsp;    logger.info(&quot;Entity id is {}&quot;, entityId);</b>
+<b class="nc">&nbsp;    long endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    logger.info(&quot;0. create customer duration: {} ms&quot;, endTime - startTime);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (entityId == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;create customer failed, customer entity id is null!&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (&quot;1&quot;.equals(request.getStep())) {</b>
+<b class="nc">&nbsp;      logger.info(&quot;finish quote step 1 done, quoteId: {}&quot;, quote.getId());</b>
+<b class="nc">&nbsp;      return quote;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    quote.setStatus(PolicyStatus.APPLICATION.getValue());</b>
+<b class="nc">&nbsp;    quote.setEntityId(entityId);</b>
+&nbsp;
+&nbsp;    // create policy
+<b class="nc">&nbsp;    this.createPolicy(quote);</b>
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;    long endTime1 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    String fromTimeStr = DateFormatUtils</b>
+<b class="nc">&nbsp;            .format(new Date(endTime), GlobalConstant.YYYYMMDD_HHSSMMSSS);</b>
+<b class="nc">&nbsp;    String endTimeStr = DateFormatUtils</b>
+<b class="nc">&nbsp;            .format(new Date(endTime1), GlobalConstant.YYYYMMDD_HHSSMMSSS);</b>
+<b class="nc">&nbsp;    logger</b>
+<b class="nc">&nbsp;            .info(&quot;finish quote done, start_time: {}, end_time:{}, duration: {} ms&quot;, fromTimeStr,</b>
+<b class="nc">&nbsp;                    endTimeStr, endTime1 - endTime);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (quoteMapper.update(quote) != 1) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Finish quote failed!&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    Customer customer = customerService.getCustomer(customerId);</b>
+<b class="nc">&nbsp;    if (customer != null) {</b>
+<b class="nc">&nbsp;      Date today = new Date();</b>
+<b class="nc">&nbsp;      String text = notificationMessageBuilder</b>
+<b class="nc">&nbsp;              .getMessage(&quot;SMS_MESSAGE_POLICY_NO_PAY&quot;, quote.getCode());</b>
+<b class="nc">&nbsp;      PolicyNotificationTask task = PolicyNotificationTask.builder().text(text)</b>
+<b class="nc">&nbsp;              .destination(customer.getPhoneNumber()).type(NotificationType.SMS.getValue())</b>
+<b class="nc">&nbsp;              .subtype(SMSTaskTypeEnum.NO_PAY.getValue())</b>
+<b class="nc">&nbsp;              .status(TaskStatusEnum.PENDING.getValue()).failureNumber(0)</b>
+<b class="nc">&nbsp;              .policyNumber(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;              .scheduleTime(today).createTime(today).build();</b>
+<b class="nc">&nbsp;      policySMSEventPublisher.publishTask(task);</b>
+<b class="nc">&nbsp;      PolicyNotificationTask nextTask = PolicyNotificationTask.builder().build();</b>
+<b class="nc">&nbsp;      BeanUtils.copyProperties(task, nextTask);</b>
+<b class="nc">&nbsp;      nextTask.setStatus(TaskStatusEnum.TODO.getValue());</b>
+<b class="nc">&nbsp;      nextTask.setScheduleTime(HealthDateUtils.nextDay(today));</b>
+<b class="nc">&nbsp;      policySMSEventPublisher.publishTask(nextTask);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.info(&quot;\n ==== created step {} : for quote {} ==== \n &quot; , HealthQuoteStepsEnum.PAYMENT_SUMMARY, quoteId);</b>
+<b class="nc">&nbsp;    stepRepository.save(HealthStepEntity</b>
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .quoteOrPolicyId(quoteId)</b>
+<b class="nc">&nbsp;            .agentId(agentId)</b>
+<b class="nc">&nbsp;            .customerId(customerId)</b>
+<b class="nc">&nbsp;            .step(HealthQuoteStepsEnum.PAYMENT_SUMMARY)</b>
+<b class="nc">&nbsp;            .build());</b>
+<b class="nc">&nbsp;    logger.info(&quot;finish quote done, quoteId: {}&quot;, quote.getId());</b>
+<b class="nc">&nbsp;    return quote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean sendPolicySMSNotification(PolicyNotificationTask task) {
+<b class="nc">&nbsp;    boolean result = false;</b>
+<b class="nc">&nbsp;    if (TaskStatusEnum.PENDING.getValue().equals(task.getStatus())) {</b>
+<b class="nc">&nbsp;      result = notificationRemote.sendPolicyInstantSMSNotification(task);</b>
+<b class="nc">&nbsp;    } else if (TaskStatusEnum.TODO.getValue().equals(task.getStatus())) {</b>
+<b class="nc">&nbsp;      result = notificationRemote.createPolicySMSTask(task);</b>
+<b class="nc">&nbsp;    } else if (TaskStatusEnum.CANCEL.getValue().equals(task.getStatus())) {</b>
+<b class="nc">&nbsp;      result = notificationRemote.cancelPolicySMSTask(task);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void createPolicy(Quote quote) {
+&nbsp;
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+&nbsp;    // 1. create policy
+<b class="nc">&nbsp;    CreatePolicyResponse createPolicyResponse = this.createBasePolicy(quote);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;create base policy, createPolicyResponse: {}&quot;, createPolicyResponse);</b>
+<b class="nc">&nbsp;    long endTime2 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    logger.info(&quot;1. create base policy duration: {} ms&quot;, endTime2 - startTime);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (createPolicyResponse != null) {</b>
+<b class="nc">&nbsp;      quote.setExtPolicyId(createPolicyResponse.getPolicyId());</b>
+<b class="nc">&nbsp;      quote.setExtPolicyNumber(createPolicyResponse.getPolicyNumber());</b>
+&nbsp;      // 2. add benefit to policy
+<b class="nc">&nbsp;      this.addBenefitToPolicy(quote, createPolicyResponse.getPolicyId());</b>
+<b class="nc">&nbsp;      long endTime3 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;      logger.info(&quot;2. add benefit to policy duration: {} ms&quot;, endTime3 - endTime2);</b>
+&nbsp;      // 3. add intermediary to policy
+<b class="nc">&nbsp;      this.addIntermediaryToPolicy(quote);</b>
+<b class="nc">&nbsp;      long endTime4 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;      logger.info(&quot;3. add intermediary to policy duration: {} ms&quot;, endTime4 - endTime3);</b>
+&nbsp;
+&nbsp;      // 4. add beneficiary to policy
+<b class="nc">&nbsp;      boolean success = beneficiaryService</b>
+<b class="nc">&nbsp;              .addBeneficiaryToBase(quote.getCustomerId(), quote.getId(),</b>
+<b class="nc">&nbsp;                      quote.getExtPolicyId(),</b>
+<b class="nc">&nbsp;                      DateFormatUtils.format(quote.getEffectiveDate(), GlobalConstant.YYYYMMDD));</b>
+<b class="nc">&nbsp;      if (!success) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;add beneficiary to policy exception!&quot;);</b>
+&nbsp;      }
+<b class="nc">&nbsp;      long endTime5 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;      logger.info(&quot;4. add beneficiary to policy duration: {} ms&quot;, endTime5 - endTime4);</b>
+&nbsp;
+&nbsp;      // 5. add beneficiary questions to policy
+<b class="nc">&nbsp;      CompletableFuture.runAsync(MdcConfig.withMdc(() -&gt; this.addBeneficiaryUWQuestions(quote)));</b>
+<b class="nc">&nbsp;      long endTime6 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;      logger.info(&quot;5. add beneficiary questions to policy duration: {} ms&quot;, endTime6 - endTime5);</b>
+&nbsp;
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;create policy exception!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean testAddingBeneficiaryUWQuestions(QuoteBaseRequest request) {
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    String agentId = request.getAgentId();</b>
+<b class="nc">&nbsp;    String quoteId = request.getQuoteId();</b>
+<b class="nc">&nbsp;    Quote quote = this.getQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    return this.addBeneficiaryUWQuestions(quote);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public QuoteStepResponse getQuoteStep(QuoteStepRequest request) {
+<b class="nc">&nbsp;    HealthStepEntity step = stepRepository</b>
+<b class="nc">&nbsp;            .findById(request.getQuoteOrPolicy())</b>
+<b class="nc">&nbsp;            .orElse(new HealthStepEntity());</b>
+<b class="nc">&nbsp;    return QuoteStepResponse</b>
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .quoteOrPolicy(step.getQuoteOrPolicyId())</b>
+<b class="nc">&nbsp;            .customerId(step.getCustomerId())</b>
+<b class="nc">&nbsp;            .agentId(step.getAgentId())</b>
+<b class="nc">&nbsp;            .step(step.getStep())</b>
+<b class="nc">&nbsp;            .quoteOrPolicy(step.getQuoteOrPolicyId())</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean addBeneficiaryUWQuestions(Quote quote) {
+<b class="nc">&nbsp;    String customerId = quote.getCustomerId();</b>
+<b class="nc">&nbsp;    String quoteId = quote.getId();</b>
+<b class="nc">&nbsp;    List&lt;Customer&gt; customerList = customerService</b>
+<b class="nc">&nbsp;            .getCustomerAndDependants(customerId, quoteId);</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(customerList)) {</b>
+<b class="nc">&nbsp;      Map&lt;String, Long&gt; entityMap = customerList.stream().collect(Collectors.toMap(</b>
+&nbsp;              Customer::getCustomerId, Customer::getEntityId));
+<b class="nc">&nbsp;      QuoteBaseRequest quoteBaseRequest = QuoteBaseRequest.builder()</b>
+<b class="nc">&nbsp;              .customerId(customerId).quoteId(quoteId).build();</b>
+<b class="nc">&nbsp;      QuoteQuestion quoteQuestion = questionService.getQuoteQuestion(quoteBaseRequest);</b>
+<b class="nc">&nbsp;      if (quoteQuestion != null) {</b>
+<b class="nc">&nbsp;        List&lt;Members&gt; membersList = quoteQuestion.getMembers();</b>
+<b class="nc">&nbsp;        if (CollectionUtils.isEmpty(membersList)) {</b>
+<b class="nc">&nbsp;          logger.warn(&quot;can&#39;t find the question for quote: {}&quot;, quoteId);</b>
+<b class="nc">&nbsp;          return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Members members : membersList) {</b>
+<b class="nc">&nbsp;          Long entityId = entityMap.get(members.getCode());</b>
+<b class="nc">&nbsp;          if (entityId != null) {</b>
+<b class="nc">&nbsp;            this.sendBeneficiaryUWQuestions(entityId, quote, members.getQuestions());</b>
+&nbsp;          }
+<b class="nc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean sendBeneficiaryUWQuestions(Long entityId, Quote quote,
+&nbsp;                                             List&lt;Questions&gt; memberQuestionList) {
+<b class="nc">&nbsp;    List&lt;UnderwritingQuestions&gt; questionsList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Map&lt;String, String&gt; questionMap = questionConfig.getQuestionMap();</b>
+<b class="nc">&nbsp;    for (Map.Entry&lt;String, String&gt; entry : questionMap.entrySet()) {</b>
+<b class="nc">&nbsp;      UnderwritingQuestions questions = UnderwritingQuestions.builder()</b>
+<b class="nc">&nbsp;              .Question(entry.getValue()).Answer(&quot;No&quot;).DiscountApplicable(false).FreeFormatAnswer(&quot;&quot;)</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      for (Questions question : memberQuestionList) {</b>
+<b class="nc">&nbsp;        if (entry.getKey().equals(question.getQuestionId())) {</b>
+<b class="nc">&nbsp;          questions.setAnswer(&quot;Yes&quot;);</b>
+<b class="nc">&nbsp;          String content = question.getContent();</b>
+<b class="nc">&nbsp;          if (StringUtils.isNotBlank(question.getDoctorName())) {</b>
+<b class="nc">&nbsp;            content = content + &quot;- &quot; + question.getDoctorName();</b>
+&nbsp;          }
+<b class="nc">&nbsp;          questions.setFreeFormatAnswer(content);</b>
+<b class="nc">&nbsp;          break;</b>
+&nbsp;        }
+<b class="nc">&nbsp;      }</b>
+<b class="nc">&nbsp;      questionsList.add(questions);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    BeneficiaryUWQuestions beneficiaryUWQuestions = BeneficiaryUWQuestions.builder()</b>
+<b class="nc">&nbsp;            .PolicyId(Long.valueOf(quote.getExtPolicyId())).PolicyEffectiveDate(</b>
+<b class="nc">&nbsp;                    DateFormatUtils.format(quote.getEffectiveDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;            .EntityId(entityId).UnderwritingQuestions(questionsList)</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;    AddIndividualPolicyBeneficiaryUWQuestionsRequest questionsRequest = AddIndividualPolicyBeneficiaryUWQuestionsRequest
+<b class="nc">&nbsp;            .builder().BeneficiaryUnderwritingQuestions(beneficiaryUWQuestions).build();</b>
+<b class="nc">&nbsp;    ApiResponse response = policyRemote.addBeneficiaryUWQuestions(questionsRequest);</b>
+<b class="nc">&nbsp;    String msg = this.checkApiResponse(response);</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(msg)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;add beneficiary questions to policy exception: &quot; + msg);</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      logger.info(&quot;add beneficiary questions to policy successfully&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean addIntermediaryToPolicy(String quoteId, String customerId, String agentId) {
+<b class="nc">&nbsp;    Quote quote = this.getQuote(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    return this.addIntermediaryToPolicy(quote);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean addIntermediaryToPolicy(Quote quote) {
+<b class="nc">&nbsp;    if (StringUtils.isNotEmpty(quote.getAgentId())) {</b>
+<b class="nc">&nbsp;      Integer agentEntityId = intermediaryService.getIntermediaryEntityId(quote.getAgentId());</b>
+<b class="nc">&nbsp;      if (agentEntityId != null) {</b>
+<b class="nc">&nbsp;        this.addBusinessSourceToPolicy(quote, agentEntityId);</b>
+<b class="nc">&nbsp;        this.addIntermediaryBranchDetails(quote,agentEntityId);</b>
+&nbsp;      } else {
+<b class="nc">&nbsp;        logger.warn(&quot;No agent entity id&quot;);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;  @Override
+&nbsp;  public boolean addIntermediaryBranchDetails(Quote quote, Integer entityId ) {
+<b class="nc">&nbsp;    AgentDetailsRequest request = AgentDetailsRequest.builder().entityId(entityId).build();</b>
+<b class="nc">&nbsp;    AgentBranchDetailsResponse response = policyRemote.getAgentBranchDetails(request);</b>
+<b class="nc">&nbsp;    List&lt;PolicyAdditionalInfoList&gt;  list = new ArrayList&lt;&gt;();</b>
+&nbsp;    PolicyAdditionalInfoList policyAdditionalInfoLists = PolicyAdditionalInfoList
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .key(&quot;APA Branch&quot;)</b>
+<b class="nc">&nbsp;            .value(response.getBranch())</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;    list.add(policyAdditionalInfoLists);</b>
+&nbsp;    AgentBranchEntity agentBranchEntity = AgentBranchEntity
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .agentId(quote.getAgentId())</b>
+<b class="nc">&nbsp;            .entityId(entityId)</b>
+<b class="nc">&nbsp;            .branchName(response.getBranch())</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;    agentBranchRepository.save(agentBranchEntity);</b>
+&nbsp;    PolicyAdditionalInfoRequest policyAdditionalInfoRequest =
+&nbsp;            PolicyAdditionalInfoRequest
+<b class="nc">&nbsp;                    .builder()</b>
+<b class="nc">&nbsp;                    .policyId(quote.getExtPolicyId())</b>
+<b class="nc">&nbsp;                    .policyEffectiveDate(DateFormatUtils.format(quote.getEffectiveDate(),&quot;yyyy-MM-dd&quot;))</b>
+<b class="nc">&nbsp;                    .policyAdditionalInfoList(list)</b>
+<b class="nc">&nbsp;                    .build();</b>
+<b class="nc">&nbsp;    ActisurePolicyBranchDetailsResponse actisurePolicyBranchDetailsResponse = policyRemote.addPolicyAdditionalBranchDetails(policyAdditionalInfoRequest);</b>
+<b class="nc">&nbsp;    return actisurePolicyBranchDetailsResponse.isSuccess();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;Quote&gt; getQuoteList(QuoteListRequest quoteListRequest) {
+<b class="nc">&nbsp;    return quoteMapper.getQuotes(quoteListRequest.getCustomerId(), quoteListRequest.getAgentId(), quoteListRequest.getProductId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HealthQuoteListResponse searchQuoteList(QuoteListSearchRequest quote) {
+<b class="nc">&nbsp;    if (null ==  quote.getQuoteStatus()){</b>
+<b class="nc">&nbsp;      quote.setQuoteStatus(QuoteStatusEnum.ACTIVE);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    String agentId = quote.getAgentId();</b>
+<b class="nc">&nbsp;    List&lt;String&gt; agentIds = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    agentIds.add(agentId);</b>
+<b class="nc">&nbsp;    Intermediary intermediary = intermediaryService.getIntermediary(agentId);</b>
+<b class="nc">&nbsp;    if (IntermediaryRole.ADMIN.getValue().equals(intermediary.getRole())) {</b>
+<b class="nc">&nbsp;      List&lt;Intermediary&gt; intermediaryList = intermediaryService.getUserList(agentId);</b>
+<b class="nc">&nbsp;      if (CollectionUtils.isNotEmpty(intermediaryList)) {</b>
+<b class="nc">&nbsp;        agentIds.addAll(</b>
+<b class="nc">&nbsp;                intermediaryList.stream().map(Intermediary::getAgentId).collect(Collectors.toList()));</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    String sortColumn = &quot;&quot;;</b>
+<b class="nc">&nbsp;    String sortType = quote.getSortType();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(sortType)) {</b>
+<b class="nc">&nbsp;      sortColumn = sortTypeMap.get(sortType);</b>
+<b class="nc">&nbsp;      if (sortColumn == null) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;invalid sort type&quot;);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    String sort = quote.getSort();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(sort) &amp;&amp; !&quot;asc&quot;.equalsIgnoreCase(sort) &amp;&amp; !&quot;desc&quot;</b>
+<b class="nc">&nbsp;            .equalsIgnoreCase(sort)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;invalid sort value, should be &#39;asc&#39; or &#39;desc&#39;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Frontend paging from page 1... which is indexed to 0
+&nbsp;     * */
+<b class="nc">&nbsp;    if(quote.getIndex() &gt; 0){</b>
+<b class="nc">&nbsp;      quote.setIndex(quote.getIndex()-1);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    quote.setIndex(quote.getIndex()*quote.getLimit());</b>
+<b class="nc">&nbsp;    logger.info(&quot;----&gt; Page is {}&quot;, quote.getIndex());</b>
+&nbsp;
+<b class="nc">&nbsp;    QuoteListSearchFilter filter = QuoteListSearchFilter.builder().agentIds(agentIds)</b>
+<b class="nc">&nbsp;            .filter(quote.getFilter()).sortColumn(sortColumn).quoteStatus(quote.getQuoteStatus().getValue())</b>
+<b class="nc">&nbsp;            .sort(sort).index(quote.getIndex()).limit(quote.getLimit()).hide(quote.getHide()).build();</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;QuoteListSearchFilter {}&quot;, filter);</b>
+<b class="nc">&nbsp;    List&lt;HealthQuote&gt; quotes = quoteMapper.searchQuotes(filter);</b>
+<b class="nc">&nbsp;    Integer count = quoteMapper.searchQuotesCount(filter);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;Quotes ---&gt;  {}&quot;, quotes);</b>
+<b class="nc">&nbsp;    return HealthQuoteListResponse.builder().list(quotes).total(count).build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;Quote&gt; getCustomerQuoteList(QuoteListRequest quote) {
+<b class="nc">&nbsp;    return quoteMapper.getCustomerQuotes(quote.getCustomerId(), quote.getAgentId(),</b>
+<b class="nc">&nbsp;            PolicyStatus.APPLICATION.getValue());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Quote getQuote(String quoteId, String customerId, String agentId) {
+<b class="nc">&nbsp;    Quote quote = getQuoteNoThrowException(quoteId, customerId, agentId);</b>
+<b class="nc">&nbsp;    if (quote == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t find the quote&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Quote getQuoteNoThrowException(String quoteId, String customerId, String agentId) {
+<b class="nc">&nbsp;    return quoteMapper.getQuote(quoteId, customerId, agentId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Quote getQuoteByPolicyNumber(String customerId, String policyNumber) {
+<b class="nc">&nbsp;    Quote quote = quoteMapper.getQuoteByPolicyNumber(customerId, policyNumber);</b>
+<b class="nc">&nbsp;    if (quote == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t find the policy&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean deleteQuote(QuoteDeleteRequest quote) {
+<b class="nc">&nbsp;    if (quote == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;delete quote exception!&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return quoteMapper.delete(quote.getQuoteId(), quote.getCustomerId(), quote.getAgentId()) &gt; 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean softDeleteQuoteByAgent(SoftDeleteQuoteByAgentRequest quote) {
+<b class="nc">&nbsp;    if (quote == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Quote cannot be null!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quoteMapper.updateQuotStatusToDeleted(quote) &gt; 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;IdAndHideList&gt; getIdAndHideResult(IdsRequest quote) {
+<b class="nc">&nbsp;    return quoteMapper.getIdAndHideResult(quote.getQuoteIds());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean hideQuote(QuoteAgentHideRequest quote) {
+<b class="nc">&nbsp;    if (quote == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;hide quote exception!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quoteMapper.hideQuote(true, quote.getQuoteId()) &gt; 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean deleteQuoteByCustomerId(String customerId) {
+<b class="nc">&nbsp;    if (customerId == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;customer is null!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quoteMapper.deleteQuoteByCustomerId(customerId) &gt; 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean softDeleteQuoteByCustomerId(String customerId) {
+<b class="nc">&nbsp;    if (customerId == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Customer is null!!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return quoteMapper.softDeleteQuoteByCustomerId(customerId) &gt; 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public List&lt;Quote&gt; createInitQuote(String customerId, String agentId, String quoteId, boolean isChildrenOnly,int productId) {
+<b class="nc">&nbsp;    List&lt;Quote&gt; quoteList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    CustomerDetailResponse customerDetail = customerService.getCustomer(</b>
+<b class="nc">&nbsp;            CustomerSearchRequest.builder()</b>
+<b class="nc">&nbsp;                    .customerId(customerId)</b>
+<b class="nc">&nbsp;                    .build());</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.getPolicyBeneficiary(customerDetail, isChildrenOnly);</b>
+&nbsp;
+<b class="nc">&nbsp;    if(null != policyBeneficiary.getSpouse()) {</b>
+<b class="nc">&nbsp;      if (policyBeneficiary.getPrincipal().getGender().equalsIgnoreCase(&quot;Male&quot;))</b>
+<b class="nc">&nbsp;        policyBeneficiary.getSpouse().setGender(&quot;Female&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;      if (policyBeneficiary.getPrincipal().getGender().equalsIgnoreCase(&quot;Female&quot;))</b>
+<b class="nc">&nbsp;        policyBeneficiary.getSpouse().setGender(&quot;Male&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if(!customerId.isEmpty()){</b>
+<b class="nc">&nbsp;      quoteMapper.deleteDependentBenefits(customerId,agentId);</b>
+&nbsp;    }
+&nbsp;    // Jamii Plus
+&nbsp;    // Whether it&#39;s shared on individual is determined by
+&nbsp;    // product id submitted. Default is 49 (Individual)
+<b class="nc">&nbsp;    logger.info(&quot;===== product by id {} is {}====&quot;, productId, ProductEnum.getById(productId));</b>
+<b class="nc">&nbsp;    Benefit jpBenefit = productService.createDefaultBenefit(customerDetail, ProductEnum.getById(productId));</b>
+<b class="nc">&nbsp;    BigDecimal jpPremium = productService.calculatePremium(policyBeneficiary, productId, jpBenefit, false);</b>
+<b class="nc">&nbsp;    Premium premium = productService.calculateTotalPremium(jpPremium, true);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal travelInsurancePremium =  productService.getTravelInsurancePremium(policyBeneficiary,jpBenefit);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(TRAVEL_INSURANCE_PREMIUM, travelInsurancePremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    premium.setPremium(premium.getPremium().add(travelInsurancePremium));</b>
+<b class="nc">&nbsp;    premium.setTotalPremium(premium.getTotalPremium().add(travelInsurancePremium));</b>
+<b class="nc">&nbsp;    String logP = new Gson().toJson(premium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;totalPremium balance add travelInsurancePremium: {}&quot;, logP);</b>
+<b class="nc">&nbsp;    Date startDate = HealthDateUtils.nextDay(new Date());</b>
+<b class="nc">&nbsp;    Quote jpQuote = Quote.builder()</b>
+<b class="nc">&nbsp;            .id(quoteId)</b>
+<b class="nc">&nbsp;            .agentId(agentId)</b>
+<b class="nc">&nbsp;            .customerId(customerId)</b>
+<b class="nc">&nbsp;            .productId(productId)</b>
+<b class="nc">&nbsp;            .startDate(startDate)</b>
+<b class="nc">&nbsp;            .effectiveDate(startDate)</b>
+<b class="nc">&nbsp;            .renewalDate(HealthDateUtils.nextYear(startDate))</b>
+<b class="nc">&nbsp;            .benefit(jpBenefit)</b>
+<b class="nc">&nbsp;            .premium(premium)</b>
+<b class="nc">&nbsp;            .balance(premium.getTotalPremium())</b>
+<b class="nc">&nbsp;            .isChildrenOnly(isChildrenOnly)</b>
+<b class="nc">&nbsp;            .status(PolicyStatus.NEW.getValue())</b>
+<b class="nc">&nbsp;            .createTime(new Date())</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;    int count = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    if (quoteId.isEmpty()){</b>
+<b class="nc">&nbsp;      count = quoteMapper.insert(jpQuote);</b>
+&nbsp;    }else {
+<b class="nc">&nbsp;      count = quoteMapper.update(jpQuote);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (count &gt; 0) {</b>
+<b class="nc">&nbsp;      jpQuote.setCode(this.generateQuoteNumber(jpQuote.getProductId(), jpQuote.getId()));</b>
+<b class="nc">&nbsp;      quoteMapper.update(jpQuote);</b>
+<b class="nc">&nbsp;      jpQuote.setId(jpQuote.getId());</b>
+<b class="nc">&nbsp;      quoteList.add(jpQuote);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.info(&quot;\n ==== created step {} : for quote {} ==== \n &quot; , HealthQuoteStepsEnum.CREATE_QUOTE, jpQuote.getId());</b>
+<b class="nc">&nbsp;    stepRepository.save(HealthStepEntity</b>
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .quoteOrPolicyId(jpQuote.getId())</b>
+<b class="nc">&nbsp;            .agentId(agentId)</b>
+<b class="nc">&nbsp;            .customerId(customerId)</b>
+<b class="nc">&nbsp;            .step(HealthQuoteStepsEnum.CREATE_QUOTE)</b>
+<b class="nc">&nbsp;            .build());</b>
+&nbsp;    // AfyaNafuu
+<b class="nc">&nbsp;    Benefit afBenefit = productService.createDefaultBenefit(customerDetail, ProductEnum.AFYANAFUU);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal afPremium = productService.calculatePremium(policyBeneficiary, ProductEnum.AFYANAFUU.getId(), afBenefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    Premium premium1 = productService.calculateTotalPremium(afPremium, true);</b>
+&nbsp;
+<b class="nc">&nbsp;    Quote afQuote = Quote.builder()</b>
+<b class="nc">&nbsp;            .agentId(agentId)</b>
+<b class="nc">&nbsp;            .customerId(customerId)</b>
+<b class="nc">&nbsp;            .productId(ProductEnum.AFYANAFUU.getId())</b>
+<b class="nc">&nbsp;            .benefit(afBenefit)</b>
+<b class="nc">&nbsp;            .premium(premium1)</b>
+<b class="nc">&nbsp;            .balance(premium1.getTotalPremium())</b>
+<b class="nc">&nbsp;            .status(PolicyStatus.NEW.getValue())</b>
+<b class="nc">&nbsp;            .isChildrenOnly(isChildrenOnly)</b>
+<b class="nc">&nbsp;            .createTime(new Date())</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;    count = quoteMapper.insert(afQuote);</b>
+<b class="nc">&nbsp;    if (count &gt; 0) {</b>
+<b class="nc">&nbsp;      afQuote.setCode(this.generateQuoteNumber(afQuote.getProductId(), afQuote.getId()));</b>
+<b class="nc">&nbsp;      quoteMapper.update(afQuote);</b>
+<b class="nc">&nbsp;      afQuote.setId(afQuote.getId());</b>
+<b class="nc">&nbsp;      quoteList.add(afQuote);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Femina
+<b class="nc">&nbsp;    Benefit faBenefit = productService.createDefaultBenefit(customerDetail, ProductEnum.FEMINA);</b>
+<b class="nc">&nbsp;    BigDecimal faPremium = productService.calculatePremium(policyBeneficiary, ProductEnum.FEMINA.getId(), faBenefit, false);</b>
+<b class="nc">&nbsp;    Premium premium2 = productService.calculateTotalPremium(faPremium, true);</b>
+<b class="nc">&nbsp;    Quote feminaQuote = Quote.builder()</b>
+<b class="nc">&nbsp;            .agentId(agentId)</b>
+<b class="nc">&nbsp;            .customerId(customerId)</b>
+<b class="nc">&nbsp;            .productId(ProductEnum.FEMINA.getId())</b>
+<b class="nc">&nbsp;            .benefit(faBenefit)</b>
+<b class="nc">&nbsp;            .premium(premium2)</b>
+<b class="nc">&nbsp;            .balance(premium2.getTotalPremium())</b>
+<b class="nc">&nbsp;            .status(PolicyStatus.NEW.getValue())</b>
+<b class="nc">&nbsp;            .isChildrenOnly(isChildrenOnly)</b>
+<b class="nc">&nbsp;            .createTime(new Date())</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;    count = quoteMapper.insert(feminaQuote);</b>
+<b class="nc">&nbsp;    if (count &gt; 0) {</b>
+<b class="nc">&nbsp;      feminaQuote</b>
+<b class="nc">&nbsp;              .setCode(this.generateQuoteNumber(feminaQuote.getProductId(), feminaQuote.getId()));</b>
+<b class="nc">&nbsp;      quoteMapper.update(feminaQuote);</b>
+<b class="nc">&nbsp;      feminaQuote.setId(feminaQuote.getId());</b>
+<b class="nc">&nbsp;      quoteList.add(feminaQuote);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return quoteList;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String getQuoteNumberPrefix(int productId) {
+<b class="nc">&nbsp;    String result = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;    switch (productId) {</b>
+&nbsp;      case 49:
+<b class="nc">&nbsp;        result = QuoteNumberEnum.HJ.getValue();</b>
+<b class="nc">&nbsp;        break;</b>
+&nbsp;      case 50:
+<b class="nc">&nbsp;        result = QuoteNumberEnum.HA.getValue();</b>
+<b class="nc">&nbsp;        break;</b>
+&nbsp;      case 51:
+<b class="nc">&nbsp;        result = QuoteNumberEnum.HF.getValue();</b>
+<b class="nc">&nbsp;        break;</b>
+&nbsp;      case 52:
+<b class="nc">&nbsp;        result = QuoteNumberEnum.HS.getValue();</b>
+<b class="nc">&nbsp;        break;</b>
+&nbsp;      default:
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String generateQuoteNumber(int productId, String quoteId) {
+<b class="nc">&nbsp;    return this.getQuoteNumberPrefix(productId) + &quot;-&quot; + EncodeUtils.crc32(quoteId).toUpperCase();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public ApplicationQuote getApplicationQuote(QuoteBaseRequest request) {
+<b class="nc">&nbsp;    return quoteMapper.searchApplicationQuote(request.getQuoteId(), request.getCustomerId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public ApplicationQuoteListResponse searchApplicationQuoteList(
+&nbsp;          ApplicationQuoteListSearchRequest request) {
+&nbsp;
+<b class="nc">&nbsp;    String sortColumn = &quot;&quot;;</b>
+<b class="nc">&nbsp;    String sortType = request.getSortType();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(sortType)) {</b>
+<b class="nc">&nbsp;      sortColumn = applicationQuoteSortTypeMap.get(sortType);</b>
+<b class="nc">&nbsp;      if (sortColumn == null) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;invalid sort type&quot;);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    String sort = request.getSort();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(sort) &amp;&amp; !&quot;asc&quot;.equalsIgnoreCase(sort) &amp;&amp; !&quot;desc&quot;</b>
+<b class="nc">&nbsp;            .equalsIgnoreCase(sort)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;invalid sort value, should be &#39;asc&#39; or &#39;desc&#39;&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    ApplicationQuoteListSearchFilter filter = ApplicationQuoteListSearchFilter.builder()</b>
+<b class="nc">&nbsp;            .filter(request.getFilter()).archived(BooleanUtils.toInteger(request.isArchived()))</b>
+<b class="nc">&nbsp;            .paid(request.isPaid()).sortColumn(sortColumn).sort(sort).build();</b>
+<b class="nc">&nbsp;    return CompletableFuture</b>
+<b class="nc">&nbsp;            .supplyAsync(MdcConfig.mdcSupplier(() -&gt; {</b>
+<b class="nc">&nbsp;              int index = request.getIndex();</b>
+<b class="nc">&nbsp;              int limit = request.getLimit();</b>
+<b class="nc">&nbsp;              if (index &gt; 0 &amp;&amp; limit &gt; 0) {</b>
+<b class="nc">&nbsp;                PageMethod.startPage(request.getIndex(), request.getLimit());</b>
+&nbsp;              }
+<b class="nc">&nbsp;              return quoteMapper.searchApplicationQuotes(filter);</b>
+&nbsp;            }))
+<b class="nc">&nbsp;            .thenCombine(CompletableFuture</b>
+<b class="nc">&nbsp;                            .supplyAsync(MdcConfig.mdcSupplier(() -&gt; quoteMapper.searchApplicationQuotesCount(filter))),</b>
+<b class="nc">&nbsp;                    (list, count) -&gt; ApplicationQuoteListResponse.builder().list(list).total(count).build()</b>
+<b class="nc">&nbsp;            ).exceptionally(e -&gt; {</b>
+<b class="nc">&nbsp;              logger.error(&quot; search quote list failed, error: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;              return null;</b>
+<b class="nc">&nbsp;            }).join();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean archiveApplicationQuote(QuoteBaseRequest request) {
+<b class="nc">&nbsp;    Quote quote = this</b>
+<b class="nc">&nbsp;            .getQuote(request.getQuoteId(), request.getCustomerId(), request.getAgentId());</b>
+<b class="nc">&nbsp;    quote.setArchived(true);</b>
+<b class="nc">&nbsp;    quote.setUpdateTime(new Date());</b>
+<b class="nc">&nbsp;    return quoteMapper.archiveApplicationQuote(quote) == 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean updateQuotePremium(Quote quote, PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    boolean success = quoteMapper.update(quote) == 1;</b>
+<b class="nc">&nbsp;    if (success) {</b>
+<b class="nc">&nbsp;      String logQut = new Gson().toJson(quote);</b>
+<b class="nc">&nbsp;      logger.trace(&quot;updateQuotePremium quote: {}&quot;, logQut);</b>
+<b class="nc">&nbsp;      String logBeneficiary  = new Gson().toJson(policyBeneficiary);</b>
+<b class="nc">&nbsp;      logger.trace(&quot;updateQuotePremium policyBeneficiary: {}&quot;, logBeneficiary);</b>
+<b class="nc">&nbsp;      premiumService.recordQuoteBeneficiaryPremium(quote, policyBeneficiary);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return success;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String searchQuoteByPolicyId(Integer policyId, String policyNumber) {
+<b class="nc">&nbsp;    return quoteMapper.searchQuoteByPolicyId(policyId, policyNumber);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public boolean createActivedQuoteNotificationTask() {
+<b class="nc">&nbsp;    List&lt;HealthQuote&gt; quoteList = quoteMapper.getQuotesByStatus(PolicyStatus.UNDERWRITING.getValue());</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(quoteList)) {</b>
+<b class="nc">&nbsp;      List&lt;Integer&gt; policyIds = quoteList.stream().map(HealthQuote::getExtPolicyId).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;      Map&lt;Integer, List&lt;Policy&gt;&gt; policyListMap = policyRemote.getBatchPolicyListsById(PolicyIdsRequest.builder().ids(policyIds).build());</b>
+<b class="nc">&nbsp;      if (MapUtils.isNotEmpty(policyListMap)) {</b>
+<b class="nc">&nbsp;        quoteList.forEach(healthQuote -&gt; {</b>
+<b class="nc">&nbsp;          if (CollectionUtils.isNotEmpty(policyListMap.get(healthQuote.getExtPolicyId()))) {</b>
+<b class="nc">&nbsp;            Quote quote = quoteMapper.getQuote(healthQuote.getId(), healthQuote.getCustomerId(), healthQuote.getAgentId());</b>
+<b class="nc">&nbsp;            quote.setStatus(PolicyStatus.LIVE.getValue());</b>
+<b class="nc">&nbsp;            quote.setUpdateTime(new Date());</b>
+<b class="nc">&nbsp;            boolean success = quoteMapper.update(quote) == 1;</b>
+<b class="nc">&nbsp;            if (success) {</b>
+<b class="nc">&nbsp;              String productName = ProductEnum.getById(healthQuote.getProductId()).getValue();</b>
+<b class="nc">&nbsp;              String customerFirstName =  StringUtils.isNotBlank(healthQuote.getFirstName()) ? healthQuote.getFirstName() : &quot;Customer&quot;;</b>
+<b class="nc">&nbsp;              String text = notificationMessageBuilder.getMessage(&quot;SMS_MESSAGE_POLICY_ACTIVE&quot;,customerFirstName, productName, healthQuote.getExtPolicyNumber());</b>
+<b class="nc">&nbsp;              Date today = new Date();</b>
+<b class="nc">&nbsp;              PolicyNotificationTask task = PolicyNotificationTask.builder()</b>
+<b class="nc">&nbsp;                      .text(text)</b>
+<b class="nc">&nbsp;                      .destination(healthQuote.getPhoneNumber())</b>
+<b class="nc">&nbsp;                      .type(NotificationType.SMS.getValue())</b>
+<b class="nc">&nbsp;                      .subtype(SMSTaskTypeEnum.ACTIVE.getValue())</b>
+<b class="nc">&nbsp;                      .status(TaskStatusEnum.PENDING.getValue())</b>
+<b class="nc">&nbsp;                      .failureNumber(0)</b>
+<b class="nc">&nbsp;                      .policyNumber(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;                      .scheduleTime(today)</b>
+<b class="nc">&nbsp;                      .createTime(today)</b>
+<b class="nc">&nbsp;                      .build();</b>
+<b class="nc">&nbsp;              policySMSEventPublisher.publishTask(task);</b>
+&nbsp;            }
+&nbsp;          }
+<b class="nc">&nbsp;        });</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    }
+<b class="nc">&nbsp;    return false;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public byte[] downloadQuote(HealthQuoteDownloadRequest request) throws IOException, TemplateException {
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    Customer customer = customerService.getCustomer(request.getCustomerId());</b>
+<b class="nc">&nbsp;    Quote quote = quoteMapper.getQuoteByCode(customerId, request.getQuoteCode());</b>
+<b class="nc">&nbsp;    StringWriter stringWriter = new StringWriter();</b>
+<b class="nc">&nbsp;    Map&lt;String, Object&gt; model = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    model.put(&quot;holderName&quot;, customer.getFirstName().toUpperCase() + &quot; &quot; + customer.getLastName().toUpperCase());</b>
+<b class="nc">&nbsp;    String quoteNumber = (quote.getCode() != null &amp;&amp; !quote.getCode().isEmpty()) ? quote.getCode() : &quot;N/A&quot;;</b>
+<b class="nc">&nbsp;    model.put(&quot;quoteNumber&quot;, quoteNumber);</b>
+<b class="nc">&nbsp;    model.put(&quot;dateOfBirth&quot;,&quot;N/A&quot;);</b>
+<b class="nc">&nbsp;    if(customer.getDateOfBirth() != null) {</b>
+<b class="nc">&nbsp;      model.put(&quot;dateOfBirth&quot;, new SimpleDateFormat(&quot;dd/MM/yyyy&quot;).format(customer.getDateOfBirth()));</b>
+&nbsp;    }
+<b class="nc">&nbsp;    populateDependantDetails(model, customer.getSpouseSummary(), customer.getChildrenSummary());</b>
+<b class="nc">&nbsp;    model.put(&quot;benefitValues&quot;, populateBenefitDetails(quote));</b>
+<b class="nc">&nbsp;    model.put(&quot;premium&quot;, quote.getPremium().getTotalPremium());</b>
+<b class="nc">&nbsp;    model.put(&quot;travel&quot;, &quot;Not Selected&quot;);</b>
+<b class="nc">&nbsp;    if (quote.getBenefit().getTravelInsurance() != null &amp;&amp; quote.getBenefit().getTravelInsurance() &gt; 0) {</b>
+<b class="nc">&nbsp;      model.put(&quot;travel&quot;, &quot;YES&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    populateAgentDetails(model,customer);</b>
+<b class="nc">&nbsp;    Template temp = configuration.getTemplate(&quot;download_quote_pdf_template.ftlh&quot;);</b>
+<b class="nc">&nbsp;    temp.process(model, stringWriter);</b>
+<b class="nc">&nbsp;    String template = stringWriter.getBuffer().toString();</b>
+<b class="nc">&nbsp;    ByteArrayOutputStream target = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;    HtmlConverter.convertToPdf(template, target);</b>
+<b class="nc">&nbsp;    byte[] bytes = target.toByteArray();</b>
+<b class="nc">&nbsp;    return Base64.getEncoder().encode(bytes);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void populateDependantDetails(Map&lt;String, Object&gt; model,Dependant dependant, Children children){
+<b class="nc">&nbsp;    model.put(&quot;isSpouse&quot;, &quot;NO&quot;);</b>
+<b class="nc">&nbsp;    model.put(&quot;spouseDateOfBirth&quot;, &quot;N/A&quot;);</b>
+<b class="nc">&nbsp;    if(dependant != null) {</b>
+<b class="nc">&nbsp;      model.put(&quot;isSpouse&quot;, &quot;YES&quot;);</b>
+<b class="nc">&nbsp;      if(dependant.getDateOfBirth()!=null) {</b>
+<b class="nc">&nbsp;        String dob = new SimpleDateFormat(&quot;dd/MM/yyyy&quot;).format(dependant.getDateOfBirth());</b>
+<b class="nc">&nbsp;        model.put(&quot;spouseDateOfBirth&quot;, dob);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    model.put(&quot;noOfChildren&quot;, &quot;0&quot;);</b>
+<b class="nc">&nbsp;    if(children != null) {</b>
+<b class="nc">&nbsp;      model.put(&quot;noOfChildren&quot;, children.getCount());</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  public void populateAgentDetails(Map&lt;String, Object&gt; model, Customer customer) {
+<b class="nc">&nbsp;    model.put(AGENT_NAME, &quot;N/A&quot;);</b>
+<b class="nc">&nbsp;    model.put(AGENT_BRANCH, &quot;N/A&quot;);</b>
+<b class="nc">&nbsp;    if(customer.getAgentId() != null) {</b>
+<b class="nc">&nbsp;      Intermediary intermediary = intermediaryService.getIntermediary(customer.getAgentId());</b>
+<b class="nc">&nbsp;      if (intermediary != null) {</b>
+<b class="nc">&nbsp;        model.put(AGENT_NAME, intermediary.getFirstName().toUpperCase() + &quot; &quot; + intermediary.getLastName().toUpperCase());</b>
+<b class="nc">&nbsp;        String agentBranch = (intermediary.getBranchName() != null &amp;&amp; !intermediary.getBranchName().isEmpty()) ? intermediary.getBranchName().toUpperCase() : &quot;N/A&quot;;</b>
+<b class="nc">&nbsp;        model.put(AGENT_BRANCH, agentBranch);</b>
+&nbsp;      }}
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  public Benefit populateBenefitDetails(Quote quote){
+<b class="nc">&nbsp;    return Benefit.builder()</b>
+<b class="nc">&nbsp;            .inpatientLimit(quote.getBenefit().getInpatientLimit() == null ? 0 : quote.getBenefit().getInpatientLimit())</b>
+<b class="nc">&nbsp;            .outpatientLimit(quote.getBenefit().getOutpatientLimit() == null ? 0 : quote.getBenefit().getOutpatientLimit())</b>
+<b class="nc">&nbsp;            .dentalLimit(quote.getBenefit().getDentalLimit() == null ? 0 : quote.getBenefit().getDentalLimit())</b>
+<b class="nc">&nbsp;            .opticalLimit(quote.getBenefit().getOpticalLimit() == null ? 0 : quote.getBenefit().getOpticalLimit())</b>
+<b class="nc">&nbsp;            .maternityLimit(quote.getBenefit().getMaternityLimit() == null ? 0 : quote.getBenefit().getMaternityLimit())</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{
+	"inpatient":[
+		{
+			"benefit": 10000000,
+			"name": "Jamii Plus 10,000,000/= Dazzle per Person"
+		},
+		{
+			"benefit": 5000000,
+			"name": "Jamii Plus 5,000,000/= Brilliant Per Person"
+		},
+		{
+			"benefit": 2000000,
+			"name": "Jamii Plus 2,000,000/= Tosha per Person"
+		},
+		{
+			"benefit": 1000000,
+			"name": "Jamii Plus 1,000,000/= Poa per Person"
+		},
+		{
+			"benefit": 500000,
+			"name": "Jamii Plus 500,000/= Classic Per Person"
+		},
+		{
+			"benefit": 10000000,
+			"name": "Jamii Plus 10,000,000/= Dazzle per Family"
+		},
+		{
+			"benefit": 5000000,
+			"name": "Jamii Plus 5,000,000/= Brilliant Per Family"
+		},
+		{
+			"benefit": 2000000,
+			"name": "Jamii Plus 2,000,000/= Tosha Per Family"
+		},
+		{
+			"benefit": 1000000,
+			"name": "Jamii Plus 1,000,000/= Poa Per Family"
+		},
+		{
+			"benefit": 500000,
+			"name": "Jamii Plus 500,000/= Classic per Family"
+		}
+	],
+	"outpatient": [
+		{
+			"benefit": 50000,
+			"name": "Outpatient 50,000/="
+		},
+		{
+			"benefit": 75000,
+			"name": "Outpatient 75,000/="
+		},
+		{
+			"benefit": 100000,
+			"name": "Outpatient 100,000/="
+		},
+		{
+			"benefit": 150000,
+			"name": "Outpatient 150,000/="
+		}
+	],
+	"maternity": [
+		{
+			"benefit": 50000,
+			"name": "Maternity Kshs.50,000"
+		},
+		{
+			"benefit": 100000,
+			"name": "Maternity Kshs.100,000"
+		},
+		{
+			"benefit": 150000,
+			"name": "Maternity Kshs.150,000"
+		}
+	],
+	"dental": [
+		{
+			"benefit": 30000,
+			"name": "Dental per person 30,000/="
+		},
+		{
+			"benefit": 20000,
+			"name": "Dental per person 20,000/="
+		},
+		{
+			"benefit": 10000,
+			"name": "Dental per person 10,000/="
+		}
+	],
+	"optical": [
+		{
+			"benefit": 10000,
+			"name": "Optical per person 10,000/="
+		},
+		{
+			"benefit": 20000,
+			"name": "Optical per person 20,000/="
+		},
+		{
+			"benefit": 30000,
+			"name": "Optical per person 30,000/="
+		}
+	],
+	"travel": [
+		{
+			"benefit": 1,
+			"name": "TravelBenefit"
+		}
+	]
+}

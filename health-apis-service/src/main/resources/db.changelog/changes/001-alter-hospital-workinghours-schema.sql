@@ -1,0 +1,1 @@
+ALTER TABLE tbl_hospitals ADD working_hours varchar(200);

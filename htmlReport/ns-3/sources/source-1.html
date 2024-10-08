@@ -1,0 +1,291 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BeneficiaryServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: BeneficiaryServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeneficiaryServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeneficiaryServiceImpl$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.lang3.time.DateUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.Customer;
+&nbsp;import ke.co.apollo.health.common.domain.model.Quote;
+&nbsp;import ke.co.apollo.health.common.domain.model.UnderwritingType;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddBeneficiariesToPolicyRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.AddBeneficiariesToPolicyResponse;
+&nbsp;import ke.co.apollo.health.common.enums.DependantRelationship;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.common.utils.HealthDateUtils;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.service.BeneficiaryService;
+&nbsp;import ke.co.apollo.health.service.CustomerService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class BeneficiaryServiceImpl implements BeneficiaryService {</b>
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerService customerService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyRemote policyRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteService quoteService;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean addBeneficiaryToBase(String customerId, String quoteId, Integer policyId,
+&nbsp;      String policyEffectiveDate) {
+<b class="nc">&nbsp;    boolean result = true;</b>
+<b class="nc">&nbsp;    List&lt;Customer&gt; customers = getQuoteBeneficiary(customerId, quoteId);</b>
+<b class="nc">&nbsp;    List&lt;AddBeneficiariesToPolicyRequest&gt; request = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (Customer client : customers) {</b>
+<b class="nc">&nbsp;      if (client.getEntityId() != null) {</b>
+<b class="nc">&nbsp;        AddBeneficiariesToPolicyRequest beneficiary = AddBeneficiariesToPolicyRequest.builder()</b>
+<b class="nc">&nbsp;            .entityId(client.getEntityId().intValue()).joinDate(new Date())</b>
+<b class="nc">&nbsp;            .originalJoinDate(new Date()).policyEffectiveDate(policyEffectiveDate)</b>
+<b class="nc">&nbsp;            .policyId(policyId)</b>
+<b class="nc">&nbsp;            .underwritingType(new UnderwritingType(GlobalConstant.UNDERWRITING_TYPE,</b>
+<b class="nc">&nbsp;                GlobalConstant.UNDERWRITING_TYPE)).build();</b>
+<b class="nc">&nbsp;        request.add(beneficiary);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    List&lt;AddBeneficiariesToPolicyResponse&gt; list = policyRemote.addBeneficiariesToPolicy(request);</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(list)) {</b>
+<b class="nc">&nbsp;      for (AddBeneficiariesToPolicyResponse response : list) {</b>
+<b class="nc">&nbsp;        result = result &amp;&amp; response.getSuccess();</b>
+<b class="nc">&nbsp;      }</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      result = false;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;Customer&gt; getQuoteBeneficiary(String customerId, String quoteId) {
+<b class="nc">&nbsp;    CustomerDetailResponse customerDetail = customerService.getCustomer(</b>
+<b class="nc">&nbsp;        CustomerSearchRequest.builder().customerId(customerId).quoteId(quoteId).build());</b>
+<b class="nc">&nbsp;    if (customerDetail == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Can not find related Customer&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    List&lt;Customer&gt; customers = customerService.getCustomerAndDependants(customerId, quoteId);</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isEmpty(customers)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Can not find related Customer and dependant&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Quote quote = quoteService.getQuote(quoteId, customerId, null);</b>
+<b class="nc">&nbsp;    if (quote != null) {</b>
+<b class="nc">&nbsp;      Iterator&lt;Customer&gt; iterator = customers.listIterator();</b>
+&nbsp;      Customer customer;
+<b class="nc">&nbsp;      int childCount = 0;</b>
+<b class="nc">&nbsp;      int spouseCount = 0;</b>
+<b class="nc">&nbsp;      while (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;        customer = iterator.next();</b>
+<b class="nc">&nbsp;        switch (DependantRelationship.getRelationship(customer.getRelationshipDesc())) {</b>
+&nbsp;          case SPOUSE:
+<b class="nc">&nbsp;            removeUselessDependants(customerDetail, iterator);</b>
+<b class="nc">&nbsp;            spouseCount++;</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;          case MARRIED_CHILD:
+&nbsp;          case UNMARRIED_CHILD:
+<b class="nc">&nbsp;            childCount++;</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;          default:
+<b class="nc">&nbsp;            removeUselessDependants(customerDetail, iterator);</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;        }
+&nbsp;      }
+<b class="nc">&nbsp;      initDependantForPremiumCalculate(customerDetail, customers, childCount, spouseCount);</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Can not find related quote&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return customers;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Add init dependants for premium calculate feature. case 1: Principal user has spouse and spouse
+&nbsp;   * DOB is not null case 2: Principal user child count is not 0 and user haven&#39;t update customer
+&nbsp;   * detail to fulfill children detail yet.
+&nbsp;   */
+&nbsp;  public void initDependantForPremiumCalculate(CustomerDetailResponse customerDetail,
+&nbsp;      List&lt;Customer&gt; customers, int childCount, int spouseCount) {
+<b class="nc">&nbsp;    if (customerDetail.getSpouse() != null &amp;&amp; customerDetail.getSpouse().getDateOfBirth() != null</b>
+<b class="nc">&nbsp;        &amp;&amp; spouseCount == 0 &amp;&amp; !customerDetail.isOnlyChild()) {</b>
+<b class="nc">&nbsp;      customers.add(Customer.builder().relationshipDesc(DependantRelationship.SPOUSE.getValue())</b>
+<b class="nc">&nbsp;          .dateOfBirth(customerDetail.getSpouse().getDateOfBirth()).build());</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (customerDetail.getChildren() != null &amp;&amp; customerDetail.getChildren().getCount() != null) {</b>
+<b class="nc">&nbsp;      int gap = customerDetail.getChildren().getCount() - childCount;</b>
+<b class="nc">&nbsp;      if (gap &gt; 0) {</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; gap; i++) {</b>
+<b class="nc">&nbsp;          customers.add(Customer.builder().relationshipDesc(DependantRelationship.UNMARRIED_CHILD</b>
+<b class="nc">&nbsp;              .getValue()).dateOfBirth(DateUtils.addYears(HealthDateUtils.currentDate(), -1))</b>
+<b class="nc">&nbsp;              .build());</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  public void removeUselessDependants(CustomerDetailResponse customerDetail,
+&nbsp;      Iterator&lt;Customer&gt; iterator) {
+<b class="nc">&nbsp;    if (customerDetail.isOnlyChild()) {</b>
+<b class="nc">&nbsp;      iterator.remove();</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CustomerService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomerService (ke.co.apollo.health.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">CustomerService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import ke.co.apollo.health.common.domain.model.Customer;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerAddPhoneRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerAddSuperIdRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerCreateRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerSuperIdRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.GetCustomerByPhoneNoRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.CustomerCreateResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.GetCustomerInfoResponse;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerAddRequest;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerListRequest;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerUpdateRequest;
+&nbsp;import ke.co.apollo.health.domain.request.DependantAddRequest;
+&nbsp;import ke.co.apollo.health.domain.request.DependantDeleteRequest;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;
+&nbsp;public interface CustomerService {
+&nbsp;
+&nbsp;  String addCustomer(CustomerAddRequest request);
+&nbsp;
+&nbsp;  Integer addDependant(DependantAddRequest request);
+&nbsp;
+&nbsp;  CustomerDetailResponse getCustomer(CustomerSearchRequest request);
+&nbsp;
+&nbsp;  CustomerDetailResponse updateCustomer(CustomerUpdateRequest request);
+&nbsp;
+&nbsp;  int deleteDependant(DependantDeleteRequest request);
+&nbsp;
+&nbsp;  Long addClientAndDependantToBase(String customerId, String quoteId);
+&nbsp;
+&nbsp;  List&lt;Customer&gt; getCustomerAndDependants(String customerId, String quoteId);
+&nbsp;
+&nbsp;  Customer getCustomer(String customerId);
+&nbsp;
+&nbsp;  List&lt;Customer&gt; getCustomerByParentId(String customerId);
+&nbsp;
+&nbsp;  List&lt;Customer&gt; getCustomerList(CustomerListRequest request);
+&nbsp;
+&nbsp;  CustomerCreateResponse createCustomerAndQuote(CustomerCreateRequest request);
+&nbsp;
+&nbsp;  boolean addPhoneForCustomer(CustomerAddPhoneRequest request);
+&nbsp;
+&nbsp;  boolean addSuperCustomerIdForCustomer(CustomerAddSuperIdRequest request);
+&nbsp;
+&nbsp;  GetCustomerInfoResponse getCustomerByPhoneNumber(GetCustomerByPhoneNoRequest request);
+&nbsp;
+&nbsp;  GetCustomerInfoResponse getCustomerByEntityId(Long entityId);
+&nbsp;
+&nbsp;  Customer findBySuperCustomerId(CustomerSuperIdRequest request);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

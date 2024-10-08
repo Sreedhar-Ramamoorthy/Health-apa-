@@ -1,0 +1,172 @@
+{
+	"inpatient": {
+		"person": [
+			{
+				"benefit": 10000000,
+				"name": "Jamii Plus 10,000,000/= Dazzle per Person"
+			},
+			{
+				"benefit": 5000000,
+				"name": "Jamii Plus 5,000,000/= Brilliant Per Person"
+			},
+			{
+				"benefit": 3000000,
+				"name": "Jamii Plus 3,000,000/= Per Person"
+			},
+			{
+				"benefit": 2000000,
+				"name": "Jamii Plus 2,000,000/= Tosha per Person"
+			},
+			{
+				"benefit": 1000000,
+				"name": "Jamii Plus 1,000,000/= Poa per Person"
+			},
+			{
+				"benefit": 500000,
+				"name": "Jamii Plus 500,000/= Classic Per Person"
+			}
+		],
+		"family": [
+			{
+				"benefit": 10000000,
+				"name": "Jamii Plus 10,000,000/= Dazzle per Family"
+			},
+			{
+				"benefit": 5000000,
+				"name": "Jamii Plus 5,000,000/= Brilliant Per Family"
+			},
+			{
+				"benefit": 3000000,
+				"name": "Jamii Plus 3,000,000/= Per Family"
+			},
+			{
+				"benefit": 2000000,
+				"name": "Jamii Plus 2,000,000/= Tosha Per Family"
+			},
+			{
+				"benefit": 1000000,
+				"name": "Jamii Plus 1,000,000/= Poa Per Family"
+			},
+			{
+				"benefit": 500000,
+				"name": "Jamii Plus 500,000/= Classic per Family"
+			}
+		],
+		"childOnly": [
+			{
+				"benefit": 10000000,
+				"name": "Jamii Plus 10,000,000/= Dazzle Child Only"
+			},
+			{
+				"benefit": 5000000,
+				"name": "Jamii Plus 5,000,000/= Brilliant Child Only"
+			},
+			{
+				"benefit": 3000000,
+				"name": "Jamii Plus 3,000,000/= Child Only"
+			},
+			{
+				"benefit": 2000000,
+				"name": "Jamii Plus 2,000,000/= Tosha Child Only"
+			},
+			{
+				"benefit": 1000000,
+				"name": "Jamii Plus 1,000,000/= Child Only"
+			},
+			{
+				"benefit": 500000,
+				"name": "Jamii Plus 500,000/= Classic Child Only"
+			}
+		]
+	},
+	"optionalBenefits": {
+		"outpatient": {
+			"person" : [
+				{
+					"benefit": 50000,
+					"name": "Outpatient 50,000/="
+				},
+				{
+					"benefit": 75000,
+					"name": "Outpatient 75,000/="
+				},
+				{
+					"benefit": 100000,
+					"name": "Outpatient 100,000/="
+				},
+				{
+					"benefit": 150000,
+					"name": "Outpatient 150,000/="
+				},
+				{
+					"benefit": 200000,
+					"name": "Outpatient 200,000/="
+				}
+			],
+			"childOnly": [
+				{
+					"benefit": 50000,
+					"name": "Outpatient 50,000/= Child Only"
+				},
+				{
+					"benefit": 75000,
+					"name": "Outpatient 75,000/= Child Only"
+				},
+				{
+					"benefit": 100000,
+					"name": "Outpatient 100,000/= Child Only"
+				},
+				{
+					"benefit": 150000,
+					"name": "Outpatient 150,000/= Child Only"
+				},
+				{
+					"benefit": 200000,
+					"name": "Outpatient 200,000/= Child Only"
+				}
+			]
+		},
+		"maternity": [
+			{
+				"benefit": 50000,
+				"name": "Maternity Kshs.50,000"
+			},
+			{
+				"benefit": 100000,
+				"name": "Maternity Kshs.100,000"
+			},
+			{
+				"benefit": 150000,
+				"name": "Maternity Kshs.150,000"
+			}
+		],
+		"dental": [
+			{
+				"benefit": 30000,
+				"name": "Dental per person 30,000/="
+			},
+			{
+				"benefit": 20000,
+				"name": "Dental per person 20,000/="
+			},
+			{
+				"benefit": 10000,
+				"name": "Dental per person 10,000/="
+			}
+		],
+		"optical": [
+			{
+				"benefit": 10000,
+				"name": "Optical per person 10,000/="
+			},
+			{
+				"benefit": 20000,
+				"name": "Optical per person 20,000/="
+			},
+			{
+				"benefit": 30000,
+				"name": "Optical per person 30,000/="
+			}
+		]
+	}
+}

@@ -1,0 +1,1093 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProductServiceImplTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: ProductServiceImplTest (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProductServiceImplTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/488)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.*;
+&nbsp;import static org.mockito.BDDMockito.when;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.CommonObjects;
+&nbsp;import ke.co.apollo.health.common.annotation.Enums;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import org.apache.ibatis.annotations.Param;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.junit.jupiter.api.Assertions;
+&nbsp;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.time.DateUtils;
+&nbsp;import ke.co.apollo.health.common.domain.model.PolicyDetail;
+&nbsp;import ke.co.apollo.health.common.domain.model.RenewalPremium;
+&nbsp;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.EnumSource;
+&nbsp;import org.junit.jupiter.params.provider.ValueSource;
+&nbsp;import org.mockito.InjectMocks;
+&nbsp;import org.mockito.Mock;
+&nbsp;import org.mockito.MockitoAnnotations;
+&nbsp;import org.mockito.junit.MockitoJUnitRunner;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.Benefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.Premium;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap;
+&nbsp;import ke.co.apollo.health.common.enums.GenderEnum;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.common.utils.FormatUtils;
+&nbsp;import ke.co.apollo.health.config.PremiumInitializer;
+&nbsp;import ke.co.apollo.health.domain.BenefitPremium;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary.Beneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyClaim;
+&nbsp;import ke.co.apollo.health.service.impl.ProductServiceImpl;
+&nbsp;import static org.mockito.ArgumentMatchers.any;
+&nbsp;import static org.mockito.Mockito.when;
+&nbsp;import static org.mockito.MockitoAnnotations.initMocks;
+&nbsp;import ke.co.apollo.health.service.CustomerService;
+&nbsp;
+<b class="nc">&nbsp;class ProductServiceImplTest {</b>
+&nbsp;
+<b class="nc">&nbsp;  private static Logger logger = LoggerFactory.getLogger(ProductServiceImplTest.class);</b>
+&nbsp;
+&nbsp;  @InjectMocks
+&nbsp;  private ProductServiceImpl productService;
+&nbsp;
+&nbsp;  @Mock
+&nbsp;  ProductPremium productPremium;
+&nbsp;
+&nbsp;  @Mock
+&nbsp;  ProductPremiumMap productPremiumMap;
+&nbsp;
+&nbsp;  @Mock
+&nbsp;  CustomerService customerService;
+&nbsp;
+&nbsp;  private static ProductPremiumMap map;
+&nbsp;
+&nbsp;  private static ProductPremium prodPremium;
+&nbsp;
+&nbsp;  // @BeforeClass
+&nbsp;  // public static void runOnceBeforeClass() {
+&nbsp;  //   PremiumInitializer premiumInitializer = new PremiumInitializer();
+&nbsp;  //   map = premiumInitializer.initProductPremiumMap();
+&nbsp;  //   logger.debug(&quot;productPremiumMap: {}&quot;, map);
+&nbsp;  //   prodPremium = premiumInitializer.initProductPremium();
+&nbsp;  // }
+&nbsp;
+&nbsp;  // @Before
+&nbsp;  // void setUp() {
+&nbsp;  //   logger.debug(&quot;test start---------------------&quot;);
+&nbsp;  //   MockitoAnnotations.initMocks(this);
+&nbsp;  // }
+&nbsp;
+&nbsp;   @BeforeEach
+&nbsp;    void setUpMocks(){
+<b class="nc">&nbsp;        initMocks(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        PremiumInitializer premiumInitializer = new PremiumInitializer();</b>
+<b class="nc">&nbsp;    map = premiumInitializer.initProductPremiumMap();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;productPremiumMap: {}&quot;, map);</b>
+<b class="nc">&nbsp;    prodPremium = premiumInitializer.initProductPremium();</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;  // void testCalculateRenewalPremium() {
+&nbsp;
+&nbsp;  //   // Customer and Dependant
+&nbsp;  //   int principalAge = 55;
+&nbsp;  //   String principalGender = GenderEnum.MALE.getValue();
+&nbsp;  //   int spouseAge = 65;
+&nbsp;  //   String spouseGender = GenderEnum.FEMALE.getValue();
+&nbsp;  //   int childAge[] = new int[]{21, 20};
+&nbsp;
+&nbsp;  //   // Benefit
+&nbsp;  //   int inpatientLimit = 5000000;
+&nbsp;  //   int outpatientLimit = 150000;
+&nbsp;  //   int maternityLimit = 150000;
+&nbsp;  //   int opticalLimit = 30000;
+&nbsp;  //   int dentalLimit = 30000;
+&nbsp;  //   int travelInsurance = 40000;
+&nbsp;
+&nbsp;  //   BigDecimal expectedPremium = BigDecimal.valueOf(452154);
+&nbsp;  //   when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());
+&nbsp;  //   when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());
+&nbsp;
+&nbsp;  //   PolicyBeneficiary policyBeneficiary = this
+&nbsp;  //       .createPolicyBeneficiary(principalAge, principalGender,
+&nbsp;  //           spouseAge, spouseGender, childAge);
+&nbsp;  //   Benefit benefit1 = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,
+&nbsp;  //       opticalLimit, dentalLimit, travelInsurance);
+&nbsp;
+&nbsp;  //   BigDecimal premium1 = productService
+&nbsp;  //       .calculatePremium(policyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1, true);
+&nbsp;  //   logger.debug(&quot;premium1: {}&quot;, premium1);
+&nbsp;  //   Assertions.assertEquals(expectedPremium, premium1);
+&nbsp;
+&nbsp;  //   // renewal premium
+&nbsp;  //   int principalRenewalAge = principalAge + 1;
+&nbsp;  //   int spouseRenewalAge = spouseAge + 1;
+&nbsp;  //   int childRenewaAge[] = new int[]{22, 21};
+&nbsp;  //   PolicyBeneficiary renewalPolicyBeneficiary = this
+&nbsp;  //       .createPolicyBeneficiary(principalRenewalAge, principalGender,
+&nbsp;  //           spouseRenewalAge, spouseGender, childRenewaAge);
+&nbsp;  //   PolicyClaim policyClaim = PolicyClaim.builder().claimsPaid(BigDecimal.valueOf(522846))
+&nbsp;  //       .earnedPremium(BigDecimal.valueOf(522846)).noClaimYear(3).build();
+&nbsp;  //   BigDecimal adjustment = BigDecimal.valueOf(0);
+&nbsp;  //   Premium premium = productService
+&nbsp;  //       .calculateRenewalPremium(renewalPolicyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1,
+&nbsp;  //           policyClaim, adjustment);
+&nbsp;  //   logger.debug(&quot;premium: {}&quot;, premium);
+&nbsp;  //   BigDecimal renewalPremium = BigDecimal.valueOf(610418);
+&nbsp;  //   BigDecimal totalPremium = BigDecimal.valueOf(613166);
+&nbsp;  //   Assertions.assertEquals(renewalPremium, premium.getPremium());
+&nbsp;  //   Assertions.assertEquals(BigDecimal.ZERO, premium.getStampDuty());
+&nbsp;  //   Assertions.assertEquals(FormatUtils.scaleValue(totalPremium),
+&nbsp;  //       FormatUtils.scaleValue(premium.getTotalPremium()));
+&nbsp;  // }
+&nbsp;
+&nbsp;  // void testCalculateChildrenOnlyPremium() {
+&nbsp;
+&nbsp;  //   // Customer and Dependant
+&nbsp;  //   int principalAge = -1;
+&nbsp;  //   String principalGender = GenderEnum.MALE.getValue();
+&nbsp;  //   int spouseAge = -1;
+&nbsp;  //   String spouseGender = GenderEnum.FEMALE.getValue();
+&nbsp;  //   int childAge[] = new int[]{21, 20};
+&nbsp;
+&nbsp;  //   // Benefit
+&nbsp;  //   int inpatientLimit = 5000000;
+&nbsp;  //   int outpatientLimit = 150000;
+&nbsp;  //   int maternityLimit = 150000;
+&nbsp;  //   int opticalLimit = 30000;
+&nbsp;  //   int dentalLimit = 30000;
+&nbsp;  //   int travelInsurance = 40000;
+&nbsp;
+&nbsp;  //   BigDecimal expectedPremium = BigDecimal.valueOf(151421);
+&nbsp;  //   when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());
+&nbsp;  //   when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());
+&nbsp;
+&nbsp;  //   PolicyBeneficiary policyBeneficiary = this
+&nbsp;  //       .createPolicyBeneficiary(principalAge, principalGender,
+&nbsp;  //           spouseAge, spouseGender, childAge);
+&nbsp;  //   Benefit benefit1 = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,
+&nbsp;  //       opticalLimit, dentalLimit, travelInsurance);
+&nbsp;
+&nbsp;  //   BigDecimal premium1 = productService
+&nbsp;  //       .calculatePremium(policyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1, false);
+&nbsp;  //   logger.debug(&quot;premium1: {}&quot;, premium1);
+&nbsp;  //   Assertions.assertEquals(expectedPremium, premium1);
+&nbsp;
+&nbsp;  //   // renewal premium
+&nbsp;  //   int principalRenewalAge = principalAge + 1;
+&nbsp;  //   int spouseRenewalAge = spouseAge + 1;
+&nbsp;  //   int childRenewaAge[] = new int[]{22, 21};
+&nbsp;  //   PolicyBeneficiary renewalPolicyBeneficiary = this
+&nbsp;  //       .createPolicyBeneficiary(principalRenewalAge, principalGender,
+&nbsp;  //           spouseRenewalAge, spouseGender, childRenewaAge);
+&nbsp;  //   PolicyClaim policyClaim = PolicyClaim.builder().claimsPaid(BigDecimal.valueOf(22846))
+&nbsp;  //       .earnedPremium(BigDecimal.valueOf(22846)).noClaimYear(3).build();
+&nbsp;  //   BigDecimal adjustment = BigDecimal.valueOf(9.123);
+&nbsp;  //   Premium premium = productService
+&nbsp;  //       .calculateRenewalPremium(renewalPolicyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1,
+&nbsp;  //           policyClaim, adjustment);
+&nbsp;  //   logger.debug(&quot;premium: {}&quot;, premium);
+&nbsp;  //   BigDecimal renewalPremium = BigDecimal.valueOf(224221);
+&nbsp;  //   BigDecimal totalPremium = BigDecimal.valueOf(225231);
+&nbsp;  //   Assertions.assertEquals(renewalPremium, premium.getPremium());
+&nbsp;  //   Assertions.assertEquals(BigDecimal.ZERO, premium.getStampDuty());
+&nbsp;  //   Assertions.assertEquals(FormatUtils.scaleValue(totalPremium),
+&nbsp;  //       FormatUtils.scaleValue(premium.getTotalPremium()));
+&nbsp;  // }
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusSharedPremiumWhenAllOptionsAreSelected() {
+&nbsp;
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{20, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.createPolicyBeneficiary(</b>
+&nbsp;            principalAge, principalGender, spouseAge, spouseGender, childAge
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(548087);</b>
+&nbsp;
+<b class="nc">&nbsp;     when(productPremiumMap.getJamiiPlusSharedMap()).thenReturn(map.getJamiiPlusSharedMap());</b>
+<b class="nc">&nbsp;     when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;     when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;     BigDecimal actualPremium = productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;             ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;     assertEquals(expectedPremium, actualPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusSharedPremiumWhenTravelIsExcluded() {
+&nbsp;
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{20, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 0;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.createPolicyBeneficiary(</b>
+&nbsp;            principalAge, principalGender, spouseAge, spouseGender, childAge
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(548087);</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusSharedMap()).thenReturn(map.getJamiiPlusSharedMap());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal actualPremium = productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;            ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedPremium, actualPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testThatBusinessExceptionIsThrownIfPolicyBeneficiaryIsNull() {
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = new PolicyBeneficiary();</b>
+<b class="nc">&nbsp;    Benefit benefit = new Benefit();</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusSharedMap()).thenReturn(map.getJamiiPlusSharedMap());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    Exception exception = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="nc">&nbsp;      productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;              ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+<b class="nc">&nbsp;    });</b>
+&nbsp;
+<b class="nc">&nbsp;    String expectedMessage = &quot;no beneficiary&quot;;</b>
+<b class="nc">&nbsp;    String actualMessage = exception.getMessage();</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedMessage, actualMessage);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @ParameterizedTest
+&nbsp;  @ValueSource(ints = {20, 81})
+&nbsp;  void testThatBusinessExceptionIsThrownWhenPrincipalIsTwentyOneOrAboveEightyYears(int age) {
+<b class="nc">&nbsp;    int principalAge = age;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 25;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+<b class="nc">&nbsp;    String expectedMessage = &quot;principal must be between 21 and 80 years old&quot;;</b>
+<b class="nc">&nbsp;    Benefit benefit = new Benefit();</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+&nbsp;
+<b class="nc">&nbsp;    Exception exception = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="nc">&nbsp;      productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;              ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+<b class="nc">&nbsp;    });</b>
+<b class="nc">&nbsp;    String actualMessage = exception.getMessage();</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedMessage,actualMessage);</b>
+<b class="nc">&nbsp;   }</b>
+&nbsp;
+&nbsp;  @ParameterizedTest
+&nbsp;  @ValueSource(ints = {20, 81})
+&nbsp;  void testThatBusinessExceptionIsThrownWhenSpouseIsBelowTwentyOneOrAboveEightyYears(int age) {
+<b class="nc">&nbsp;    int principalAge = 35;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = age;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+<b class="nc">&nbsp;    String expectedMessage = &quot;spouse must be between 21 and 80 years old&quot;;</b>
+<b class="nc">&nbsp;    Benefit benefit = new Benefit();</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+&nbsp;
+<b class="nc">&nbsp;    Exception exception = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="nc">&nbsp;      productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;              ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+<b class="nc">&nbsp;    });</b>
+<b class="nc">&nbsp;    String actualMessage = exception.getMessage();</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedMessage,actualMessage);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @ParameterizedTest
+&nbsp;  @ValueSource(ints = {-1, 81})
+&nbsp;  void testCalculateJamiiPlusSharedPremiumThatBusinessExceptionIsThrownWhenChildlIsBelowTwentyOneOrAboveEightyYears(int age) {
+<b class="nc">&nbsp;    int principalAge = 35;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 35;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{age, age};</b>
+&nbsp;
+<b class="nc">&nbsp;    String expectedMessage = &quot;child must be between 1 and 80 years old&quot;;</b>
+<b class="nc">&nbsp;    Benefit benefit = new Benefit();</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+&nbsp;
+<b class="nc">&nbsp;    Exception exception = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="nc">&nbsp;      productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;              ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+<b class="nc">&nbsp;    });</b>
+<b class="nc">&nbsp;    String actualMessage = exception.getMessage();</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedMessage,actualMessage);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusSharedPremiumWhenSpouseIsNull() {
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{19, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+<b class="nc">&nbsp;    policyBeneficiary.setSpouse(null);</b>
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(353309);</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusSharedMap()).thenReturn(map.getJamiiPlusSharedMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal actualPremium = productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;              ProductEnum.JAMIIPLUS_SHARED.getId(), benefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedPremium,actualPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusPremiumWhenPrincipalAndSpouseAreAbsent() {
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{19, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+<b class="nc">&nbsp;    policyBeneficiary.setSpouse(null);</b>
+<b class="nc">&nbsp;    policyBeneficiary.setPrincipal(null);</b>
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(197616);</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getChildOnlyCoverMap()).thenReturn(map.getChildOnlyCoverMap());</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal actualPremium = productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;            ProductEnum.JAMIIPLUS.getId(), benefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedPremium,actualPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusPremiumWhenPrincipalIsAbsentAndSpouseIsPresent() {
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{19, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+<b class="nc">&nbsp;    String expectedMessage = &quot;no principal&quot;;</b>
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+<b class="nc">&nbsp;    policyBeneficiary.setPrincipal(null);</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    Exception exception = assertThrows(BusinessException.class, () -&gt;{</b>
+<b class="nc">&nbsp;      productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;                      ProductEnum.JAMIIPLUS.getId(), benefit, false);</b>
+<b class="nc">&nbsp;            });</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedMessage,exception.getMessage());</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusPremiumWhenSpouseIsNull() {
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{19, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;            .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+<b class="nc">&nbsp;    policyBeneficiary.setSpouse(null);</b>
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(353309);</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal actualPremium = productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;            ProductEnum.JAMIIPLUS.getId(), benefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedPremium,actualPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculateJamiiPlusPremiumWhenTravelIsExcluded() {
+&nbsp;
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{20, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 0;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.createPolicyBeneficiary(</b>
+&nbsp;            principalAge, principalGender, spouseAge, spouseGender, childAge
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    Benefit benefit = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(566312);</b>
+&nbsp;
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusSharedMap()).thenReturn(map.getJamiiPlusSharedMap());</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal actualPremium = productService.calculatePremium(policyBeneficiary,</b>
+<b class="nc">&nbsp;            ProductEnum.JAMIIPLUS.getId(), benefit, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    assertEquals(expectedPremium, actualPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium1() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 55;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int spouseAge = 65;</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(522846);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,spouseAge, spouseGender, childAge);</b>
+<b class="nc">&nbsp;    Benefit benefit1 = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,opticalLimit, dentalLimit, travelInsurance);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium1 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium1: {}&quot;, premium1);</b>
+&nbsp;    // Assertions.assertEquals(expectedPremium, premium1);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;    // this.assertPolicyPremiums(policyBeneficiary);
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private void assertPolicyPremiums(PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    logger.debug(&quot;policyBeneficiary: {}&quot;, policyBeneficiary);</b>
+<b class="nc">&nbsp;    this.assertBenefitPremiums(policyBeneficiary.getPrincipal().getBenefitPremiums());</b>
+<b class="nc">&nbsp;    this.assertBenefitPremiums(policyBeneficiary.getSpouse().getBenefitPremiums());</b>
+<b class="nc">&nbsp;    for (Beneficiary beneficiary : policyBeneficiary.getChildren()) {</b>
+<b class="nc">&nbsp;      this.assertBenefitPremiums(beneficiary.getBenefitPremiums());</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private void assertBenefitPremiums(List&lt;BenefitPremium&gt; benefitPremiums) {
+<b class="nc">&nbsp;    Assertions.assertNotNull(benefitPremiums);</b>
+<b class="nc">&nbsp;    for (BenefitPremium benefitPremium : benefitPremiums) {</b>
+<b class="nc">&nbsp;      Assertions.assertNotNull(benefitPremium.getBenefitLimit());</b>
+<b class="nc">&nbsp;      Assertions.assertNotNull(benefitPremium.getBenefitType());</b>
+<b class="nc">&nbsp;      Assertions.assertNotNull(benefitPremium.getPremium());</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium1min() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 80;</b>
+<b class="nc">&nbsp;    int spouseAge = 76;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 500000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 50000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 50000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 10000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 10000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(291780);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit1 = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit,</b>
+&nbsp;        opticalLimit, dentalLimit, travelInsurance);
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium1 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium1: {}&quot;, premium1);</b>
+&nbsp;    //Assertions.assertEquals(expectedPremium, premium1);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium1max() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 35;</b>
+<b class="nc">&nbsp;    int spouseAge = 43;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{6};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 10000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 150000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 150000;</b>
+<b class="nc">&nbsp;    int opticalLimit = 30000;</b>
+<b class="nc">&nbsp;    int dentalLimit = 30000;</b>
+<b class="nc">&nbsp;    int travelInsurance = 40000;</b>
+&nbsp;
+&nbsp;//    BigDecimal expectedPremium = BigDecimal.valueOf(552846);
+<b class="nc">&nbsp;    when(productPremiumMap.getJamiiPlusMap()).thenReturn(map.getJamiiPlusMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.createPolicyBeneficiary(principalAge, principalGender, spouseAge, spouseGender, childAge);</b>
+<b class="nc">&nbsp;    Benefit benefit1 = createBenefit1(inpatientLimit, outpatientLimit, maternityLimit, opticalLimit, dentalLimit, travelInsurance);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium1 = productService.calculatePremium(policyBeneficiary, ProductEnum.JAMIIPLUS.getId(), benefit1, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium1: {}&quot;, premium1);</b>
+&nbsp;    //Assertions.assertEquals(new BigDecimal(332175), premium1);
+<b class="nc">&nbsp;    Assertions.assertNotNull(premium1);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium2() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 50;</b>
+<b class="nc">&nbsp;    int spouseAge = 50;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 1000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 100000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 100000;</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(332175);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getAfyaNafuuMap()).thenReturn(map.getAfyaNafuuMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit2 = createBenefit2(inpatientLimit, outpatientLimit, maternityLimit);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium2 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.AFYANAFUU.getId(), benefit2, false);</b>
+&nbsp;
+&nbsp;    //Assertions.assertEquals(expectedPremium, premium2);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium2min() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 75;</b>
+<b class="nc">&nbsp;    int spouseAge = 70;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 100000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 30000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 50000;</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(69280);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getAfyaNafuuMap()).thenReturn(map.getAfyaNafuuMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit2 = createBenefit2(inpatientLimit, outpatientLimit, maternityLimit);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium2 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.AFYANAFUU.getId(), benefit2, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium2: {}&quot;, premium2);</b>
+&nbsp;    // Assertions.assertEquals(expectedPremium, premium2);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium2max() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 75;</b>
+<b class="nc">&nbsp;    int spouseAge = 70;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int inpatientLimit = 1000000;</b>
+<b class="nc">&nbsp;    int outpatientLimit = 100000;</b>
+<b class="nc">&nbsp;    int maternityLimit = 100000;</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(231717);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getAfyaNafuuMap()).thenReturn(map.getAfyaNafuuMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit2 = createBenefit2(inpatientLimit, outpatientLimit, maternityLimit);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium2 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.AFYANAFUU.getId(), benefit2, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium2: {}&quot;, premium2);</b>
+&nbsp;    //Assertions.assertEquals(expectedPremium, premium2);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium3() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 50;</b>
+<b class="nc">&nbsp;    int spouseAge = 45;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{21, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int principalLimit = 500000;</b>
+<b class="nc">&nbsp;    int spouseLimit = 250000;</b>
+<b class="nc">&nbsp;    int childLimit[] = new int[]{500000, 250000};</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(7900);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getFeminaMap()).thenReturn(map.getFeminaMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit3 = createBenefit3(principalLimit, spouseLimit, childLimit);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium3 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.FEMINA.getId(), benefit3, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium3: {}&quot;, premium3);</b>
+&nbsp;    // Assertions.assertEquals(expectedPremium, premium3);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium3min() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 80;</b>
+<b class="nc">&nbsp;    int spouseAge = 39;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{29, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int principalLimit = 250000;</b>
+<b class="nc">&nbsp;    int spouseLimit = 250000;</b>
+<b class="nc">&nbsp;    int childLimit[] = new int[]{250000, 250000};</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(4550);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getFeminaMap()).thenReturn(map.getFeminaMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit3 = createBenefit3(principalLimit, spouseLimit, childLimit);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium3 = productService</b>
+<b class="nc">&nbsp;        .calculatePremium(policyBeneficiary, ProductEnum.FEMINA.getId(), benefit3, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium3: {}&quot;, premium3);</b>
+&nbsp;    // Assertions.assertEquals(expectedPremium, premium3);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void testCalculatePremium3max() {
+&nbsp;
+&nbsp;    // Customer and Dependant
+<b class="nc">&nbsp;    int principalAge = 80;</b>
+<b class="nc">&nbsp;    int spouseAge = 39;</b>
+<b class="nc">&nbsp;    String principalGender = GenderEnum.MALE.getValue();</b>
+<b class="nc">&nbsp;    String spouseGender = GenderEnum.FEMALE.getValue();</b>
+<b class="nc">&nbsp;    int childAge[] = new int[]{29, 20};</b>
+&nbsp;
+&nbsp;    // Benefit
+<b class="nc">&nbsp;    int principalLimit = 500000;</b>
+<b class="nc">&nbsp;    int spouseLimit = 500000;</b>
+<b class="nc">&nbsp;    int childLimit[] = new int[]{500000, 500000};</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal expectedPremium = BigDecimal.valueOf(8900);</b>
+<b class="nc">&nbsp;    when(productPremiumMap.getFeminaMap()).thenReturn(map.getFeminaMap());</b>
+<b class="nc">&nbsp;    when(productPremium.getHealth()).thenReturn(prodPremium.getHealth());</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this</b>
+<b class="nc">&nbsp;        .createPolicyBeneficiary(principalAge, principalGender,</b>
+&nbsp;            spouseAge, spouseGender, childAge);
+<b class="nc">&nbsp;    Benefit benefit3 = createBenefit3(principalLimit, spouseLimit, childLimit);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premium3 = productService.calculatePremium(policyBeneficiary, ProductEnum.FEMINA.getId(), benefit3, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;premium3: {}&quot;, premium3);</b>
+&nbsp;    // Assertions.assertEquals(expectedPremium, premium3);
+<b class="nc">&nbsp;    Assertions.assertNotNull(expectedPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;  private PolicyBeneficiary createPolicyBeneficiary(int principalAge, String principalGender,
+&nbsp;      int spouseAge, String spouseGender, int[] childAge) {
+<b class="nc">&nbsp;    Beneficiary principal = null;</b>
+<b class="nc">&nbsp;    Beneficiary spouse = null;</b>
+<b class="nc">&nbsp;    if (principalAge &gt; 0) {</b>
+<b class="nc">&nbsp;      principal = Beneficiary.builder().age(principalAge).gender(principalGender).build();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (spouseAge &gt; 0) {</b>
+<b class="nc">&nbsp;      spouse = Beneficiary.builder().age(spouseAge).gender(spouseGender).build();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; children = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    if (childAge.length &gt; 0) {</b>
+<b class="nc">&nbsp;      for (int i = 0; i &lt; childAge.length; i++) {</b>
+<b class="nc">&nbsp;        children.add(Beneficiary.builder().age(childAge[i]).build());</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return PolicyBeneficiary.builder().id(&quot;JUnitTest&quot;).principal(principal).spouse(spouse)</b>
+<b class="nc">&nbsp;        .children(children)</b>
+<b class="nc">&nbsp;        .build();</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private Benefit createBenefit1(int inpatientLimit, int outpatientLimit, int maternityLimit,
+&nbsp;      int opticalLimit, int dentalLimit, int travelInsurance) {
+<b class="nc">&nbsp;    Benefit benefit1 = new Benefit();</b>
+<b class="nc">&nbsp;    benefit1.setInpatientLimit(inpatientLimit);</b>
+<b class="nc">&nbsp;    benefit1.setOutpatientLimit(outpatientLimit);</b>
+<b class="nc">&nbsp;    benefit1.setMaternityLimit(maternityLimit);</b>
+<b class="nc">&nbsp;    benefit1.setOpticalLimit(opticalLimit);</b>
+<b class="nc">&nbsp;    benefit1.setDentalLimit(dentalLimit);</b>
+<b class="nc">&nbsp;    benefit1.setTravelInsurance(travelInsurance);</b>
+<b class="nc">&nbsp;    return benefit1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Benefit createBenefit2(int inpatientLimit, int outpatientLimit, int maternityLimit) {
+<b class="nc">&nbsp;    Benefit benefit2 = new Benefit();</b>
+<b class="nc">&nbsp;    benefit2.setInpatientLimit(inpatientLimit);</b>
+<b class="nc">&nbsp;    benefit2.setOutpatientLimit(outpatientLimit);</b>
+<b class="nc">&nbsp;    benefit2.setMaternityLimit(maternityLimit);</b>
+<b class="nc">&nbsp;    return benefit2;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Benefit createBenefit3(int principalLimit, int spouseLimit, int[] childLimit) {
+<b class="nc">&nbsp;    Benefit benefit3 = new Benefit();</b>
+<b class="nc">&nbsp;    benefit3.setPrincipal(principalLimit);</b>
+<b class="nc">&nbsp;    benefit3.setSpouse(spouseLimit);</b>
+<b class="nc">&nbsp;    if (childLimit.length &gt; 0) {</b>
+<b class="nc">&nbsp;      benefit3.setChildren(Arrays.stream(childLimit).boxed().collect(Collectors.toList()));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return benefit3;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void calcRenewPremiumByTotalPremiumTest() {
+<b class="nc">&nbsp;    PolicyDetail policyDetail = PolicyDetail.builder()</b>
+<b class="nc">&nbsp;                  .totalPremium(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                  .productId(1)</b>
+<b class="nc">&nbsp;                  .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        RenewalPremium ren = productService.calcRenewPremiumByTotalPremium(</b>
+<b class="nc">&nbsp;                PolicyBeneficiary.builder().build(),</b>
+&nbsp;                policyDetail,
+<b class="nc">&nbsp;                Benefit.builder().build(),</b>
+<b class="nc">&nbsp;                PolicyClaim.builder().claimsPaid(new BigDecimal(10)).build(),</b>
+&nbsp;                new BigDecimal(10)
+&nbsp;              );
+&nbsp;
+<b class="nc">&nbsp;      Assertions.assertNotNull(ren);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void calculateRenewalPremiumTest() {
+<b class="nc">&nbsp;    PolicyBeneficiary pb = PolicyBeneficiary.builder().build();</b>
+<b class="nc">&nbsp;    Benefit benefit = Benefit.builder().build();</b>
+<b class="nc">&nbsp;    PolicyClaim pc = PolicyClaim.builder()</b>
+<b class="nc">&nbsp;                    .claimsPaid(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                    .earnedPremium(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                    .build();</b>
+&nbsp;
+<b class="nc">&nbsp;    RenewalPremium ren = productService.calculateRenewalPremium(pb,1,benefit, pc, new BigDecimal(1));</b>
+<b class="nc">&nbsp;    Assertions.assertNotNull(ren);</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;  @Test
+&nbsp;  void calcRenewPremiumByTotalPremiumForComingWorkerTest() {
+&nbsp;
+<b class="nc">&nbsp;        PolicyBeneficiary policyBeneficiary = PolicyBeneficiary.builder().build();</b>
+<b class="nc">&nbsp;        PolicyDetail policyDetail = PolicyDetail.builder()</b>
+<b class="nc">&nbsp;                          .totalPremium(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                          .productId(1)</b>
+<b class="nc">&nbsp;                          .build();</b>
+<b class="nc">&nbsp;        Benefit benefit = Benefit.builder().build();</b>
+<b class="nc">&nbsp;        PolicyClaim policyClaim = PolicyClaim.builder()</b>
+<b class="nc">&nbsp;                        .claimsPaid(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                        .earnedPremium(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;
+&nbsp;    
+<b class="nc">&nbsp;        RenewalPremium ren = productService.calcRenewPremiumByTotalPremiumForComingWorker(policyBeneficiary,policyDetail, benefit, policyClaim, new BigDecimal(1));</b>
+<b class="nc">&nbsp;        Assertions.assertNotNull(ren);</b>
+&nbsp;
+<b class="nc">&nbsp;      }</b>
+&nbsp;
+&nbsp;  @ParameterizedTest
+&nbsp;  @EnumSource(ProductEnum.class)
+&nbsp;  void testCreateDefaultBenefit(ProductEnum productEnum) {
+<b class="nc">&nbsp;    CustomerDetailResponse customerDetailResponse = CommonObjects.customerDetailResponse;</b>
+&nbsp;
+<b class="nc">&nbsp;    Benefit expectedBenefit = productService.createDefaultBenefit(customerDetailResponse, productEnum);</b>
+&nbsp;
+<b class="nc">&nbsp;    assertNotNull(expectedBenefit);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

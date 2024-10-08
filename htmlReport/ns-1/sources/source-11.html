@@ -1,0 +1,1609 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProductServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: ProductServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProductServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/268)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/937)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import static java.lang.Double.MAX_VALUE;
+&nbsp;import static ke.co.apollo.health.common.constants.GlobalConstant.STAMP_DUTY;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.math.RoundingMode;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import ke.co.apollo.health.domain.request.JamiiPlusSetupRequest;
+&nbsp;import ke.co.apollo.health.domain.response.JamiiPlusSetupResponse;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.collections4.map.MultiKeyMap;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.Benefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.DefaultBenefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.DefaultBenefit.AfyaNafuuBenefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.DefaultBenefit.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.DependantBenefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.PolicyDetail;
+&nbsp;import ke.co.apollo.health.common.domain.model.Premium;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium.Health;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium.Health.AfyaNafuu;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium.Health.Femina;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium.Health.JamiiPlus;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium.Health.JamiiPlus.Permium;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap.JamiiPlusSharedMap;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap.AfyaNafuuMap;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap.FeminaMap;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap.InpatientMap;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap.JamiiPlusMap;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremiumMap.JamiiPlusChildOnlyCoverMap;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.RenewalPremium;
+&nbsp;import ke.co.apollo.health.common.enums.BenefitEnum;
+&nbsp;import ke.co.apollo.health.common.enums.GenderEnum;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.common.utils.FormatUtils;
+&nbsp;import ke.co.apollo.health.common.utils.ProductUtils;
+&nbsp;import ke.co.apollo.health.domain.BenefitPremium;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary.Beneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyClaim;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.service.CustomerService;
+&nbsp;import ke.co.apollo.health.service.ProductService;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class ProductServiceImpl implements ProductService {</b>
+&nbsp;
+&nbsp;  public static final String LOADING_PERCENT = &quot;loadingPercent: {}&quot;;
+<b class="nc">&nbsp;  private Logger logger = LoggerFactory.getLogger(getClass());</b>
+&nbsp;
+<b class="nc">&nbsp;  Gson g = new Gson();</b>
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  ProductPremium productPremium;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  ProductPremiumMap productPremiumMap;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerService customerService;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public ProductPremium getProductPremium() {
+<b class="nc">&nbsp;    return productPremium;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Premium calculateTotalPremium(BigDecimal premium, boolean isNewPolicy) {
+<b class="nc">&nbsp;    BigDecimal itl = ProductUtils.calculateITL(premium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;itl : {}&quot;, itl);</b>
+<b class="nc">&nbsp;    BigDecimal phcf = ProductUtils.calculatePHCF(premium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;phcf : {}&quot;, phcf);</b>
+<b class="nc">&nbsp;    BigDecimal stampDuty = BigDecimal.ZERO;</b>
+<b class="nc">&nbsp;    if (isNewPolicy) {</b>
+<b class="nc">&nbsp;      stampDuty = STAMP_DUTY;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    BigDecimal totalPremium = FormatUtils.scaleValue(premium.add(itl).add(phcf).add(stampDuty));</b>
+<b class="nc">&nbsp;    logger.info(&quot;totalPremium without travel: {}&quot;, totalPremium);</b>
+<b class="nc">&nbsp;    return Premium.builder().premium(premium).itl(itl).phcf(phcf).stampDuty(stampDuty)</b>
+<b class="nc">&nbsp;        .totalPremium(totalPremium)</b>
+<b class="nc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public BigDecimal calculatePremium(PolicyBeneficiary policyBeneficiary, Integer productId,
+&nbsp;      Benefit benefit, boolean renewal ) {
+<b class="nc">&nbsp;    BigDecimal totalPremium = BigDecimal.ZERO;</b>
+&nbsp;
+<b class="nc">&nbsp;    if (this.validateBenefit(productPremium.getHealth(), productId, benefit)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;invalid benefit&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (ProductEnum.JAMIIPLUS.getId() == productId) {</b>
+<b class="nc">&nbsp;      totalPremium = this.calculateJamiiPlusPremium(policyBeneficiary, benefit, renewal, ProductEnum.JAMIIPLUS.getValue());</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.AFYANAFUU.getId() == productId) {</b>
+<b class="nc">&nbsp;      totalPremium = this.calculateAfyaNafuuPremium(policyBeneficiary, benefit);</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.FEMINA.getId() == productId) {</b>
+<b class="nc">&nbsp;      totalPremium = this.calculateFeminaPremium(policyBeneficiary, benefit);</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.JAMIIPLUS_SHARED.getId() == productId) {</b>
+<b class="nc">&nbsp;      totalPremium = this.calculateJamiiPlusSharedPremium(policyBeneficiary, benefit, renewal, ProductEnum.JAMIIPLUS_SHARED.getValue());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return totalPremium;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean validateBenefit(Health health, Integer productId, Benefit benefit) {
+<b class="nc">&nbsp;    if (ProductEnum.JAMIIPLUS.getId() == productId) {</b>
+<b class="nc">&nbsp;      JamiiPlus jamiiPlus = health.getJamiiPlus();</b>
+<b class="nc">&nbsp;      return (jamiiPlus.getInpatient().stream()</b>
+<b class="nc">&nbsp;          .noneMatch(t -&gt; t.getBenefit() == benefit.getInpatientLimit()))</b>
+<b class="nc">&nbsp;          || (benefit.getOutpatientLimit() &gt; 0 &amp;&amp; jamiiPlus.getOutpatient().stream()</b>
+<b class="nc">&nbsp;          .noneMatch(t -&gt; t.getBenefit() == benefit.getOutpatientLimit()))</b>
+<b class="nc">&nbsp;          || this.checkBenefit(benefit.getDentalLimit(), jamiiPlus.getDental())</b>
+<b class="nc">&nbsp;          || this.checkBenefit(benefit.getMaternityLimit(), jamiiPlus.getMaternity())</b>
+<b class="nc">&nbsp;          || this.checkBenefit(benefit.getOpticalLimit(), jamiiPlus.getOptical())</b>
+<b class="nc">&nbsp;          || (benefit.getTravelInsurance() &gt; 0</b>
+<b class="nc">&nbsp;          &amp;&amp; jamiiPlus.getTravel().getBenefit() != benefit</b>
+<b class="nc">&nbsp;          .getTravelInsurance());</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.AFYANAFUU.getId() == productId) {</b>
+<b class="nc">&nbsp;      AfyaNafuu afyaNafuu = health.getAfyaNafuu();</b>
+<b class="nc">&nbsp;      return (afyaNafuu.getInpatient().stream()</b>
+<b class="nc">&nbsp;          .noneMatch(t -&gt; t.getBenefit() == benefit.getInpatientLimit()</b>
+<b class="nc">&nbsp;          )) || (benefit.getOutpatientLimit() &gt; 0 &amp;&amp; afyaNafuu.getOutpatient().stream()</b>
+<b class="nc">&nbsp;          .noneMatch(t -&gt; t.getBenefit() == benefit.getOutpatientLimit()</b>
+<b class="nc">&nbsp;          )) || (benefit.getMaternityLimit() &gt; 0 &amp;&amp; afyaNafuu.getMaternity().stream()</b>
+<b class="nc">&nbsp;          .noneMatch(t -&gt; t.getBenefit() == benefit.getMaternityLimit()</b>
+&nbsp;          ));
+<b class="nc">&nbsp;    } else if (ProductEnum.FEMINA.getId() == productId) {</b>
+<b class="nc">&nbsp;      List&lt;Femina&gt; feminas = health.getFemina();</b>
+<b class="nc">&nbsp;      List&lt;Integer&gt; benefitList = feminas.stream().map(Femina::getBenefit)</b>
+<b class="nc">&nbsp;          .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;      return this.checkPSBenefit(benefit.getPrincipal(), benefitList)</b>
+<b class="nc">&nbsp;          || this.checkPSBenefit(benefit.getSpouse(), benefitList)</b>
+<b class="nc">&nbsp;          || (CollectionUtils.size(benefit.getChildren()) &gt; 0 &amp;&amp; benefit.getChildren().stream()</b>
+<b class="nc">&nbsp;          .noneMatch(p -&gt; checkBenefitList(benefitList, p)));</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return false;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean checkBenefit(int benefit, List&lt;Permium&gt; permiumList) {
+<b class="nc">&nbsp;    return benefit &gt; 0 &amp;&amp; permiumList.stream().noneMatch(t -&gt; t.getBenefit() == benefit);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean checkPSBenefit(int benefit, List&lt;Integer&gt; benefitList) {
+<b class="nc">&nbsp;    return benefit &gt; 0 &amp;&amp; !benefitList.contains(benefit);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean checkBenefitList(List&lt;Integer&gt; benefitList, int p) {
+<b class="nc">&nbsp;    return benefitList.contains(p);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private int getTotalBeneficiary(PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    int total = 0;</b>
+<b class="nc">&nbsp;    if (policyBeneficiary.getPrincipal() != null) {</b>
+<b class="nc">&nbsp;      total++;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (policyBeneficiary.getSpouse() != null) {</b>
+<b class="nc">&nbsp;      total++;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    total += CollectionUtils.size(policyBeneficiary.getChildren());</b>
+<b class="nc">&nbsp;    if (total == 0) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;no beneficiary&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return total;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void validateBeneficiary(PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    Beneficiary principalBeneficiary = policyBeneficiary.getPrincipal();</b>
+<b class="nc">&nbsp;    Beneficiary spouseBeneficiary = policyBeneficiary.getSpouse();</b>
+<b class="nc">&nbsp;    if (principalBeneficiary != null &amp;&amp; (principalBeneficiary.getAge() &lt; 21</b>
+<b class="nc">&nbsp;        || principalBeneficiary.getAge() &gt; 80)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;principal must be between 21 and 80 years old&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (spouseBeneficiary != null &amp;&amp; (spouseBeneficiary.getAge() &lt; 21</b>
+<b class="nc">&nbsp;        || spouseBeneficiary.getAge() &gt; 80)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;spouse must be between 21 and 80 years old&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; childrenBeneficiary = policyBeneficiary.getChildren();</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(childrenBeneficiary)) {</b>
+<b class="nc">&nbsp;      for (Beneficiary child : childrenBeneficiary) {</b>
+<b class="nc">&nbsp;        if (child.getAge() &lt; 0 || child.getAge() &gt; 80) {</b>
+<b class="nc">&nbsp;          throw new BusinessException(&quot;child must be between 1 and 80 years old&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private JamiiPlusSetupResponse setUpJamiiPlus(JamiiPlusSetupRequest jamiiPlusSetupRequest, boolean renewal) {
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = jamiiPlusSetupRequest.getPolicyBeneficiary();</b>
+<b class="nc">&nbsp;    String product = jamiiPlusSetupRequest.getProduct();</b>
+<b class="nc">&nbsp;    Benefit benefit = jamiiPlusSetupRequest.getBenefit();</b>
+&nbsp;
+<b class="nc">&nbsp;    String track = &quot;renewal-&quot; + renewal;</b>
+<b class="nc">&nbsp;    logger.info(&quot;{} ***Product: {}***, policyBeneficiary: {}, benefit: {}, renewal: {}&quot;, product,</b>
+<b class="nc">&nbsp;            track,                    policyBeneficiary,    benefit,     renewal);</b>
+<b class="nc">&nbsp;    String benefitJson =  g.toJson(benefit);</b>
+<b class="nc">&nbsp;    String policyBeneficiaryJson =  g.toJson(policyBeneficiary);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;{}, benefitJson: \t{}&quot;, track, benefitJson);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, policyBeneficiaryJson: \t{}&quot;, track, policyBeneficiaryJson);</b>
+&nbsp;
+&nbsp;    // Inpatient
+<b class="nc">&nbsp;    this.validateBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;    int totalBeneficiary = this.getTotalBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, JP totalBeneficiary: {}&quot;, track, totalBeneficiary);</b>
+<b class="nc">&nbsp;    Beneficiary principalBeneficiary = policyBeneficiary.getPrincipal();</b>
+<b class="nc">&nbsp;    Beneficiary spouseBeneficiary = policyBeneficiary.getSpouse();</b>
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; childrenBeneficiary = policyBeneficiary.getChildren();</b>
+<b class="nc">&nbsp;    boolean hasSpouse = spouseBeneficiary != null;</b>
+<b class="nc">&nbsp;    boolean hasPrincipal = principalBeneficiary != null;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    return JamiiPlusSetupResponse.builder()</b>
+<b class="nc">&nbsp;            .hasPrincipal(hasPrincipal)</b>
+<b class="nc">&nbsp;            .hasSpouse(hasSpouse)</b>
+<b class="nc">&nbsp;            .principalBeneficiary(principalBeneficiary)</b>
+<b class="nc">&nbsp;            .totalBeneficiary(totalBeneficiary)</b>
+<b class="nc">&nbsp;            .spouseBeneficiary(spouseBeneficiary)</b>
+<b class="nc">&nbsp;            .childrenBeneficiary(childrenBeneficiary)</b>
+<b class="nc">&nbsp;            .track(track)</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void logMessage(String track, String nameOfObject, Object object) {
+<b class="nc">&nbsp;      logger.info(&quot;{}, {}, {}&quot;, track, nameOfObject, object);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private BigDecimal calculateJamiiPlusSharedPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                                     Benefit benefit, boolean renewal, String product) {
+&nbsp;
+<b class="nc">&nbsp;    int totalPremium = 0;</b>
+<b class="nc">&nbsp;    int inpatientPremium = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    int inpatientPrincipalPremium = 0;</b>
+<b class="nc">&nbsp;    int inpatientSpousePremium = 0;</b>
+<b class="nc">&nbsp;    int inpatientChildrenPremium = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    JamiiPlusSetupRequest jamiiPlusSetupRequest = JamiiPlusSetupRequest.builder()</b>
+<b class="nc">&nbsp;           .product(product)</b>
+<b class="nc">&nbsp;           .policyBeneficiary(policyBeneficiary)</b>
+<b class="nc">&nbsp;           .benefit(benefit)</b>
+<b class="nc">&nbsp;           .build();</b>
+&nbsp;
+<b class="nc">&nbsp;    JamiiPlusSetupResponse jamiiPlusSetupResponse = setUpJamiiPlus(jamiiPlusSetupRequest, renewal);</b>
+<b class="nc">&nbsp;    String track = jamiiPlusSetupResponse.getTrack();</b>
+<b class="nc">&nbsp;    boolean hasPrincipal = jamiiPlusSetupResponse.getHasPrincipal();</b>
+<b class="nc">&nbsp;    boolean hasSpouse = jamiiPlusSetupResponse.getHasSpouse();</b>
+<b class="nc">&nbsp;    Beneficiary principalBeneficiary = jamiiPlusSetupResponse.getPrincipalBeneficiary();</b>
+<b class="nc">&nbsp;    Beneficiary spouseBeneficiary = jamiiPlusSetupResponse.getSpouseBeneficiary();</b>
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; childrenBeneficiary = jamiiPlusSetupResponse.getChildrenBeneficiary();</b>
+<b class="nc">&nbsp;    int totalBeneficiary = jamiiPlusSetupResponse.getTotalBeneficiary();</b>
+&nbsp;
+&nbsp;      // Use Jamii Plus Map to calculate OP, Dental, Optical, Maternity and travel
+&nbsp;      // because they have the same price.
+<b class="nc">&nbsp;    JamiiPlusMap jamiiPlusMapForOptionalRiders = productPremiumMap.getJamiiPlusMap();</b>
+<b class="nc">&nbsp;    JamiiPlusSharedMap jamiiPlusSharedMap = productPremiumMap.getJamiiPlusSharedMap();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;{}  {}Map {}&quot;, track, product, jamiiPlusSharedMap);</b>
+<b class="nc">&nbsp;    InpatientMap inpatientMap = jamiiPlusSharedMap.getInpatient();</b>
+<b class="nc">&nbsp;    logMessage(track, &quot;inpatientMap&quot;, inpatientMap);</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; inpatientAgeList = jamiiPlusSharedMap.getInpatientAge();</b>
+<b class="nc">&nbsp;    logMessage(track, &quot;inpatientAgeList&quot;, inpatientAgeList);</b>
+<b class="nc">&nbsp;    Integer inpatientLimit = benefit.getInpatientLimit();</b>
+<b class="nc">&nbsp;    logMessage(track, &quot;hasPrincipal&quot;, hasPrincipal);</b>
+<b class="nc">&nbsp;    logMessage(track, &quot;hasSpouse&quot;, hasSpouse);</b>
+<b class="nc">&nbsp;    logMessage(track, &quot;Children&quot;, policyBeneficiary.getChildren());</b>
+&nbsp;
+<b class="nc">&nbsp;    List&lt;Integer&gt; inpatientAgeIndexList = this.getInpatientAgeIndexList(policyBeneficiary, inpatientAgeList, track);</b>
+<b class="nc">&nbsp;    String inpatientAgeIndexListJson  = g.toJson(inpatientAgeIndexList);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}  inpatientAgeIndexList json {}&quot;, track, inpatientAgeIndexListJson);</b>
+&nbsp;        // Inpatient Principal and Spouse
+<b class="nc">&nbsp;    int principalAgeIndex = inpatientAgeIndexList.get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (hasSpouse) {</b>
+<b class="nc">&nbsp;        logger.debug(&quot;{}, {} cover principal and spouse&quot;, track, product);</b>
+&nbsp;        // calculate inpatient premium
+<b class="nc">&nbsp;        inpatientPrincipalPremium = inpatientMap.getPrincipal().get(inpatientLimit, principalAgeIndex);</b>
+<b class="nc">&nbsp;        logMessage(track, &quot;inpatientLimit&quot;, inpatientLimit);</b>
+<b class="nc">&nbsp;        logMessage(track, &quot;principalAgeIndex&quot;, principalAgeIndex);</b>
+<b class="nc">&nbsp;        logMessage(track, &quot;inpatientMap&quot;, inpatientMap);</b>
+<b class="nc">&nbsp;        logMessage(track, &quot;inpatientPrincipalPremium&quot;, inpatientPrincipalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        int spouseAgeIndex = inpatientAgeIndexList.get(1);</b>
+<b class="nc">&nbsp;        inpatientSpousePremium = inpatientMap.getSpouse().get(inpatientLimit, spouseAgeIndex);</b>
+&nbsp;
+&nbsp;        // record premium
+<b class="nc">&nbsp;        BenefitPremium principalInpatientPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;                .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.valueOf(inpatientPrincipalPremium))</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        logger.info(&quot;==== principle beneficiary {}&quot;, principalBeneficiary);</b>
+<b class="nc">&nbsp;        logger.info(&quot;==== benefit premiums {}&quot;, principalBeneficiary.getBenefitPremiums());</b>
+&nbsp;
+<b class="nc">&nbsp;        addPrincipalInpatientPremium(inpatientSpousePremium, track, principalBeneficiary, spouseBeneficiary, inpatientLimit, principalInpatientPremium);</b>
+<b class="nc">&nbsp;      }</b>
+&nbsp;    else {
+&nbsp;        // Inpatient Principal
+<b class="nc">&nbsp;        logger.info(&quot;{}, JP not cover spouse&quot;, track);</b>
+&nbsp;        // calculate inpatient premium
+<b class="nc">&nbsp;        inpatientPrincipalPremium = inpatientMap.getPrincipal().get(inpatientLimit, principalAgeIndex);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{} inpatientPrincipalPremium: {}&quot;, track, inpatientPrincipalPremium);</b>
+&nbsp;        // record premium
+<b class="nc">&nbsp;        BenefitPremium principalInpatientPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;                .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.valueOf(inpatientPrincipalPremium))</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        logger.info(&quot;{} principalInpatientPremium: {}&quot;, track, principalInpatientPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        principalBeneficiary.getBenefitPremiums().add(principalInpatientPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{} principalBeneficiary: {}&quot;, track, principalBeneficiary);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    inpatientChildrenPremium = calcInpatientChildren(childrenBeneficiary,</b>
+&nbsp;            track,
+&nbsp;            inpatientMap,
+&nbsp;            inpatientLimit,
+&nbsp;            inpatientAgeList,
+&nbsp;            inpatientChildrenPremium);
+&nbsp;    // total inpatient premium
+<b class="nc">&nbsp;    inpatientPremium += inpatientPrincipalPremium + inpatientSpousePremium + inpatientChildrenPremium;</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;{}, #inpatientLimit: {}&quot;, track, inpatientLimit);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, *inpatientPrincipalPremium: {}, *inpatientSpousePremium: {} ,*inpatientChildrenPremium: {}&quot;,</b>
+<b class="nc">&nbsp;            track, inpatientPrincipalPremium, inpatientSpousePremium, inpatientChildrenPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;{}, *inpatientPremium: {}&quot;, track, inpatientPremium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, *checkPremium hasPrincipal: {}, inpatientPrincipalPremium: {}&quot;, track, hasPrincipal, inpatientPrincipalPremium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, *checkPremium hasSpouse: {},inpatientSpousePremium: {}&quot;, track, hasSpouse,inpatientSpousePremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    this.checkPremium(inpatientPrincipalPremium, inpatientSpousePremium, hasPrincipal, hasSpouse, renewal);</b>
+&nbsp;
+&nbsp;    // Optional
+&nbsp;
+<b class="nc">&nbsp;    int optionalPremium = this.calculateOptionalPremium(benefit, jamiiPlusMapForOptionalRiders, totalBeneficiary, track, policyBeneficiary);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, *optionalPremium: {}&quot;, track, optionalPremium);</b>
+&nbsp;
+&nbsp;    //Maternity
+<b class="nc">&nbsp;    int maternityPremium = this.calculateMaternityPremium(benefit, jamiiPlusMapForOptionalRiders, policyBeneficiary, track);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, *maternityPremium: {}&quot;, track, maternityPremium);</b>
+&nbsp;    // Travel Insurance
+<b class="nc">&nbsp;    logger.info(&quot;{}, *benefit.getTravelInsurance() &gt; 0: {}&quot;, track, benefit.getTravelInsurance() &gt; 0);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    if (benefit.getTravelInsurance() &gt; 0) {</b>
+<b class="nc">&nbsp;      int premium = jamiiPlusSharedMap.getTravel().get(benefit.getTravelInsurance());</b>
+<b class="nc">&nbsp;      this.recordBenefitPremium(BenefitEnum.TRAVEL, benefit.getTravelInsurance(), premium, policyBeneficiary);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    totalPremium = inpatientPremium + optionalPremium + maternityPremium ;</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;{} *inpatientPremium: {}, *optionalPremium: {}, *maternityPremium: {}&quot;,</b>
+<b class="nc">&nbsp;            track, inpatientPremium, optionalPremium, maternityPremium );</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;{} ***JamiiPlus end***, *totalPremium: {}&quot;, track, totalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    return BigDecimal.valueOf(totalPremium);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;    private void addPrincipalInpatientPremium(int inpatientSpousePremium, String track, Beneficiary principalBeneficiary, Beneficiary spouseBeneficiary, Integer inpatientLimit, BenefitPremium principalInpatientPremium) {
+<b class="nc">&nbsp;        principalBeneficiary.getBenefitPremiums().add(principalInpatientPremium);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}  principalBeneficiary {}&quot;, track, principalBeneficiary);</b>
+&nbsp;
+<b class="nc">&nbsp;        BenefitPremium spouseInpatientPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;                .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.valueOf(inpatientSpousePremium))</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        spouseBeneficiary.getBenefitPremiums().add(spouseInpatientPremium);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}  spouseBeneficiary {}&quot;, track, spouseBeneficiary);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private BigDecimal calculateJamiiPlusPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                               Benefit benefit, boolean renewal, String product) {
+<b class="nc">&nbsp;      int totalPremium = 0;</b>
+<b class="nc">&nbsp;      int inpatientPremium = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;      int inpatientPrincipalPremium = 0;</b>
+<b class="nc">&nbsp;      int inpatientSpousePremium = 0;</b>
+<b class="nc">&nbsp;      int inpatientChildrenPremium = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;      JamiiPlusSetupRequest jamiiPlusSetupRequest = JamiiPlusSetupRequest.builder()</b>
+<b class="nc">&nbsp;              .product(product)</b>
+<b class="nc">&nbsp;              .policyBeneficiary(policyBeneficiary)</b>
+<b class="nc">&nbsp;              .benefit(benefit)</b>
+<b class="nc">&nbsp;              .build();</b>
+&nbsp;
+<b class="nc">&nbsp;      JamiiPlusSetupResponse jamiiPlusSetupResponse = setUpJamiiPlus(jamiiPlusSetupRequest, renewal);</b>
+<b class="nc">&nbsp;      String track = jamiiPlusSetupResponse.getTrack();</b>
+<b class="nc">&nbsp;      boolean hasPrincipal = jamiiPlusSetupResponse.getHasPrincipal();</b>
+<b class="nc">&nbsp;      boolean hasSpouse = jamiiPlusSetupResponse.getHasSpouse();</b>
+<b class="nc">&nbsp;      Beneficiary principalBeneficiary = jamiiPlusSetupResponse.getPrincipalBeneficiary();</b>
+<b class="nc">&nbsp;      Beneficiary spouseBeneficiary = jamiiPlusSetupResponse.getSpouseBeneficiary();</b>
+<b class="nc">&nbsp;      List&lt;Beneficiary&gt; childrenBeneficiary = jamiiPlusSetupResponse.getChildrenBeneficiary();</b>
+<b class="nc">&nbsp;      int totalBeneficiary = jamiiPlusSetupResponse.getTotalBeneficiary();</b>
+&nbsp;
+<b class="nc">&nbsp;      JamiiPlusMap jamiiPlusMap = productPremiumMap.getJamiiPlusMap();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}  {}Map {}&quot;, track, product, jamiiPlusMap);</b>
+<b class="nc">&nbsp;      InpatientMap inpatientMap = jamiiPlusMap.getInpatient();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}  inpatientMap {}&quot;, track, inpatientMap);</b>
+<b class="nc">&nbsp;      List&lt;Integer&gt; inpatientAgeList = jamiiPlusMap.getInpatientAge();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}  inpatientAgeList {}&quot;, track, inpatientAgeList);</b>
+<b class="nc">&nbsp;      Integer inpatientLimit = benefit.getInpatientLimit();</b>
+<b class="nc">&nbsp;      logger.info(&quot;{}  hasPrincipal {}&quot;, track, hasPrincipal);</b>
+<b class="nc">&nbsp;      logger.info(&quot;{}  hasSpouse {}&quot;, track, hasSpouse);</b>
+<b class="nc">&nbsp;      logger.info(&quot;{}  Children {}&quot;, track, policyBeneficiary.getChildren());</b>
+&nbsp;
+<b class="nc">&nbsp;      if (hasPrincipal || hasSpouse) {</b>
+<b class="nc">&nbsp;        List&lt;Integer&gt; inpatientAgeIndexList = this.getInpatientAgeIndexList(policyBeneficiary, inpatientAgeList, track);</b>
+<b class="nc">&nbsp;        String inpatientAgeIndexListJson = g.toJson(inpatientAgeIndexList);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}  inpatientAgeIndexList json {}&quot;, track, inpatientAgeIndexListJson);</b>
+&nbsp;        // Inpatient Principal and Spouse
+<b class="nc">&nbsp;        int principalAgeIndex = inpatientAgeIndexList.get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (hasSpouse) {</b>
+<b class="nc">&nbsp;          logger.debug(&quot;{}, {} cover principal and spouse&quot;, track, product);</b>
+&nbsp;          // calculate inpatient premium
+<b class="nc">&nbsp;          inpatientPrincipalPremium = inpatientMap.getPrincipal().get(inpatientLimit, principalAgeIndex);</b>
+<b class="nc">&nbsp;          logger.info(&quot;{}  inpatientLimit {}&quot;, track, inpatientLimit);</b>
+<b class="nc">&nbsp;          logger.info(&quot;{}  principalAgeIndex {}&quot;, track, principalAgeIndex);</b>
+<b class="nc">&nbsp;          logger.info(&quot;{}  inpatientMap {}&quot;, track, inpatientMap);</b>
+<b class="nc">&nbsp;          logger.info(&quot;{}  inpatientPrincipalPremium {}&quot;, track, inpatientPrincipalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;          int spouseAgeIndex = inpatientAgeIndexList.get(1);</b>
+<b class="nc">&nbsp;          inpatientSpousePremium = inpatientMap.getSpouse().get(inpatientLimit, spouseAgeIndex);</b>
+&nbsp;
+&nbsp;          // record premium
+<b class="nc">&nbsp;          BenefitPremium principalInpatientPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                  .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;                  .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;                  .premium(BigDecimal.valueOf(inpatientPrincipalPremium))</b>
+<b class="nc">&nbsp;                  .build();</b>
+<b class="nc">&nbsp;          addPrincipalInpatientPremium(inpatientSpousePremium, track, principalBeneficiary, spouseBeneficiary, inpatientLimit, principalInpatientPremium);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        else {
+&nbsp;          // Inpatient Principal
+<b class="nc">&nbsp;          logger.info(&quot;{}, JP not cover spouse&quot;, track);</b>
+&nbsp;          // calculate inpatient premium
+<b class="nc">&nbsp;          inpatientPrincipalPremium = inpatientMap.getPrincipal().get(inpatientLimit, principalAgeIndex);</b>
+<b class="nc">&nbsp;          logger.info(&quot;{} inpatientPrincipalPremium: {}&quot;, track, inpatientPrincipalPremium);</b>
+&nbsp;          // record premium
+<b class="nc">&nbsp;          BenefitPremium principalInpatientPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                  .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;                  .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;                  .premium(BigDecimal.valueOf(inpatientPrincipalPremium))</b>
+<b class="nc">&nbsp;                  .build();</b>
+<b class="nc">&nbsp;          logger.info(&quot;{} principalInpatientPremium: {}&quot;, track, principalInpatientPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;          principalBeneficiary.getBenefitPremiums().add(principalInpatientPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;          logger.info(&quot;{} principalBeneficiary: {}&quot;, track, principalBeneficiary);</b>
+&nbsp;        }
+&nbsp;      }
+<b class="nc">&nbsp;      if (hasPrincipal == false &amp;&amp; hasSpouse == false &amp;&amp; !childrenBeneficiary.isEmpty()) {</b>
+<b class="nc">&nbsp;        logger.info(&quot;Computing premium for children only cover&quot;);</b>
+<b class="nc">&nbsp;        JamiiPlusChildOnlyCoverMap jpChildOnlyCoverMap = productPremiumMap.getChildOnlyCoverMap();</b>
+<b class="nc">&nbsp;        Map&lt;Integer, Integer&gt; inpatientChildOnly = jpChildOnlyCoverMap.getInpatient();</b>
+<b class="nc">&nbsp;        inpatientPremium = calcInpatientForChildOnlyCover(childrenBeneficiary,</b>
+&nbsp;                track,
+&nbsp;                inpatientChildOnly,
+&nbsp;                inpatientLimit,
+&nbsp;                inpatientChildrenPremium
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{}, #inpatientLimit: {}&quot;, track, inpatientLimit);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}, *inpatientPrincipalPremium: {}, *inpatientSpousePremium: {} ,*inpatientChildrenPremium: {}&quot;,</b>
+<b class="nc">&nbsp;                track, inpatientPrincipalPremium, inpatientSpousePremium, inpatientChildrenPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{}, *inpatientPremium: {}&quot;, track, inpatientPremium);</b>
+<b class="nc">&nbsp;        this.checkPremium(inpatientPrincipalPremium, inpatientSpousePremium, false, false, renewal);</b>
+&nbsp;
+<b class="nc">&nbsp;        int optionalChildOnlyPremium = this.calculateOptionalPremium(benefit, jamiiPlusMap, totalBeneficiary, track, policyBeneficiary);</b>
+<b class="nc">&nbsp;        totalPremium = inpatientPremium + optionalChildOnlyPremium;</b>
+&nbsp;
+<b class="nc">&nbsp;        return BigDecimal.valueOf(totalPremium);</b>
+&nbsp;      }
+&nbsp;      else {
+<b class="nc">&nbsp;        inpatientChildrenPremium = calcInpatientChildren(childrenBeneficiary,</b>
+&nbsp;                track,
+&nbsp;                inpatientMap,
+&nbsp;                inpatientLimit,
+&nbsp;                inpatientAgeList,
+&nbsp;                inpatientChildrenPremium);
+&nbsp;
+&nbsp;        // total inpatient premium
+<b class="nc">&nbsp;        inpatientPremium += inpatientPrincipalPremium + inpatientSpousePremium + inpatientChildrenPremium;</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{}, #inpatientLimit: {}&quot;, track, inpatientLimit);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}, *inpatientPrincipalPremium: {}, *inpatientSpousePremium: {} ,*inpatientChildrenPremium: {}&quot;,</b>
+<b class="nc">&nbsp;                track, inpatientPrincipalPremium, inpatientSpousePremium, inpatientChildrenPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{}, *inpatientPremium: {}&quot;, track, inpatientPremium);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}, *checkPremium hasPrincipal: {}, inpatientPrincipalPremium: {}&quot;, track, hasPrincipal, inpatientPrincipalPremium);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}, *checkPremium hasSpouse: {},inpatientSpousePremium: {}&quot;, track, hasSpouse, inpatientSpousePremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.checkPremium(inpatientPrincipalPremium, inpatientSpousePremium, hasPrincipal, hasSpouse, renewal);</b>
+&nbsp;
+&nbsp;        // Optional
+<b class="nc">&nbsp;        int optionalPremium = this.calculateOptionalPremium(benefit, jamiiPlusMap, totalBeneficiary, track, policyBeneficiary);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}, *optionalPremium: {}&quot;, track, optionalPremium);</b>
+&nbsp;
+&nbsp;        //Maternity
+<b class="nc">&nbsp;        int maternityPremium = this.calculateMaternityPremium(benefit, jamiiPlusMap, policyBeneficiary, track);</b>
+<b class="nc">&nbsp;        logger.info(&quot;{}, *maternityPremium: {}&quot;, track, maternityPremium);</b>
+&nbsp;        // Travel Insurance
+<b class="nc">&nbsp;        logger.info(&quot;{}, *benefit.getTravelInsurance() &gt; 0: {}&quot;, track, benefit.getTravelInsurance() &gt; 0);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        if (benefit.getTravelInsurance() &gt; 0) {</b>
+<b class="nc">&nbsp;          int premium = jamiiPlusMap.getTravel().get(benefit.getTravelInsurance());</b>
+<b class="nc">&nbsp;          this.recordBenefitPremium(BenefitEnum.TRAVEL, benefit.getTravelInsurance(), premium, policyBeneficiary);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        totalPremium = inpatientPremium + optionalPremium + maternityPremium;</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{} *inpatientPremium: {}, *optionalPremium: {}, *maternityPremium: {}&quot;,</b>
+<b class="nc">&nbsp;                track, inpatientPremium, optionalPremium, maternityPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;{} ***JamiiPlus end***, *totalPremium: {}&quot;, track, totalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;        return BigDecimal.valueOf(totalPremium);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private int calcInpatientForChildOnlyCover(List&lt;Beneficiary&gt; childrenBeneficiary,
+&nbsp;                                               String track,
+&nbsp;                                               Map&lt;Integer, Integer&gt; inpatientChildOnly,
+&nbsp;                                               Integer inpatientLimit,
+&nbsp;                                               int inpatientChildrenPremium) {
+<b class="nc">&nbsp;    for (Beneficiary beneficiary: childrenBeneficiary) {</b>
+<b class="nc">&nbsp;      int childPremium = inpatientChildOnly.get(inpatientLimit);</b>
+<b class="nc">&nbsp;      inpatientChildrenPremium = inpatientChildrenPremium + childPremium;</b>
+<b class="nc">&nbsp;      logger.info(&quot;{}, *inpatientChildrenPremium: {}&quot;, track, inpatientChildrenPremium);</b>
+&nbsp;
+&nbsp;      // record premium
+<b class="nc">&nbsp;      BenefitPremium childrenPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;              .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;              .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;              .premium(BigDecimal.valueOf(childPremium))</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      beneficiary.getBenefitPremiums().add(childrenPremium);</b>
+<b class="nc">&nbsp;      logger.info(&quot;{}, beneficiary: {}&quot;, track, beneficiary);</b>
+<b class="nc">&nbsp;      logger.info(&quot;{}, *childPremium: {}&quot;, track, childPremium);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    return inpatientChildrenPremium;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int calcInpatientChildren(List&lt;Beneficiary&gt; childrenBeneficiary,
+&nbsp;                                      String track,
+&nbsp;                                      InpatientMap inpatientMap,
+&nbsp;                                      Integer inpatientLimit,
+&nbsp;                                      List&lt;Integer&gt; inpatientAgeList,
+&nbsp;                                      int inpatientChildrenPremium) {
+&nbsp;        // Inpatient Children
+<b class="nc">&nbsp;        if (CollectionUtils.isNotEmpty(childrenBeneficiary)) {</b>
+<b class="nc">&nbsp;            for (Beneficiary beneficiary : childrenBeneficiary) {</b>
+<b class="nc">&nbsp;                int childAge = beneficiary.getAge();</b>
+<b class="nc">&nbsp;                logger.debug(&quot;{}, childAge: {}&quot;, track, childAge);</b>
+&nbsp;
+<b class="nc">&nbsp;                int inpatientChildAgeIndex = 0;</b>
+<b class="nc">&nbsp;                int childPremium = 0;</b>
+<b class="nc">&nbsp;                if (childAge &lt;= 20) {</b>
+<b class="nc">&nbsp;                    childPremium = inpatientMap.getChild().get(inpatientLimit);</b>
+<b class="nc">&nbsp;                    logger.debug(&quot;{}, childPremium: {}&quot;, track, childPremium);</b>
+&nbsp;                } else {
+&nbsp;                    // &gt;20, same as the spouse premium
+<b class="nc">&nbsp;                    inpatientChildAgeIndex = this.calculateAgeIndex(childAge, inpatientAgeList);</b>
+<b class="nc">&nbsp;                    logger.debug(&quot;{}, inpatientChildAgeIndex: {}&quot;, track, inpatientChildAgeIndex);</b>
+&nbsp;
+<b class="nc">&nbsp;                    childPremium = inpatientMap.getPrincipal()</b>
+<b class="nc">&nbsp;                                               .get(inpatientLimit, inpatientChildAgeIndex);</b>
+<b class="nc">&nbsp;                    logger.debug(&quot;{}, childPremium: {}&quot;, track, childPremium);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // record premium
+<b class="nc">&nbsp;                BenefitPremium childrenPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                                                               .benefitLimit(inpatientLimit)</b>
+<b class="nc">&nbsp;                                                               .benefitType(BenefitEnum.INPATIENT)</b>
+<b class="nc">&nbsp;                                                               .premium(BigDecimal.valueOf(childPremium))</b>
+<b class="nc">&nbsp;                                                               .build();</b>
+<b class="nc">&nbsp;                beneficiary.getBenefitPremiums().add(childrenPremium);</b>
+<b class="nc">&nbsp;                logger.debug(&quot;{}, beneficiary: {}&quot;, track, beneficiary);</b>
+<b class="nc">&nbsp;                logger.debug(&quot;{}, *childPremium: {}&quot;, track, childPremium);</b>
+<b class="nc">&nbsp;                inpatientChildrenPremium += childPremium;</b>
+<b class="nc">&nbsp;                logger.debug(&quot;{}, *inpatientChildrenPremium: {}&quot;, track, inpatientChildrenPremium);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return inpatientChildrenPremium;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  private void recordBenefitPremium(BenefitEnum benefitEnum, Integer benefitLimit, int premium,
+&nbsp;                                    PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    if (policyBeneficiary.getPrincipal() != null) {</b>
+<b class="nc">&nbsp;      BenefitPremium benefitPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                                                    .benefitType(benefitEnum)</b>
+<b class="nc">&nbsp;                                                    .benefitLimit(benefitLimit)</b>
+<b class="nc">&nbsp;                                                    .premium(BigDecimal.valueOf(premium))</b>
+<b class="nc">&nbsp;                                                    .build();</b>
+<b class="nc">&nbsp;      policyBeneficiary.getPrincipal()</b>
+<b class="nc">&nbsp;                       .getBenefitPremiums()</b>
+<b class="nc">&nbsp;                       .add(benefitPremium);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (policyBeneficiary.getSpouse() != null) {</b>
+<b class="nc">&nbsp;      BenefitPremium benefitPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                                                    .benefitType(benefitEnum)</b>
+<b class="nc">&nbsp;                                                    .benefitLimit(benefitLimit)</b>
+<b class="nc">&nbsp;                                                    .premium(BigDecimal.valueOf(premium))</b>
+<b class="nc">&nbsp;                                                    .build();</b>
+<b class="nc">&nbsp;      policyBeneficiary.getSpouse()</b>
+<b class="nc">&nbsp;                       .getBenefitPremiums()</b>
+<b class="nc">&nbsp;                       .add(benefitPremium);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    int total = CollectionUtils.size(policyBeneficiary.getChildren());</b>
+<b class="nc">&nbsp;    if (total &gt; 0) {</b>
+<b class="nc">&nbsp;      for (Beneficiary beneficiary : policyBeneficiary.getChildren()) {</b>
+<b class="nc">&nbsp;        BenefitPremium benefitPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                                                      .benefitType(benefitEnum)</b>
+<b class="nc">&nbsp;                                                      .benefitLimit(benefitLimit)</b>
+<b class="nc">&nbsp;                                                      .premium(BigDecimal.valueOf(premium))</b>
+<b class="nc">&nbsp;                                                      .build();</b>
+<b class="nc">&nbsp;        beneficiary.getBenefitPremiums()</b>
+<b class="nc">&nbsp;                   .add(benefitPremium);</b>
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private void recordMaternityBenefitPremium(BenefitEnum benefitEnum, Integer benefitLimit,
+&nbsp;      int premium, PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    if (policyBeneficiary.getPrincipal() != null &amp;&amp; GenderEnum.FEMALE.getValue()</b>
+<b class="nc">&nbsp;        .equals(policyBeneficiary.getPrincipal().getGender())) {</b>
+<b class="nc">&nbsp;      BenefitPremium benefitPremium = BenefitPremium.builder().benefitType(benefitEnum)</b>
+<b class="nc">&nbsp;          .benefitLimit(benefitLimit).premium(BigDecimal.valueOf(premium)).build();</b>
+<b class="nc">&nbsp;      policyBeneficiary.getPrincipal().getBenefitPremiums().add(benefitPremium);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (policyBeneficiary.getSpouse() != null &amp;&amp; GenderEnum.FEMALE.getValue()</b>
+<b class="nc">&nbsp;        .equals(policyBeneficiary.getSpouse().getGender())) {</b>
+<b class="nc">&nbsp;      BenefitPremium benefitPremium = BenefitPremium.builder().benefitType(benefitEnum)</b>
+<b class="nc">&nbsp;          .benefitLimit(benefitLimit).premium(BigDecimal.valueOf(premium)).build();</b>
+<b class="nc">&nbsp;      policyBeneficiary.getSpouse().getBenefitPremiums().add(benefitPremium);</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private List&lt;Integer&gt; getInpatientAgeIndexList(PolicyBeneficiary policyBeneficiary,
+&nbsp;      List&lt;Integer&gt; inpatientAgeList,String track) {
+<b class="nc">&nbsp;    List&lt;Integer&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    int principalAge = Optional.ofNullable(policyBeneficiary)</b>
+<b class="nc">&nbsp;                               .map(PolicyBeneficiary::getPrincipal)</b>
+<b class="nc">&nbsp;                               .map(Beneficiary::getAge)</b>
+<b class="nc">&nbsp;                               .orElse(-1);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}  principalAge {}&quot;, track, principalAge);</b>
+<b class="nc">&nbsp;    int spouseAge = Optional.ofNullable(policyBeneficiary)</b>
+<b class="nc">&nbsp;                            .map(PolicyBeneficiary::getSpouse)</b>
+<b class="nc">&nbsp;                            .map(Beneficiary::getAge)</b>
+<b class="nc">&nbsp;                            .orElse(-1);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}  spouseAge {}&quot;, track, spouseAge);</b>
+<b class="nc">&nbsp;    if (principalAge &lt; 0 &amp;&amp; spouseAge &gt;= 0) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;no principal&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (principalAge &gt;= 0 &amp;&amp; spouseAge &gt;= 0) {</b>
+<b class="nc">&nbsp;      int calcPrincipalAge = 0;</b>
+<b class="nc">&nbsp;      int calcSpouseAge = 0;</b>
+<b class="nc">&nbsp;      calcPrincipalAge = principalAge;</b>
+<b class="nc">&nbsp;      calcSpouseAge = spouseAge;</b>
+<b class="nc">&nbsp;      int principalAgeIndex = this.calculateAgeIndex(calcPrincipalAge, inpatientAgeList);</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}  principalAgeIndex {}&quot;, track, principalAgeIndex);</b>
+<b class="nc">&nbsp;      int spouseAgeIndex = this.calculateAgeIndex(calcSpouseAge, inpatientAgeList);</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}  spouseAgeIndex {}&quot;, track, spouseAgeIndex);</b>
+<b class="nc">&nbsp;      list.add(principalAgeIndex);</b>
+<b class="nc">&nbsp;      list.add(spouseAgeIndex);</b>
+<b class="nc">&nbsp;    } else if (principalAge &gt;= 0) {</b>
+<b class="nc">&nbsp;      list.add(this.calculateAgeIndex(principalAge, inpatientAgeList));</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;{}  getInpatientAgeIndexList {}&quot;, track, list);</b>
+<b class="nc">&nbsp;    return list;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private int calculateOptionalPremium(Benefit benefit, JamiiPlusMap jamiiPlusMap,
+&nbsp;      int totalBeneficiary, String track, PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    int opticalPremium = 0;</b>
+<b class="nc">&nbsp;    int dentalPremium = 0;</b>
+&nbsp;
+&nbsp;    //Outpatient
+<b class="nc">&nbsp;    int outpatientPremium = this.calculateOutpatientPremium(benefit.getOutpatientLimit(),</b>
+&nbsp;        jamiiPlusMap, policyBeneficiary);
+<b class="nc">&nbsp;    logger.debug(&quot;{}, #outpatientLimit: {}&quot;, track, benefit.getOutpatientLimit());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, *outpatientPremium: {}&quot;, track, outpatientPremium);</b>
+&nbsp;
+&nbsp;    // calculate Dental/Optical/Optical Premium only when outpatient premium is available
+<b class="nc">&nbsp;    logger.debug(&quot;{}, *outpatientPremium &gt; 0: {}&quot;, track, outpatientPremium &gt; 0);</b>
+<b class="nc">&nbsp;    if (outpatientPremium &gt; 0) {</b>
+&nbsp;      // Dental
+<b class="nc">&nbsp;      if (benefit.getDentalLimit() &gt; 0) {</b>
+<b class="nc">&nbsp;        int premium = jamiiPlusMap.getDental().get(benefit.getDentalLimit());</b>
+<b class="nc">&nbsp;        dentalPremium = premium * totalBeneficiary;</b>
+<b class="nc">&nbsp;        this.recordBenefitPremium(BenefitEnum.DENTAL, benefit.getDentalLimit(),</b>
+&nbsp;            premium, policyBeneficiary);
+&nbsp;      }
+<b class="nc">&nbsp;      logger.debug(&quot;{}, #dentalLimit: {}&quot;, track, benefit.getDentalLimit());</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, *dentalPremium: {}&quot;, track, dentalPremium);</b>
+&nbsp;
+&nbsp;      // Optical
+<b class="nc">&nbsp;      if (benefit.getOpticalLimit() &gt; 0) {</b>
+<b class="nc">&nbsp;        int premium = jamiiPlusMap.getOptical().get(benefit.getOpticalLimit());</b>
+<b class="nc">&nbsp;        opticalPremium = premium * totalBeneficiary;</b>
+<b class="nc">&nbsp;        this.recordBenefitPremium(BenefitEnum.OPTICAL, benefit.getOpticalLimit(),</b>
+&nbsp;            premium, policyBeneficiary);
+&nbsp;      }
+<b class="nc">&nbsp;      logger.debug(&quot;{}, #opticalLimit: {}&quot;, track, benefit.getOpticalLimit());</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, *opticalPremium: {}&quot;, track, opticalPremium);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return outpatientPremium + opticalPremium + dentalPremium;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private int calculateMaternityPremium(Benefit benefit, JamiiPlusMap jamiiPlusMap,
+&nbsp;      PolicyBeneficiary policyBeneficiary, String track) {
+<b class="nc">&nbsp;    int maternityPremium = 0;</b>
+<b class="nc">&nbsp;    int maternityCoverNumber = this.getMaternityCoverNumber(policyBeneficiary);</b>
+<b class="nc">&nbsp;    if (maternityCoverNumber &gt; 0 &amp;&amp; benefit.getMaternityLimit() &gt; 0) {</b>
+<b class="nc">&nbsp;      int premium = jamiiPlusMap.getMaternity().get(benefit.getMaternityLimit());</b>
+<b class="nc">&nbsp;      maternityPremium = premium * maternityCoverNumber;</b>
+<b class="nc">&nbsp;      this.recordMaternityBenefitPremium(BenefitEnum.MATERNITY, benefit.getMaternityLimit(),</b>
+&nbsp;          premium, policyBeneficiary);
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;{}, #maternityLimit: {}&quot;, track, benefit.getMaternityLimit());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, maternityCoverNumber: {}, maternityPremium: {}&quot;, track, maternityCoverNumber, maternityPremium);</b>
+<b class="nc">&nbsp;    return maternityPremium;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void checkPremium(int inpatientPrincipalPremium, int inpatientSpousePremium,
+&nbsp;      boolean principal, boolean spouse,boolean renewal) {
+<b class="nc">&nbsp;    if (renewal) {</b>
+<b class="nc">&nbsp;      return;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (principal &amp;&amp; inpatientPrincipalPremium == 0 || (spouse &amp;&amp; inpatientSpousePremium == 0)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(</b>
+&nbsp;          &quot;Sorry, we are unable to provide quotation at this stage, please contact our customer service at (+254) 0709 912 777 for more information.&quot;);
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private int getMaternityCoverNumber(PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    int maternityCoverNumber = 0;</b>
+<b class="nc">&nbsp;    if (GenderEnum.FEMALE.getValue()</b>
+<b class="nc">&nbsp;        .equals(Optional.ofNullable(policyBeneficiary).map(PolicyBeneficiary::getPrincipal)</b>
+<b class="nc">&nbsp;            .map(Beneficiary::getGender).orElse(null))) {</b>
+<b class="nc">&nbsp;      maternityCoverNumber++;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (GenderEnum.FEMALE.getValue()</b>
+<b class="nc">&nbsp;        .equals(Optional.ofNullable(policyBeneficiary).map(PolicyBeneficiary::getSpouse)</b>
+<b class="nc">&nbsp;            .map(Beneficiary::getGender).orElse(null))) {</b>
+<b class="nc">&nbsp;      maternityCoverNumber++;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return maternityCoverNumber;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private int calculateOptionalPremium(int limit, MultiKeyMap&lt;Integer, Integer&gt; premiumMap,
+&nbsp;      List&lt;Integer&gt; ageIndexList) {
+<b class="nc">&nbsp;    int optionalPremium = 0;</b>
+<b class="nc">&nbsp;    if (limit &gt; 0) {</b>
+<b class="nc">&nbsp;      for (Integer ageIndex : ageIndexList) {</b>
+<b class="nc">&nbsp;        optionalPremium += premiumMap.get(limit, ageIndex);</b>
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return optionalPremium;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private int calculateOutpatientPremium(int limit, JamiiPlusMap jamiiPlusMap,
+&nbsp;      PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    int optionalPremium = 0;</b>
+<b class="nc">&nbsp;    MultiKeyMap&lt;Integer, Integer&gt; premiumMap = jamiiPlusMap.getOutpatient();</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; outpatientAgeList = jamiiPlusMap.getOutpatientAge();</b>
+<b class="nc">&nbsp;    if (limit &gt; 0) {</b>
+<b class="nc">&nbsp;      int principalAge = Optional.ofNullable(policyBeneficiary).map(PolicyBeneficiary::getPrincipal)</b>
+<b class="nc">&nbsp;          .map(Beneficiary::getAge).orElse(-1);</b>
+<b class="nc">&nbsp;      if (principalAge &gt;= 0) {</b>
+<b class="nc">&nbsp;        int ageIndex = this.calculateAgeIndex(principalAge, outpatientAgeList);</b>
+<b class="nc">&nbsp;        int outpatientPremium = premiumMap.get(limit, ageIndex);</b>
+<b class="nc">&nbsp;        BenefitPremium benefitPremium = BenefitPremium.builder().benefitType(BenefitEnum.OUTPATIENT)</b>
+<b class="nc">&nbsp;            .benefitLimit(limit).premium(BigDecimal.valueOf(outpatientPremium)).build();</b>
+<b class="nc">&nbsp;        policyBeneficiary.getPrincipal().getBenefitPremiums().add(benefitPremium);</b>
+<b class="nc">&nbsp;        optionalPremium += outpatientPremium;</b>
+&nbsp;      }
+<b class="nc">&nbsp;      int spouseAge = Optional.ofNullable(policyBeneficiary).map(PolicyBeneficiary::getSpouse)</b>
+<b class="nc">&nbsp;          .map(Beneficiary::getAge).orElse(-1);</b>
+<b class="nc">&nbsp;      if (spouseAge &gt;= 0) {</b>
+<b class="nc">&nbsp;        int ageIndex = this.calculateAgeIndex(spouseAge, outpatientAgeList);</b>
+<b class="nc">&nbsp;        int outpatientPremium = premiumMap.get(limit, ageIndex);</b>
+<b class="nc">&nbsp;        BenefitPremium benefitPremium = BenefitPremium.builder().benefitType(BenefitEnum.OUTPATIENT)</b>
+<b class="nc">&nbsp;            .benefitLimit(limit).premium(BigDecimal.valueOf(outpatientPremium)).build();</b>
+<b class="nc">&nbsp;        policyBeneficiary.getSpouse().getBenefitPremiums().add(benefitPremium);</b>
+<b class="nc">&nbsp;        optionalPremium += outpatientPremium;</b>
+&nbsp;      }
+<b class="nc">&nbsp;      List&lt;Beneficiary&gt; childrenBeneficiary = policyBeneficiary.getChildren();</b>
+<b class="nc">&nbsp;      if (CollectionUtils.isNotEmpty(childrenBeneficiary)) {</b>
+<b class="nc">&nbsp;        for (Beneficiary child : childrenBeneficiary) {</b>
+<b class="nc">&nbsp;          if (principalAge &lt; 0 &amp;&amp; spouseAge &lt; 0) {</b>
+<b class="nc">&nbsp;            logger.info(&quot;Computing outpatient for children only cover&quot;);</b>
+<b class="nc">&nbsp;            JamiiPlusChildOnlyCoverMap jamiiPlusChildOnlyCoverMap = productPremiumMap.getChildOnlyCoverMap();</b>
+<b class="nc">&nbsp;            int outpatientChildOnlyPremium = jamiiPlusChildOnlyCoverMap.getOutpatient().get(limit);</b>
+<b class="nc">&nbsp;            BenefitPremium benefitPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                    .benefitType(BenefitEnum.OUTPATIENT)</b>
+<b class="nc">&nbsp;                    .benefitLimit(limit).premium(BigDecimal.valueOf(outpatientChildOnlyPremium)).build();</b>
+<b class="nc">&nbsp;            child.getBenefitPremiums().add(benefitPremium);</b>
+<b class="nc">&nbsp;            optionalPremium += outpatientChildOnlyPremium;</b>
+<b class="nc">&nbsp;          }</b>
+&nbsp;          else {
+<b class="nc">&nbsp;            int ageIndex = this.calculateAgeIndex(child.getAge(), outpatientAgeList);</b>
+<b class="nc">&nbsp;            int outpatientPremium = premiumMap.get(limit, ageIndex);</b>
+<b class="nc">&nbsp;            BenefitPremium benefitPremium = BenefitPremium.builder()</b>
+<b class="nc">&nbsp;                    .benefitType(BenefitEnum.OUTPATIENT)</b>
+<b class="nc">&nbsp;                    .benefitLimit(limit).premium(BigDecimal.valueOf(outpatientPremium)).build();</b>
+<b class="nc">&nbsp;            child.getBenefitPremiums().add(benefitPremium);</b>
+<b class="nc">&nbsp;            optionalPremium += outpatientPremium;</b>
+&nbsp;          }
+<b class="nc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return optionalPremium;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private BigDecimal calculateAfyaNafuuPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;      Benefit benefit) {
+<b class="nc">&nbsp;    int totalPremium = 0;</b>
+<b class="nc">&nbsp;    int inpatientPremium = 0;</b>
+<b class="nc">&nbsp;    int outpatientPremium = 0;</b>
+<b class="nc">&nbsp;    int maternityPremium = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    logger</b>
+<b class="nc">&nbsp;        .info(&quot;{} ***AfyaNafuu start***, policyBeneficiary: {}, benefit: {}&quot;,</b>
+&nbsp;            GlobalConstant.CALCULATE_PREMIUM, policyBeneficiary, benefit);
+&nbsp;
+<b class="nc">&nbsp;    AfyaNafuuMap afyaNafuuMap = productPremiumMap.getAfyaNafuuMap();</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; inpatientAgeList = afyaNafuuMap.getInpatientAge();</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; outpatientAgeList = afyaNafuuMap.getOutpatientAge();</b>
+&nbsp;
+&nbsp;    // Inpatient
+<b class="nc">&nbsp;    this.validateBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;    int totalBeneficiary = this.getTotalBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, AF totalBeneficiary: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, totalBeneficiary);</b>
+<b class="nc">&nbsp;    Beneficiary principalBeneficiary = policyBeneficiary.getPrincipal();</b>
+<b class="nc">&nbsp;    Beneficiary spouseBeneficiary = policyBeneficiary.getSpouse();</b>
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; childrenBeneficiary = policyBeneficiary.getChildren();</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; inpatientAgeIndexList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; outpatientAgeIndexList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    if (principalBeneficiary != null || spouseBeneficiary != null) {</b>
+&nbsp;
+<b class="nc">&nbsp;      int principalAge = policyBeneficiary.getPrincipal().getAge();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, principalAge: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, principalAge);</b>
+<b class="nc">&nbsp;      if (spouseBeneficiary != null) {</b>
+<b class="nc">&nbsp;        int spouseAge = spouseBeneficiary.getAge();</b>
+<b class="nc">&nbsp;        logger.debug(&quot;{}, spouseAge: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, spouseAge);</b>
+<b class="nc">&nbsp;        inpatientAgeIndexList.add(this.calculateAgeIndex(principalAge, inpatientAgeList));</b>
+<b class="nc">&nbsp;        inpatientAgeIndexList.add(this.calculateAgeIndex(spouseAge, inpatientAgeList));</b>
+<b class="nc">&nbsp;        outpatientAgeIndexList.add(this.calculateAgeIndex(principalAge, outpatientAgeList));</b>
+<b class="nc">&nbsp;        outpatientAgeIndexList.add(this.calculateAgeIndex(spouseAge, outpatientAgeList));</b>
+<b class="nc">&nbsp;      } else {</b>
+<b class="nc">&nbsp;        logger.debug(&quot;{}, AF not cover spouse&quot;, GlobalConstant.CALCULATE_PREMIUM);</b>
+<b class="nc">&nbsp;        inpatientAgeIndexList.add(this.calculateAgeIndex(principalAge, inpatientAgeList));</b>
+<b class="nc">&nbsp;        outpatientAgeIndexList.add(this.calculateAgeIndex(principalAge, outpatientAgeList));</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (CollectionUtils.isEmpty(childrenBeneficiary)) {</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, AF not cover children&quot;, GlobalConstant.CALCULATE_PREMIUM);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    for (Beneficiary beneficiary : childrenBeneficiary) {</b>
+<b class="nc">&nbsp;      int childAge = beneficiary.getAge();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, childAge: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, childAge);</b>
+<b class="nc">&nbsp;      inpatientAgeIndexList.add(calculateAgeIndex(childAge, inpatientAgeList));</b>
+<b class="nc">&nbsp;      outpatientAgeIndexList.add(calculateAgeIndex(childAge, outpatientAgeList));</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, ageIndexList: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, inpatientAgeIndexList);</b>
+&nbsp;
+<b class="nc">&nbsp;    inpatientPremium = this.calculateOptionalPremium(benefit.getInpatientLimit(),</b>
+<b class="nc">&nbsp;        afyaNafuuMap.getInpatient(), inpatientAgeIndexList);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, inpatientLimit: {}&quot;, GlobalConstant.CALCULATE_PREMIUM,</b>
+<b class="nc">&nbsp;        benefit.getInpatientLimit());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, inpatientPremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, inpatientPremium);</b>
+&nbsp;
+&nbsp;    //Outpatient
+<b class="nc">&nbsp;    outpatientPremium = this.calculateOptionalPremium(benefit.getOutpatientLimit(),</b>
+<b class="nc">&nbsp;        afyaNafuuMap.getOutpatient(), outpatientAgeIndexList);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, outpatientLimit: {}&quot;, GlobalConstant.CALCULATE_PREMIUM,</b>
+<b class="nc">&nbsp;        benefit.getOutpatientLimit());</b>
+<b class="nc">&nbsp;    logger</b>
+<b class="nc">&nbsp;        .debug(&quot;{}, outpatientPremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, outpatientPremium);</b>
+&nbsp;
+&nbsp;    //Maternity
+<b class="nc">&nbsp;    int maternityCoverNumber = this.getMaternityCoverNumber(policyBeneficiary);</b>
+<b class="nc">&nbsp;    if (maternityCoverNumber &gt; 0 &amp;&amp; benefit.getMaternityLimit() &gt; 0) {</b>
+<b class="nc">&nbsp;      maternityPremium = afyaNafuuMap.getMaternity().get(benefit.getMaternityLimit()) * maternityCoverNumber;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;{}, maternityLimit: {}&quot;, GlobalConstant.CALCULATE_PREMIUM,</b>
+<b class="nc">&nbsp;        benefit.getMaternityLimit());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{}, maternityCoverNumber: {}, maternityPremium: {}&quot;,</b>
+<b class="nc">&nbsp;        GlobalConstant.CALCULATE_PREMIUM, maternityCoverNumber, maternityPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    totalPremium = inpatientPremium + outpatientPremium + maternityPremium;</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***AfyaNafuu end***, totalPremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM,</b>
+<b class="nc">&nbsp;        totalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    return BigDecimal.valueOf(totalPremium);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private BigDecimal calculateFeminaPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;      Benefit benefit) {
+<b class="nc">&nbsp;    int totalPremium = 0;</b>
+<b class="nc">&nbsp;    int principalPremium = 0;</b>
+<b class="nc">&nbsp;    int spousePremium = 0;</b>
+<b class="nc">&nbsp;    int childrenPremium = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***Femina start***, policyBeneficiary: {}, benefit: {}&quot;,</b>
+&nbsp;        GlobalConstant.CALCULATE_PREMIUM, policyBeneficiary, benefit);
+<b class="nc">&nbsp;    FeminaMap feminaMap = productPremiumMap.getFeminaMap();</b>
+<b class="nc">&nbsp;    List&lt;Integer&gt; ageList = feminaMap.getAge();</b>
+&nbsp;
+<b class="nc">&nbsp;    this.validateBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;    int totalBeneficiary = this.getTotalBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;    logger.info(&quot;{}, FA totalBeneficiary: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, totalBeneficiary);</b>
+<b class="nc">&nbsp;    Beneficiary principalBeneficiary = policyBeneficiary.getPrincipal();</b>
+<b class="nc">&nbsp;    Beneficiary spouseBeneficiary = policyBeneficiary.getSpouse();</b>
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; childrenBeneficiary = policyBeneficiary.getChildren();</b>
+&nbsp;
+<b class="nc">&nbsp;    if (principalBeneficiary != null) {</b>
+<b class="nc">&nbsp;      int principalAge = principalBeneficiary.getAge();</b>
+<b class="nc">&nbsp;      int principalAgeIndex = this.calculateAgeIndex(principalAge, ageList);</b>
+<b class="nc">&nbsp;      principalPremium = feminaMap.getFemina().get(benefit.getPrincipal(), principalAgeIndex);</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, principalAge: {}, principalAgeIndex: {}, limit: {}&quot;,</b>
+<b class="nc">&nbsp;          GlobalConstant.CALCULATE_PREMIUM, principalAge, principalAgeIndex,</b>
+<b class="nc">&nbsp;          benefit.getPrincipal());</b>
+<b class="nc">&nbsp;      logger</b>
+<b class="nc">&nbsp;          .debug(&quot;{}, principalPremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, principalPremium);</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, FA not cover spouse&quot;, GlobalConstant.CALCULATE_PREMIUM);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (spouseBeneficiary != null) {</b>
+<b class="nc">&nbsp;      int spouseAge = spouseBeneficiary.getAge();</b>
+<b class="nc">&nbsp;      int spouseAgeIndex = calculateAgeIndex(spouseAge, ageList);</b>
+<b class="nc">&nbsp;      spousePremium = feminaMap.getFemina().get(benefit.getSpouse(), spouseAgeIndex);</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, spouseAge: {}, spouseAgeIndex: {}, limit: {}&quot;,</b>
+<b class="nc">&nbsp;          GlobalConstant.CALCULATE_PREMIUM, spouseAge, spouseAgeIndex, benefit.getSpouse());</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, spousePremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, spousePremium);</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, FA not cover spouse&quot;, GlobalConstant.CALCULATE_PREMIUM);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (CollectionUtils.isEmpty(childrenBeneficiary)) {</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, FA not cover children&quot;, GlobalConstant.CALCULATE_PREMIUM);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    for (int i = 0; i &lt; childrenBeneficiary.size(); i++) {</b>
+<b class="nc">&nbsp;      int childAge = childrenBeneficiary.get(i).getAge();</b>
+<b class="nc">&nbsp;      int childAgeIndex = calculateAgeIndex(childAge, ageList);</b>
+<b class="nc">&nbsp;      int premium = feminaMap.getFemina().get(benefit.getChildren().get(i), childAgeIndex);</b>
+<b class="nc">&nbsp;      childrenPremium += premium;</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, childAge: {}, childAgeIndex: {}, limit: {}&quot;,</b>
+<b class="nc">&nbsp;          GlobalConstant.CALCULATE_PREMIUM, childAge, childAgeIndex,</b>
+<b class="nc">&nbsp;          benefit.getChildren().get(i));</b>
+<b class="nc">&nbsp;      logger.debug(&quot;{}, premium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, premium);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;{}, childrenPremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, childrenPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    totalPremium = principalPremium + spousePremium + childrenPremium;</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***Femina end***, totalPremium: {}&quot;, GlobalConstant.CALCULATE_PREMIUM, totalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    return BigDecimal.valueOf(totalPremium);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  private int calculateAgeIndex(int age, List&lt;Integer&gt; ageList) {
+<b class="nc">&nbsp;    int index = 0;</b>
+<b class="nc">&nbsp;    for (int i = 0; i &lt; ageList.size(); i++) {</b>
+<b class="nc">&nbsp;      if (age &lt;= ageList.get(i)) {</b>
+<b class="nc">&nbsp;        index = i;</b>
+<b class="nc">&nbsp;        break;</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return index;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Benefit createDefaultBenefit(CustomerDetailResponse customerDetailResponse,
+&nbsp;      ProductEnum productEnum) {
+<b class="nc">&nbsp;    DefaultBenefit defaultBenefit = DefaultBenefit.builder().build();</b>
+<b class="nc">&nbsp;    Benefit benefit = Benefit.builder().build();</b>
+<b class="nc">&nbsp;    DependantBenefit dependantBenefit = customerDetailResponse.getBenefit();</b>
+<b class="nc">&nbsp;    if (ProductEnum.JAMIIPLUS == productEnum) {</b>
+<b class="nc">&nbsp;      benefit = this.createJPBenefit(defaultBenefit, dependantBenefit);</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.JAMIIPLUS_SHARED == productEnum) {</b>
+<b class="nc">&nbsp;      benefit = this.createJPSBenefit(defaultBenefit, dependantBenefit);</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.AFYANAFUU == productEnum) {</b>
+<b class="nc">&nbsp;      AfyaNafuuBenefit afyaNafuuBenefit = defaultBenefit.getAfyaNafuuBenefit();</b>
+<b class="nc">&nbsp;      benefit.setInpatientLimit(afyaNafuuBenefit.getInpatientLimit());</b>
+&nbsp;      int outpatientLimit =
+<b class="nc">&nbsp;          dependantBenefit.isOutpatient() ? afyaNafuuBenefit.getOutpatientLimit() : 0;</b>
+<b class="nc">&nbsp;      benefit.setOutpatientLimit(outpatientLimit);</b>
+&nbsp;      int maternityLimit =
+<b class="nc">&nbsp;          dependantBenefit.isMaternity() ? afyaNafuuBenefit.getMaternityLimit() : 0;</b>
+<b class="nc">&nbsp;      benefit.setMaternityLimit(maternityLimit);</b>
+<b class="nc">&nbsp;    } else if (ProductEnum.FEMINA == productEnum) {</b>
+<b class="nc">&nbsp;      benefit.setPrincipal(defaultBenefit.getFeminaBenefit().getPrincipal());</b>
+<b class="nc">&nbsp;      benefit.setSpouse(defaultBenefit.getFeminaBenefit().getSpouse());</b>
+&nbsp;
+<b class="nc">&nbsp;      if (customerDetailResponse.getChildren() != null) {</b>
+<b class="nc">&nbsp;        List&lt;Integer&gt; children = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; customerDetailResponse.getChildren().getCount(); i++) {</b>
+<b class="nc">&nbsp;          children.add(defaultBenefit.getFeminaBenefit().getChildren());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        benefit.setChildren(children);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;product: {}, default benefit: {}&quot;, productEnum.getValue(), benefit);</b>
+<b class="nc">&nbsp;    return benefit;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;    private Benefit createJPSBenefit(DefaultBenefit defaultBenefit, DependantBenefit dependantBenefit) {
+<b class="nc">&nbsp;      Benefit benefit = Benefit.builder().build();</b>
+<b class="nc">&nbsp;      JamiiPlusSharedBenefit jamiiPlusSharedBenefit = defaultBenefit.getJamiiPlusSharedBenefit();</b>
+<b class="nc">&nbsp;      benefit.setInpatientLimit(jamiiPlusSharedBenefit.getInpatientLimit());</b>
+&nbsp;      int outpatientLimit =
+<b class="nc">&nbsp;              dependantBenefit.isOutpatient() ? jamiiPlusSharedBenefit.getOutpatientLimit() : 0;</b>
+<b class="nc">&nbsp;      benefit.setOutpatientLimit(outpatientLimit);</b>
+<b class="nc">&nbsp;      int dentalLimit = dependantBenefit.isDental() ? jamiiPlusSharedBenefit.getDentalLimit() : 0;</b>
+<b class="nc">&nbsp;      benefit.setDentalLimit(dentalLimit);</b>
+<b class="nc">&nbsp;      int opticalLimit = dependantBenefit.isOptical() ? jamiiPlusSharedBenefit.getOpticalLimit() : 0;</b>
+<b class="nc">&nbsp;      benefit.setOpticalLimit(opticalLimit);</b>
+<b class="nc">&nbsp;      int maternityLimit = dependantBenefit.isMaternity() ?</b>
+<b class="nc">&nbsp;              jamiiPlusSharedBenefit.getMaternityLimit() : 0;</b>
+<b class="nc">&nbsp;      benefit.setMaternityLimit(maternityLimit);</b>
+&nbsp;      int travelInsuranceLimit =
+<b class="nc">&nbsp;              dependantBenefit.isTravelInsurance() ? jamiiPlusSharedBenefit.getTravelInsurance() : 0;</b>
+<b class="nc">&nbsp;      benefit.setTravelInsurance(travelInsuranceLimit);</b>
+<b class="nc">&nbsp;      return benefit;</b>
+&nbsp;    }
+&nbsp;    private Benefit createJPBenefit(DefaultBenefit defaultBenefit, DependantBenefit dependantBenefit) {
+<b class="nc">&nbsp;    Benefit benefit = Benefit.builder().build();</b>
+<b class="nc">&nbsp;    JamiiPlusBenefit jamiiPlusBenefit = defaultBenefit.getJamiiPlusBenefit();</b>
+<b class="nc">&nbsp;    benefit.setInpatientLimit(jamiiPlusBenefit.getInpatientLimit());</b>
+&nbsp;    int outpatientLimit =
+<b class="nc">&nbsp;        dependantBenefit.isOutpatient() ? jamiiPlusBenefit.getOutpatientLimit() : 0;</b>
+<b class="nc">&nbsp;    benefit.setOutpatientLimit(outpatientLimit);</b>
+<b class="nc">&nbsp;    int dentalLimit = dependantBenefit.isDental() ? jamiiPlusBenefit.getDentalLimit() : 0;</b>
+<b class="nc">&nbsp;    benefit.setDentalLimit(dentalLimit);</b>
+<b class="nc">&nbsp;    int opticalLimit = dependantBenefit.isOptical() ? jamiiPlusBenefit.getOpticalLimit() : 0;</b>
+<b class="nc">&nbsp;    benefit.setOpticalLimit(opticalLimit);</b>
+<b class="nc">&nbsp;    int maternityLimit = dependantBenefit.isMaternity() ?</b>
+<b class="nc">&nbsp;        jamiiPlusBenefit.getMaternityLimit() : 0;</b>
+<b class="nc">&nbsp;    benefit.setMaternityLimit(maternityLimit);</b>
+&nbsp;    int travelInsuranceLimit =
+<b class="nc">&nbsp;        dependantBenefit.isTravelInsurance() ? jamiiPlusBenefit.getTravelInsurance() : 0;</b>
+<b class="nc">&nbsp;    benefit.setTravelInsurance(travelInsuranceLimit);</b>
+<b class="nc">&nbsp;    return benefit;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  //Deprecated
+&nbsp;  public RenewalPremium calculateRenewalPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;      Integer productId, Benefit benefit, PolicyClaim policyClaim, BigDecimal adjustment) {
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***start***, policyBeneficiary: {}, benefit: {}, policyClaim: {}&quot;,</b>
+&nbsp;        GlobalConstant.CALCULATE_RENEWAL_PREMIUM, policyBeneficiary, benefit, policyClaim);
+<b class="nc">&nbsp;    String policyClaimJson =  g.toJson(policyClaim);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;policyClaimJson {}&quot;, policyClaimJson);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;adjustment {}&quot;, adjustment);</b>
+<b class="nc">&nbsp;    BigDecimal updatePremium = this.calculatePremium(policyBeneficiary, productId, benefit, true);</b>
+&nbsp;
+<b class="nc">&nbsp;    double adjustmentPercent = adjustment.doubleValue() / 100;</b>
+<b class="nc">&nbsp;    logger.debug(&quot;adjustmentPercent {}&quot;, adjustmentPercent);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal newUpdatePremium = updatePremium.multiply(BigDecimal.valueOf(1).add(BigDecimal.valueOf(adjustmentPercent)));</b>
+<b class="nc">&nbsp;    logger.debug(&quot;newUpdatePremium: {}&quot;, newUpdatePremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    double lossRatio = 0.0;</b>
+<b class="nc">&nbsp;    double loadingPercent = 1;</b>
+<b class="nc">&nbsp;    double claimsPaid = policyClaim.getClaimsPaid().doubleValue();</b>
+<b class="nc">&nbsp;    double earnedPremium = policyClaim.getEarnedPremium().doubleValue();</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;claimsPaid: {}, earnedPremium: {}&quot;, claimsPaid, earnedPremium);</b>
+<b class="nc">&nbsp;    if (earnedPremium &gt; 0) {</b>
+&nbsp;
+<b class="nc">&nbsp;      lossRatio = (claimsPaid / ((earnedPremium * 10 / 12) * GlobalConstant.LOSSRATIO_FACTOR));</b>
+<b class="nc">&nbsp;      logger.debug(&quot;lossRatio: {}&quot;, lossRatio);</b>
+<b class="nc">&nbsp;      loadingPercent = this.calculateLoadingPercent(lossRatio);</b>
+<b class="nc">&nbsp;      logger.debug(LOADING_PERCENT, loadingPercent);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;lossRatio: {}, loadingPercent: {}&quot;, lossRatio, loadingPercent);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal loading = FormatUtils.scaleValue(newUpdatePremium.multiply(BigDecimal.valueOf(loadingPercent)));</b>
+<b class="nc">&nbsp;    logger.debug(&quot;loading: {}&quot;, loading);</b>
+&nbsp;
+<b class="nc">&nbsp;    double discountPercent = this.calculateDiscountPercent(policyClaim.getNoClaimYear());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;discountPercent: {}&quot;, discountPercent);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal discount = FormatUtils.scaleValue(newUpdatePremium.multiply(BigDecimal.valueOf(discountPercent)));</b>
+<b class="nc">&nbsp;    logger.debug(&quot;discount: {}&quot;, discount);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal renewalPremium = FormatUtils.scaleValue(newUpdatePremium.add(loading).subtract(discount));</b>
+<b class="nc">&nbsp;    logger.debug(&quot;renewalPremium: {}&quot;, renewalPremium);</b>
+<b class="nc">&nbsp;    logger.debug(</b>
+&nbsp;        &quot;{} ***end***, loadingPercent: {}, loading: {}, discountPercent: {}, discount: {}&quot;,
+<b class="nc">&nbsp;        GlobalConstant.CALCULATE_RENEWAL_PREMIUM, loadingPercent, loading, discountPercent, discount);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***end***, updatePremium: {}, newUpdatePremium: {}, renewalPremium : {}&quot;, GlobalConstant.CALCULATE_RENEWAL_PREMIUM, updatePremium, newUpdatePremium, renewalPremium);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***end***, adjustment: {}, renewalPremium: {}&quot;, GlobalConstant.CALCULATE_RENEWAL_PREMIUM, adjustment, renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    Premium premium = this.calculateTotalPremium(renewalPremium, false);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;calculateTotalPremium: {}&quot;, premium);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal itl = premium.getItl();</b>
+<b class="nc">&nbsp;    BigDecimal phcf = premium.getPhcf();</b>
+<b class="nc">&nbsp;    BigDecimal stampDuty = premium.getStampDuty();</b>
+&nbsp;    // calculate total renewal premium
+<b class="nc">&nbsp;    BigDecimal totalPremium = premium.getTotalPremium();</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;{} ***end***, itl: {}, phcf: {}, stampDuty: {}, totalPremium: {}&quot;,</b>
+&nbsp;        GlobalConstant.CALCULATE_RENEWAL_PREMIUM, itl, phcf, stampDuty, totalPremium);
+<b class="nc">&nbsp;    return RenewalPremium.builder().claimsPaid(policyClaim.getClaimsPaid())</b>
+<b class="nc">&nbsp;        .earnedPremium(policyClaim.getEarnedPremium()).lossRatio(BigDecimal.valueOf(lossRatio))</b>
+<b class="nc">&nbsp;        .manualAdjustment(adjustment)</b>
+<b class="nc">&nbsp;        .loading(loading).discount(discount).premium(renewalPremium)</b>
+<b class="nc">&nbsp;        .itl(itl).phcf(phcf).stampDuty(stampDuty).totalPremium(totalPremium).build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public RenewalPremium calcRenewPremiumByTotalPremiumForComingWorker(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                                       PolicyDetail policyDetail,
+&nbsp;                                                       Benefit benefit,
+&nbsp;                                                       PolicyClaim policyClaim,
+&nbsp;                                                       BigDecimal adjustment) {
+<b class="nc">&nbsp;    logger.debug(&quot;6. start  calcRenewPremiumByTotalPremiumForComingWorker: {}&quot;, policyDetail.getPolicyNumber());</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiaryCopy = new PolicyBeneficiary();</b>
+<b class="nc">&nbsp;    Benefit benefitCopy = new Benefit();</b>
+<b class="nc">&nbsp;    BeanUtils.copyProperties(policyBeneficiary, policyBeneficiaryCopy);</b>
+<b class="nc">&nbsp;    BeanUtils.copyProperties(benefit, benefitCopy);</b>
+&nbsp;
+&nbsp;    // 1.Get premiumPaid from endpoint(SQL script)
+<b class="nc">&nbsp;    BigDecimal totalPremium = policyDetail.getTotalPremium();</b>
+&nbsp;    //2.Remove tax. premiumPaid - (0.45% * premiumPaid)
+<b class="nc">&nbsp;    logger.debug(&quot;6.2 totalPremium: {}&quot;, totalPremium);</b>
+<b class="nc">&nbsp;    BigDecimal totalPremiumWithoutTax = totalPremium.multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(100.45), 2, RoundingMode.HALF_UP);</b>
+&nbsp;
+&nbsp;    //2.lossRatio = claimsPaid / (premiumPaid * 10 / 12) (lossRatio = Claims Ratio)
+&nbsp;    double lossRatio;
+<b class="nc">&nbsp;    double loadingPercent = 1;</b>
+&nbsp;
+<b class="nc">&nbsp;    double claimsPaid = policyClaim.getClaimsPaid().doubleValue();</b>
+&nbsp;
+<b class="nc">&nbsp;    lossRatio = (claimsPaid / ((totalPremiumWithoutTax.doubleValue() * 10 / 12) * GlobalConstant.LOSSRATIO_FACTOR));</b>
+<b class="nc">&nbsp;    logger.debug(&quot;6.3 lossRatio: {}&quot;, lossRatio);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal earnedPremium = BigDecimal.valueOf(totalPremiumWithoutTax.doubleValue() * 10 / 12);</b>
+&nbsp;    //3.loading percentage = refer to  lossRatio VS Premium Loadings(loading percentage) table
+<b class="nc">&nbsp;    loadingPercent = this.calculateLoadingPercent(lossRatio);</b>
+&nbsp;
+&nbsp;    //4.loading amount  = premiumPaid * loading percentage
+<b class="nc">&nbsp;    BigDecimal loadingAmount = totalPremiumWithoutTax.multiply(BigDecimal.valueOf(loadingPercent))</b>
+<b class="nc">&nbsp;            .setScale(2, RoundingMode.HALF_UP);</b>
+&nbsp;
+&nbsp;    //5.discount percentage = noClaimYear (0-3 years no discount,3 years - 0.025, 4 years - 0.05, 5 years - 0.075,6 year or more - 0.1
+<b class="nc">&nbsp;    double discountPercent = this.calculateDiscountPercent(policyClaim.getNoClaimYear());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;6.5 discountPercent: {}&quot;, discountPercent);</b>
+&nbsp;    //6.discount amount = premiumPaid * discount percentage
+<b class="nc">&nbsp;    BigDecimal discountAmount = totalPremiumWithoutTax.multiply(BigDecimal.valueOf(discountPercent))</b>
+<b class="nc">&nbsp;            .setScale(2, RoundingMode.HALF_UP);</b>
+&nbsp;//  7.renewal Premium = premiumPaid + loading amount - discount amount + add premium change due to change in age.
+<b class="nc">&nbsp;    BigDecimal normalAgeRenewPremium = this.calculatePremium(policyBeneficiary, policyDetail.getProductId(), benefit, true);</b>
+&nbsp;
+&nbsp;
+&nbsp;    //8.loading amountChangeInAge  = premiumPaid * loading percentage
+<b class="nc">&nbsp;    BigDecimal loadingAmountCurrentAge = normalAgeRenewPremium.multiply(BigDecimal.valueOf(loadingPercent))</b>
+<b class="nc">&nbsp;            .setScale(2, RoundingMode.HALF_UP);</b>
+<b class="nc">&nbsp;    logger.info(&quot;loadingAmountCurrentAge: {}&quot;, loadingAmountCurrentAge);</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiaryUpdate = reduceAgeForAllPolicyBeneficiary(policyBeneficiaryCopy);</b>
+<b class="nc">&nbsp;    BigDecimal reduceAgeRenewPremium = this.calculatePremium(policyBeneficiaryUpdate, policyDetail.getProductId(), benefitCopy, true);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premiumChangeInAge = normalAgeRenewPremium.subtract(reduceAgeRenewPremium);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;Change in Age ==&gt;  : {}&quot;, premiumChangeInAge);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal renewalPremium =  totalPremiumWithoutTax.add(loadingAmount).subtract(discountAmount).add(premiumChangeInAge);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal renewalPremiumCurrentAge =  normalAgeRenewPremium.add(loadingAmountCurrentAge).subtract(discountAmount);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;normalAgeRenewPremium + loadingAmount - discountAmount :{}&quot;, renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (renewalPremiumCurrentAge.compareTo(renewalPremium) &gt; 0){</b>
+<b class="nc">&nbsp;      renewalPremium = renewalPremiumCurrentAge;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (loadingAmountCurrentAge.compareTo(loadingAmount) &gt; 0){</b>
+<b class="nc">&nbsp;      loadingAmount = loadingAmountCurrentAge;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal itl = ProductUtils.calculateITL(renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal phcf = ProductUtils.calculatePHCF(renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premiumWithIncludeTax =  renewalPremium.add(itl).add(phcf).setScale(0, RoundingMode.UP);</b>
+<b class="nc">&nbsp;    BigDecimal stampDuty = BigDecimal.ZERO;</b>
+&nbsp;
+<b class="nc">&nbsp;    return RenewalPremium.builder()</b>
+<b class="nc">&nbsp;            .claimsPaid(policyClaim.getClaimsPaid())</b>
+<b class="nc">&nbsp;            .earnedPremium(earnedPremium)</b>
+<b class="nc">&nbsp;            .lossRatio(BigDecimal.valueOf(lossRatio))</b>
+<b class="nc">&nbsp;            .manualAdjustment(adjustment)</b>
+<b class="nc">&nbsp;            .loading(loadingAmount)</b>
+<b class="nc">&nbsp;            .discount(discountAmount)</b>
+<b class="nc">&nbsp;            .premium(renewalPremium)</b>
+<b class="nc">&nbsp;            .itl(itl)</b>
+<b class="nc">&nbsp;            .phcf(phcf)</b>
+<b class="nc">&nbsp;            .stampDuty(stampDuty)</b>
+<b class="nc">&nbsp;            .totalPremium(premiumWithIncludeTax)</b>
+<b class="nc">&nbsp;            .changeInAgePremium(premiumChangeInAge)</b>
+<b class="nc">&nbsp;            .loadingPercentage(BigDecimal.valueOf(loadingPercent))</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;  }
+&nbsp;  @Override
+&nbsp;  public RenewalPremium calcRenewPremiumByTotalPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                                       PolicyDetail policyDetail,
+&nbsp;                                                       Benefit benefit,
+&nbsp;                                                       PolicyClaim policyClaim,
+&nbsp;                                                       BigDecimal adjustment) {
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiaryCopy = new PolicyBeneficiary();</b>
+<b class="nc">&nbsp;    Benefit benefitCopy = new Benefit();</b>
+<b class="nc">&nbsp;    BeanUtils.copyProperties(policyBeneficiary, policyBeneficiaryCopy);</b>
+<b class="nc">&nbsp;    BeanUtils.copyProperties(benefit, benefitCopy);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    StringBuilder calcLog = new StringBuilder();</b>
+<b class="nc">&nbsp;    logger.info(&quot;########  calcRenewPremiumByTotalPremium start ########&quot;);</b>
+<b class="nc">&nbsp;    String logPolicyBeneficiary = g.toJson(policyBeneficiary);</b>
+<b class="nc">&nbsp;    String logPolicyDetail =  g.toJson(policyDetail);</b>
+<b class="nc">&nbsp;    String logBenefit = g.toJson(benefit);</b>
+<b class="nc">&nbsp;    String logAdjustment = g.toJson(adjustment);</b>
+<b class="nc">&nbsp;    logger.info(&quot;policyBeneficiary: {}&quot;, logPolicyBeneficiary);</b>
+<b class="nc">&nbsp;    logger.info(&quot;policyDetail: {}&quot;, logPolicyDetail);</b>
+<b class="nc">&nbsp;    logger.info(&quot;benefit: {}&quot;, logBenefit);</b>
+<b class="nc">&nbsp;    logger.info(&quot;adjustment: {}&quot;, logAdjustment);</b>
+&nbsp;
+&nbsp;    // 1.Get premiumPaid from endpoint(SQL script)
+<b class="nc">&nbsp;    BigDecimal totalPremium = policyDetail.getTotalPremium();</b>
+<b class="nc">&nbsp;    logger.info(&quot;totalPremium {}&quot;, totalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    calcLog.append(&quot;1.Get premiumPaid from endpoint(SQL script)&quot;).append(&quot;\t&quot;);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;  premiumPaid = &quot;).append(totalPremium).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;    //2.Remove tax. premiumPaid - (0.45% * premiumPaid)
+<b class="nc">&nbsp;    BigDecimal tax = totalPremium.subtract(new BigDecimal(100).multiply(totalPremium)</b>
+<b class="nc">&nbsp;                                                              .divide(BigDecimal.valueOf(100.45), 2, RoundingMode.HALF_UP));</b>
+<b class="nc">&nbsp;    logger.info(&quot;tax : {}&quot;, tax);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;tax = &quot;).append(tax).append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal totalPremiumWithoutTax = totalPremium.multiply(BigDecimal.valueOf(100))</b>
+<b class="nc">&nbsp;                                                    .divide(BigDecimal.valueOf(100.45), 2, RoundingMode.HALF_UP);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;totalPremiumWithoutTax remove 0.45% tax: {}&quot;, totalPremiumWithoutTax);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;2.premiumPaid  =  100*premiumPaid/100.45  &quot;).append(&quot; (remove 0.45% tax) &quot;).append(&quot;\t&quot;);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;  premiumPaid  = 100*&quot;).append(totalPremium).append(&quot;/100.45 &quot;).append(&quot;=&quot;).append(totalPremiumWithoutTax).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;    //2.lossRatio = claimsPaid / (premiumPaid * 10 / 12) (lossRatio = Claims Ratio)
+&nbsp;    double lossRatio;
+<b class="nc">&nbsp;    double loadingPercent = 1;</b>
+&nbsp;
+<b class="nc">&nbsp;    double claimsPaid = policyClaim.getClaimsPaid().doubleValue();</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.debug(&quot;claimsPaid:  {}&quot;, claimsPaid);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;2.claimsPaid = &quot;).append(claimsPaid).append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    lossRatio = (claimsPaid / ((totalPremiumWithoutTax.doubleValue() * 10 / 12) * GlobalConstant.LOSSRATIO_FACTOR));</b>
+<b class="nc">&nbsp;    logger.info(&quot;LR lossRatio: {}&quot;, lossRatio);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;lossRatio = claimsPaid/ (premiumPaid * 10/12) = &quot;).append(lossRatio).append(&quot;\t&quot;);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;lossRatio = &quot;)</b>
+<b class="nc">&nbsp;           .append(claimsPaid)</b>
+<b class="nc">&nbsp;           .append(&quot;/(&quot;)</b>
+<b class="nc">&nbsp;           .append(totalPremiumWithoutTax)</b>
+<b class="nc">&nbsp;           .append(&quot; * 10/12&quot;)</b>
+<b class="nc">&nbsp;           .append(&quot;)&quot;)</b>
+<b class="nc">&nbsp;           .append(&quot;=&quot;)</b>
+<b class="nc">&nbsp;           .append(lossRatio)</b>
+<b class="nc">&nbsp;           .append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;    //3.loading percentage = refer to  lossRatio VS Premium Loadings(loading percentage) table
+<b class="nc">&nbsp;    loadingPercent = this.calculateLoadingPercent(lossRatio);</b>
+<b class="nc">&nbsp;    logger.info(LOADING_PERCENT, loadingPercent);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;3.loadingPercent = &quot;).append(loadingPercent).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;    //4.loading amount  = premiumPaid * loading percentage
+<b class="nc">&nbsp;    BigDecimal loadingAmount = totalPremiumWithoutTax.multiply(BigDecimal.valueOf(loadingPercent))</b>
+<b class="nc">&nbsp;                                                     .setScale(2, RoundingMode.HALF_UP);</b>
+<b class="nc">&nbsp;    logger.info(&quot;loadingAmount: {}&quot;, loadingAmount);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;4.loadingAmount = &quot;).append(loadingAmount).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;    //5.discount percentage = noClaimYear (0-3 years no discount,3 years - 0.025, 4 years - 0.05, 5 years - 0.075,6 year or more - 0.1
+<b class="nc">&nbsp;    double discountPercent = this.calculateDiscountPercent(policyClaim.getNoClaimYear());</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;noClaimYear = &quot;).append(policyClaim.getNoClaimYear()).append(&quot;\t&quot;);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;discount percentage = noClaimYear (0-3 years no discount,3 years - 0.025, 4 years - 0.05, 5 years - 0.075,6 year or more - 0.1 \t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;discountPercent: {}&quot;, discountPercent);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;5.discountPercent = &quot;).append(discountPercent).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;    //6.discount amount = premiumPaid * discount percentage
+<b class="nc">&nbsp;    BigDecimal discountAmount = totalPremiumWithoutTax.multiply(BigDecimal.valueOf(discountPercent))</b>
+<b class="nc">&nbsp;                                                      .setScale(2, RoundingMode.HALF_UP);</b>
+<b class="nc">&nbsp;    logger.info(&quot;discountAmount: {}&quot;, discountAmount);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;6.discountAmount = &quot;).append(discountAmount).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;//  7.renewal Premium = premiumPaid + loading amount - discount amount + add premium change due to change in age.
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal normalAgeRenewPremium = this.calculatePremium(policyBeneficiary, policyDetail.getProductId(), benefit, true);</b>
+&nbsp;
+&nbsp;
+&nbsp;    //8.loading amountChangeInAge  = premiumPaid * loading percentage
+<b class="nc">&nbsp;    BigDecimal loadingAmountCurrentAge = normalAgeRenewPremium.multiply(BigDecimal.valueOf(loadingPercent))</b>
+<b class="nc">&nbsp;            .setScale(2, RoundingMode.HALF_UP);</b>
+<b class="nc">&nbsp;    logger.info(&quot;loadingAmountCurrentAge: {}&quot;, loadingAmountCurrentAge);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;4.loadingAmountCurrentAge = &quot;).append(loadingAmountCurrentAge).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;***** start reduceAge RenewPremium ******&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiaryUpdate = reduceAgeForAllPolicyBeneficiary(policyBeneficiaryCopy);</b>
+<b class="nc">&nbsp;    BigDecimal reduceAgeRenewPremium = this.calculatePremium(policyBeneficiaryUpdate, policyDetail.getProductId(), benefitCopy, true);</b>
+<b class="nc">&nbsp;    logger.info(&quot;***** end reduceAge RenewPremium ******&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;normalAgeRenewPremium: {}&quot;, normalAgeRenewPremium);</b>
+<b class="nc">&nbsp;    logger.info(&quot;reduceAgeRenewPremium: {}&quot;, reduceAgeRenewPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premiumChangeInAge = normalAgeRenewPremium.subtract(reduceAgeRenewPremium);</b>
+&nbsp;
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;premiumChangeInAge: {}&quot;, premiumChangeInAge);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;8.add premium change due to change in age = &quot;).append(premiumChangeInAge).append(&quot;\t&quot;);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal renewalPremium =  totalPremiumWithoutTax.add(loadingAmount).subtract(discountAmount).add(premiumChangeInAge);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;renewalPremium + loadingAmount - discountAmount + premiumChangeInAge :{}&quot;, renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal renewalPremiumCurrentAge =  normalAgeRenewPremium.add(loadingAmountCurrentAge).subtract(discountAmount);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;normalAgeRenewPremium + loadingAmount - discountAmount :{}&quot;, renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (renewalPremiumCurrentAge.compareTo(renewalPremium) &gt; 0){</b>
+<b class="nc">&nbsp;      renewalPremium = renewalPremiumCurrentAge;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    calcLog.append(&quot;renewal Premium = premiumPaid + loadingAmount - discountAmount + add premium change due to change in age.&quot;).append(&quot;\t&quot;);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;renewal Premium = &quot;)</b>
+<b class="nc">&nbsp;           .append(totalPremiumWithoutTax)</b>
+<b class="nc">&nbsp;           .append(&quot; + &quot;)</b>
+<b class="nc">&nbsp;           .append(loadingAmount)</b>
+<b class="nc">&nbsp;           .append(&quot; - &quot;)</b>
+<b class="nc">&nbsp;           .append(discountAmount)</b>
+<b class="nc">&nbsp;           .append(&quot; + &quot;)</b>
+<b class="nc">&nbsp;           .append(premiumChangeInAge)</b>
+<b class="nc">&nbsp;           .append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal itl = ProductUtils.calculateITL(renewalPremium);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;itl = &quot;).append(itl).append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal phcf = ProductUtils.calculatePHCF(renewalPremium);</b>
+<b class="nc">&nbsp;    calcLog.append(&quot;phcf = &quot;).append(phcf).append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal phcfAnditl = itl.add(phcf);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;itl + phcf : {}&quot;, phcfAnditl);</b>
+&nbsp;
+<b class="nc">&nbsp;    calcLog.append(&quot;renewalPremium = &quot;).append(renewalPremium).append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal premiumWithIncludeTax =  renewalPremium.add(itl).add(phcf).setScale(0, RoundingMode.UP);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;premiumWithoutTax: {}&quot;, renewalPremium);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;renewalPremium + itl + phcf : {}&quot;, premiumWithIncludeTax);</b>
+&nbsp;
+<b class="nc">&nbsp;    calcLog.append(&quot;final renewalPremium = renewalPremium + itl + phcf = &quot;).append(premiumWithIncludeTax).append(&quot;\t&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    BigDecimal stampDuty = BigDecimal.ZERO;</b>
+<b class="nc">&nbsp;    logger.info(&quot;***** Detailed calculation process start ******&quot;);</b>
+<b class="nc">&nbsp;    String log = calcLog.toString();</b>
+<b class="nc">&nbsp;    logger.info(log);</b>
+<b class="nc">&nbsp;    logger.info(&quot;***** Detailed calculation process end ******&quot;);</b>
+<b class="nc">&nbsp;    return RenewalPremium.builder()</b>
+<b class="nc">&nbsp;                         .claimsPaid(policyClaim.getClaimsPaid())</b>
+<b class="nc">&nbsp;                         .earnedPremium(policyClaim.getEarnedPremium())</b>
+<b class="nc">&nbsp;                         .lossRatio(BigDecimal.valueOf(lossRatio))</b>
+<b class="nc">&nbsp;                         .manualAdjustment(adjustment)</b>
+<b class="nc">&nbsp;                         .loading(loadingAmount)</b>
+<b class="nc">&nbsp;                         .discount(discountAmount)</b>
+<b class="nc">&nbsp;                         .premium(renewalPremium)</b>
+<b class="nc">&nbsp;                         .itl(itl)</b>
+<b class="nc">&nbsp;                         .phcf(phcf)</b>
+<b class="nc">&nbsp;                         .stampDuty(stampDuty)</b>
+<b class="nc">&nbsp;                         .totalPremium(premiumWithIncludeTax)</b>
+<b class="nc">&nbsp;                         .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  public BigDecimal getTravelInsurancePremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                        Benefit benefit) {
+<b class="nc">&nbsp;    int travelInsurancePremium = 0;</b>
+<b class="nc">&nbsp;    if (benefit.getTravelInsurance() &gt; 0) {</b>
+<b class="nc">&nbsp;      JamiiPlusMap jamiiPlusMap = productPremiumMap.getJamiiPlusMap();</b>
+<b class="nc">&nbsp;      int premium = jamiiPlusMap.getTravel().get(benefit.getTravelInsurance());</b>
+<b class="nc">&nbsp;      int totalBeneficiary = this.getTotalBeneficiary(policyBeneficiary);</b>
+<b class="nc">&nbsp;      logger.info(&quot;totalBeneficiary: {}&quot;, totalBeneficiary);</b>
+<b class="nc">&nbsp;      travelInsurancePremium = premium * totalBeneficiary;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return new BigDecimal(travelInsurancePremium);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public PolicyBeneficiary reduceAgeForAllPolicyBeneficiary(PolicyBeneficiary policyBeneficiarySource) {
+&nbsp;
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiaryCopy = new PolicyBeneficiary();</b>
+<b class="nc">&nbsp;    BeanUtils.copyProperties(policyBeneficiarySource, policyBeneficiaryCopy);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (policyBeneficiaryCopy.getPrincipal() != null) {</b>
+<b class="nc">&nbsp;      policyBeneficiarySource.getPrincipal().getBenefitPremiums().clear();</b>
+<b class="nc">&nbsp;      logger.info(&quot;policyBeneficiary principal age:{}&quot;, policyBeneficiaryCopy.getPrincipal().getAge());</b>
+<b class="nc">&nbsp;      policyBeneficiaryCopy.getPrincipal().setAge(policyBeneficiaryCopy.getPrincipal().getAge() - 1);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (policyBeneficiaryCopy.getSpouse() != null) {</b>
+<b class="nc">&nbsp;      logger.info(&quot;policyBeneficiary spouse age:{}&quot;, policyBeneficiaryCopy.getSpouse().getAge());</b>
+<b class="nc">&nbsp;      policyBeneficiarySource.getSpouse().getBenefitPremiums().clear();</b>
+<b class="nc">&nbsp;      policyBeneficiaryCopy.getSpouse().setAge(policyBeneficiaryCopy.getSpouse().getAge() - 1);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(policyBeneficiaryCopy.getChildren())) {</b>
+<b class="nc">&nbsp;      policyBeneficiaryCopy.getChildren().forEach(o -&gt; {</b>
+<b class="nc">&nbsp;      o.getBenefitPremiums().clear();</b>
+<b class="nc">&nbsp;                                  logger.info(&quot;policyBeneficiary children age:{}&quot;, o.getAge());</b>
+<b class="nc">&nbsp;                                  o.setAge(o.getAge() - 1);</b>
+<b class="nc">&nbsp;                                });</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return policyBeneficiaryCopy;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  private double calculateLoadingPercent(double lossRatio) {
+<b class="nc">&nbsp;    List&lt;Double&gt; lossRateList = new ArrayList&lt;&gt;(Arrays.asList(0.62, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0, 1.1, MAX_VALUE));</b>
+<b class="nc">&nbsp;    List&lt;Double&gt; loadPercentList = new ArrayList&lt;&gt;(Arrays.asList(0.0, 0.06, 0.08, 0.09, 0.10, 0.12, 0.13, 0.15, 0.16, 0.23));</b>
+<b class="nc">&nbsp;    int index = 0;</b>
+<b class="nc">&nbsp;    for (int i = 0; i &lt; lossRateList.size(); i++) {</b>
+<b class="nc">&nbsp;      if (lossRatio &lt;= lossRateList.get(i)) {</b>
+<b class="nc">&nbsp;        index = i;</b>
+<b class="nc">&nbsp;        break;</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return loadPercentList.get(index);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private double calculateDiscountPercent(int year) {
+<b class="nc">&nbsp;    Map&lt;Integer, Double&gt; discountMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    discountMap.put(0, 0.0);</b>
+<b class="nc">&nbsp;    discountMap.put(1, 0.0);</b>
+<b class="nc">&nbsp;    discountMap.put(2, 0.0);</b>
+<b class="nc">&nbsp;    discountMap.put(3, 0.025);</b>
+<b class="nc">&nbsp;    discountMap.put(4, 0.05);</b>
+<b class="nc">&nbsp;    discountMap.put(5, 0.075);</b>
+<b class="nc">&nbsp;    discountMap.put(6, 0.1);</b>
+<b class="nc">&nbsp;    discountMap.put(7, 0.1);</b>
+<b class="nc">&nbsp;    discountMap.put(8, 0.1);</b>
+<b class="nc">&nbsp;    discountMap.put(9, 0.1);</b>
+<b class="nc">&nbsp;    discountMap.put(10, 0.1);</b>
+<b class="nc">&nbsp;    return discountMap.get(year);</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

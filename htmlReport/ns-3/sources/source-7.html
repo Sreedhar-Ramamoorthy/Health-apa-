@@ -1,0 +1,416 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HospitalServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: HospitalServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HospitalServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/163)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import com.github.wenhao.jpa.Specifications;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import ke.co.apollo.health.domain.request.HospitalUpdateRequest;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.compress.utils.Lists;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.poi.ss.usermodel.Row;
+&nbsp;import org.apache.poi.ss.usermodel.Sheet;
+&nbsp;import org.apache.poi.ss.usermodel.Workbook;
+&nbsp;import org.apache.poi.ss.usermodel.WorkbookFactory;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.data.jpa.domain.Specification;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.web.multipart.MultipartFile;
+&nbsp;
+&nbsp;import ke.co.apollo.health.domain.entity.HospitalEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.LocationEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.PaymentEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.ServiceEntity;
+&nbsp;import ke.co.apollo.health.domain.request.HospitalSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.response.HospitalInitialResponse;
+&nbsp;import ke.co.apollo.health.repository.HospitalRepository;
+&nbsp;import ke.co.apollo.health.repository.LocationRepository;
+&nbsp;import ke.co.apollo.health.repository.PaymentRepository;
+&nbsp;import ke.co.apollo.health.repository.ServiceRepository;
+&nbsp;import ke.co.apollo.health.service.HospitalService;
+&nbsp;import ke.co.apollo.health.utils.ExcelUtil;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public class HospitalServiceImpl implements HospitalService {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    HospitalRepository hospitalRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    ServiceRepository serviceRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    PaymentRepository paymentRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    LocationRepository locationRepository;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;PaymentEntity&gt; getPayments() {
+<b class="nc">&nbsp;        return paymentRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;ServiceEntity&gt; getServices() {
+<b class="nc">&nbsp;        return serviceRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;LocationEntity&gt; getLocations() {
+<b class="nc">&nbsp;        List&lt;LocationEntity&gt; locationEntities = locationRepository.findAll();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LocationEntity&gt; nairobi = locationEntities.stream()</b>
+<b class="nc">&nbsp;                                                       .filter(o -&gt; StringUtils.startsWith(o.getName(), &quot;NAIROBI&quot;))</b>
+<b class="nc">&nbsp;                                                       .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LocationEntity&gt; others = locationEntities.stream()</b>
+<b class="nc">&nbsp;                                                      .filter(o -&gt; !StringUtils.startsWith(o.getName(), &quot;NAIROBI&quot;))</b>
+<b class="nc">&nbsp;                                                      .sorted(Comparator.comparing(LocationEntity::getName))</b>
+<b class="nc">&nbsp;                                                      .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        nairobi.addAll(others);</b>
+&nbsp;
+<b class="nc">&nbsp;        return nairobi;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;HospitalEntity&gt; getHospitals() {
+<b class="nc">&nbsp;        return hospitalRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;HospitalEntity&gt; searchHospitals(HospitalSearchRequest request) {
+<b class="nc">&nbsp;        Pageable pageable = PageRequest.of(request.getIndex() - 1, request.getLimit());</b>
+<b class="nc">&nbsp;        Integer location = request.getLocationId();</b>
+<b class="nc">&nbsp;        List&lt;Integer&gt; paymentIds = request.getCoPaymentId();</b>
+<b class="nc">&nbsp;        List&lt;Integer&gt; serviceIds = request.getServiceId();</b>
+<b class="nc">&nbsp;        log.warn( &quot;list list of payments {}&quot; , paymentIds);</b>
+<b class="nc">&nbsp;        log.warn(&quot;list list of services {}&quot; , serviceIds);</b>
+<b class="nc">&nbsp;        boolean isPaymentIds = CollectionUtils.isEmpty(paymentIds);</b>
+<b class="nc">&nbsp;        boolean isServiceIds = CollectionUtils.isEmpty(serviceIds);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(isPaymentIds &amp;&amp; isServiceIds){</b>
+<b class="nc">&nbsp;            Specification&lt;HospitalEntity&gt; spec = Specifications.&lt;HospitalEntity&gt;and()</b>
+<b class="nc">&nbsp;                    .in(false, &quot;paymentId&quot;, paymentIds)</b>
+<b class="nc">&nbsp;                    .eq(Objects.nonNull(location), &quot;locationId&quot;, location)</b>
+<b class="nc">&nbsp;                    .in(false, &quot;services.id&quot;, serviceIds)</b>
+<b class="nc">&nbsp;                    .build();</b>
+<b class="nc">&nbsp;            return hospitalRepository.findAll(spec,pageable);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return hospitalRepository.findAllByPaymentIdAndServiceIdNative(pageable,location,paymentIds,serviceIds);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean updateHospitalLocation(MultipartFile multipartFile) {
+<b class="nc">&nbsp;        locationRepository.deleteAll();</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public void updateHospital(MultipartFile multipartFile) throws IOException {
+<b class="nc">&nbsp;        log.debug(&quot;MultipartFile getName: {}&quot;, multipartFile.getName());</b>
+<b class="nc">&nbsp;        log.debug(&quot;MultipartFile getOriginalFilename: {}&quot;, multipartFile.getOriginalFilename());</b>
+<b class="nc">&nbsp;        log.debug(&quot;MultipartFile getContentType: {}&quot;, multipartFile.getContentType());</b>
+&nbsp;
+<b class="nc">&nbsp;        hospitalRepository.deleteAll();</b>
+<b class="nc">&nbsp;        Workbook workbook = null;</b>
+<b class="nc">&nbsp;        InputStream inputStream = multipartFile.getInputStream();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            workbook = WorkbookFactory.create(inputStream);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(e.getMessage());</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if (workbook != null) {</b>
+<b class="nc">&nbsp;                workbook.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            inputStream.close();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (workbook != null) {</b>
+<b class="nc">&nbsp;            saveHospitalEntityList(workbook);</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private void saveHospitalEntityList(Workbook workbook) {
+<b class="nc">&nbsp;        Sheet sheet = workbook.getSheetAt(6);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;HospitalEntity&gt; hospitalEntityList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ServiceEntity&gt; serviceEntityList = serviceRepository.findAll();</b>
+<b class="nc">&nbsp;        Map&lt;Integer, ServiceEntity&gt; serviceEntityMap = serviceEntityList.stream()</b>
+<b class="nc">&nbsp;                                                                        .collect(Collectors.toMap(ServiceEntity::getId, a -&gt; a));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LocationEntity&gt; locationEntities = locationRepository.findAll();</b>
+<b class="nc">&nbsp;        Map&lt;String, Integer&gt; locationMapId = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        locationEntities.forEach(o -&gt; locationMapId.put(o.getName(), o.getId()));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 1; i &lt;= sheet.getLastRowNum(); i++) {</b>
+<b class="nc">&nbsp;            Row rowH = sheet.getRow(i);</b>
+&nbsp;
+<b class="nc">&nbsp;            String name = ExcelUtil.getCellValue(rowH.getCell(0));</b>
+<b class="nc">&nbsp;            String address = ExcelUtil.getCellValue(rowH.getCell(1));</b>
+<b class="nc">&nbsp;            String phone = ExcelUtil.getCellValue(rowH.getCell(3));</b>
+<b class="nc">&nbsp;            String email = ExcelUtil.getCellValue(rowH.getCell(4));</b>
+<b class="nc">&nbsp;            String location = ExcelUtil.getCellValue(rowH.getCell(5));</b>
+<b class="nc">&nbsp;            String pay = ExcelUtil.getCellValue(rowH.getCell(6));</b>
+<b class="nc">&nbsp;            Integer paymentId = null;</b>
+<b class="nc">&nbsp;            if (StringUtils.equalsIgnoreCase(pay, &quot;Yes&quot;)) {</b>
+<b class="nc">&nbsp;                paymentId = 1;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (StringUtils.equalsIgnoreCase(pay, &quot;No&quot;)) {</b>
+<b class="nc">&nbsp;                paymentId = 2;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;ServiceEntity&gt; serviceEntitySet = getService(rowH, serviceEntityMap);</b>
+<b class="nc">&nbsp;            HospitalEntity hospitalEntity = HospitalEntity.builder()</b>
+<b class="nc">&nbsp;                                                          .name(name)</b>
+<b class="nc">&nbsp;                                                          .address(address)</b>
+<b class="nc">&nbsp;                                                          .locationId(locationMapId.get(location))</b>
+<b class="nc">&nbsp;                                                          .contact(phone)</b>
+<b class="nc">&nbsp;                                                          .email(email)</b>
+<b class="nc">&nbsp;                                                          .paymentId(paymentId)</b>
+<b class="nc">&nbsp;                                                          .services(serviceEntitySet)</b>
+<b class="nc">&nbsp;                                                          .build();</b>
+<b class="nc">&nbsp;            if (paymentId == null) {</b>
+<b class="nc">&nbsp;                log.error(hospitalEntity.getAddress());</b>
+<b class="nc">&nbsp;                log.error(hospitalEntity.getContact());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            hospitalEntityList.add(hospitalEntity);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;hospitalEntityList size: {}&quot;, hospitalEntityList.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        hospitalRepository.saveAll(hospitalEntityList);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private Set&lt;ServiceEntity&gt; getService(Row row, Map&lt;Integer, ServiceEntity&gt; serviceEntityMap) {
+<b class="nc">&nbsp;        Set&lt;ServiceEntity&gt; serviceEntitySet = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int i = 8; i &lt; 45; i++) {</b>
+<b class="nc">&nbsp;            String name = ExcelUtil.getCellValue(row.getCell(i));</b>
+<b class="nc">&nbsp;            Integer serviceId = StringUtils.isNotEmpty(name) ? Integer.valueOf(name) : null;</b>
+&nbsp;
+<b class="nc">&nbsp;            serviceEntitySet.add(serviceEntityMap.get(serviceId));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return serviceEntitySet;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public HospitalInitialResponse getInitialData() {
+<b class="nc">&nbsp;        return HospitalInitialResponse.builder()</b>
+<b class="nc">&nbsp;                                      .locations(this.getLocations())</b>
+<b class="nc">&nbsp;                                      .coPayments(this.getPayments())</b>
+<b class="nc">&nbsp;                                      .services(this.getServices())</b>
+<b class="nc">&nbsp;                                      .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void updateHospitalList(MultipartFile multipartFile) throws IOException {
+<b class="nc">&nbsp;        log.debug(&quot;UpdateHospitalList MultipartFile getName: {}&quot;, multipartFile.getName());</b>
+<b class="nc">&nbsp;        log.debug(&quot;UpdateHospitalList MultipartFile getOriginalFilename: {}&quot;, multipartFile.getOriginalFilename());</b>
+<b class="nc">&nbsp;        log.debug(&quot;UpdateHospitalList MultipartFile getContentType: {}&quot;, multipartFile.getContentType());</b>
+<b class="nc">&nbsp;        Workbook validWorkbook = null;</b>
+<b class="nc">&nbsp;        InputStream validInputStream = multipartFile.getInputStream();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            validWorkbook = WorkbookFactory.create(validInputStream);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(e.getMessage());</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if (validWorkbook != null) {</b>
+<b class="nc">&nbsp;                validWorkbook.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            validInputStream.close();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (validWorkbook != null) {</b>
+<b class="nc">&nbsp;            updateHospitalEntityList(validWorkbook);</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;    public void updateHospitalEntityList(Workbook workbook) {
+<b class="nc">&nbsp;        Sheet sheet = workbook.getSheetAt(2);</b>
+<b class="nc">&nbsp;        List&lt;HospitalEntity&gt; hospitalList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;ServiceEntity&gt; serviceList = serviceRepository.findAll();</b>
+<b class="nc">&nbsp;        Map&lt;Integer, ServiceEntity&gt; serviceMap = serviceList.stream()</b>
+<b class="nc">&nbsp;                .collect(Collectors.toMap(ServiceEntity::getId, a -&gt; a));</b>
+<b class="nc">&nbsp;        List&lt;LocationEntity&gt; locations = locationRepository.findAll();</b>
+<b class="nc">&nbsp;        Map&lt;String, Integer&gt; locationMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        locations.forEach(o -&gt; locationMap.put(o.getName(), o.getId()));</b>
+<b class="nc">&nbsp;        for (int i = 1; i &lt;= sheet.getLastRowNum(); i++) {</b>
+<b class="nc">&nbsp;            Row row = sheet.getRow(i);</b>
+<b class="nc">&nbsp;            String validName = ExcelUtil.getCellValue(row.getCell(0));</b>
+<b class="nc">&nbsp;            String validAddress = ExcelUtil.getCellValue(row.getCell(1));</b>
+<b class="nc">&nbsp;            String validPhone = ExcelUtil.getCellValue(row.getCell(3));</b>
+<b class="nc">&nbsp;            String validEmail = ExcelUtil.getCellValue(row.getCell(4));</b>
+<b class="nc">&nbsp;            String validLocation = ExcelUtil.getCellValue(row.getCell(5));</b>
+<b class="nc">&nbsp;            String validPay = ExcelUtil.getCellValue(row.getCell(6));</b>
+<b class="nc">&nbsp;            String workingHours = ExcelUtil.getCellValue(row.getCell(7));</b>
+<b class="nc">&nbsp;            Integer payId = null;</b>
+<b class="nc">&nbsp;            if (StringUtils.equalsIgnoreCase(validPay, &quot;Yes&quot;)) {</b>
+<b class="nc">&nbsp;                payId = 1;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (StringUtils.equalsIgnoreCase(validPay, &quot;No&quot;)) {</b>
+<b class="nc">&nbsp;                payId = 2;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;HospitalEntity&gt; nameEntity = hospitalRepository.findAllByNameAndAddress(validName, validAddress);</b>
+<b class="nc">&nbsp;            if(!nameEntity.isEmpty()) {</b>
+<b class="nc">&nbsp;                Integer paymentId = payId;</b>
+<b class="nc">&nbsp;                nameEntity.stream().forEach(hospitalEntity-&gt; {</b>
+<b class="nc">&nbsp;                    HospitalUpdateRequest hospitalUpdateRequest = HospitalUpdateRequest.builder()</b>
+<b class="nc">&nbsp;                            .name(validName)</b>
+<b class="nc">&nbsp;                            .address(validAddress)</b>
+<b class="nc">&nbsp;                            .locationId(locationMap.get(validLocation))</b>
+<b class="nc">&nbsp;                            .contact(validPhone)</b>
+<b class="nc">&nbsp;                            .email(validEmail)</b>
+<b class="nc">&nbsp;                            .paymentId(paymentId)</b>
+<b class="nc">&nbsp;                            .workingHours(workingHours)</b>
+<b class="nc">&nbsp;                            .build();</b>
+<b class="nc">&nbsp;                    hospitalRepository.updateHospital(hospitalUpdateRequest);</b>
+<b class="nc">&nbsp;                });</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;            else {
+<b class="nc">&nbsp;                Set&lt;ServiceEntity&gt; serviceEntitySet = getService(row, serviceMap);</b>
+<b class="nc">&nbsp;                HospitalEntity hospitalEntity = HospitalEntity.builder()</b>
+<b class="nc">&nbsp;                        .name(validName)</b>
+<b class="nc">&nbsp;                        .address(validAddress)</b>
+<b class="nc">&nbsp;                        .locationId(StringUtils.isNotBlank(validLocation) ? locationMap.get(validLocation): null)</b>
+<b class="nc">&nbsp;                        .contact(validPhone)</b>
+<b class="nc">&nbsp;                        .email(validEmail)</b>
+<b class="nc">&nbsp;                        .paymentId(payId)</b>
+<b class="nc">&nbsp;                        .services(serviceEntitySet)</b>
+<b class="nc">&nbsp;                        .workingHours(workingHours)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                hospitalList.add(hospitalEntity);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        hospitalRepository.saveAll(hospitalList);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

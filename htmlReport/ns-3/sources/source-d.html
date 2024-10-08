@@ -1,0 +1,883 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PolicyServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: PolicyServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PolicyServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/463)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import com.github.pagehelper.page.PageMethod;
+&nbsp;import com.google.common.collect.ImmutableMap;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.PolicyIdRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.PolicyNumberRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.ApplicationRenewalPolicyListResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.PolicyOverComingResponseDto;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.PolicyRenewalResponse;
+&nbsp;import ke.co.apollo.health.common.enums.DependantRelationship;
+&nbsp;import ke.co.apollo.health.common.enums.PolicyStatus;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.common.utils.HealthDateUtils;
+&nbsp;import ke.co.apollo.health.common.utils.JsonUtils;
+&nbsp;import ke.co.apollo.health.config.MdcConfig;
+&nbsp;import ke.co.apollo.health.config.PolicyRenewalDaysConfig;
+&nbsp;import ke.co.apollo.health.config.PolicyRenewalExecutorConfiguration;
+&nbsp;import ke.co.apollo.health.config.PolicyStatusConfig;
+&nbsp;import ke.co.apollo.health.domain.ApplicationPolicyListSearchFilter;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary.Beneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyClaim;
+&nbsp;import ke.co.apollo.health.domain.entity.PolicyOverComingEntity;
+&nbsp;import ke.co.apollo.health.domain.request.ApplicationPolicyListSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerIdRequest;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.request.EmailAttachmentBytesDto;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.domain.response.HealthPolicyListResponse;
+&nbsp;import ke.co.apollo.health.event.ReminderEventPublisher;
+&nbsp;import ke.co.apollo.health.feign.NotificationClient;
+&nbsp;import ke.co.apollo.health.mapper.health.PolicyMapper;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.repository.PolicyOverComingRepository;
+&nbsp;import ke.co.apollo.health.service.*;
+&nbsp;import ke.co.apollo.health.utils.GenericExcelFileUtils;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.lang3.BooleanUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.time.DateFormatUtils;
+&nbsp;import org.apache.commons.lang3.time.DateUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.*;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class PolicyServiceImpl implements PolicyService {</b>
+&nbsp;
+<b class="nc">&nbsp;  private Logger logger = LoggerFactory.getLogger(getClass());</b>
+&nbsp;
+<b class="nc">&nbsp;  private static final Map&lt;String, String&gt; applicationPolicySortTypeMap = ImmutableMap</b>
+<b class="nc">&nbsp;      .of(&quot;createdTime&quot;, &quot;policy.create_time&quot;, &quot;policyNumber&quot;, &quot;policy.policy_number&quot;);</b>
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyRemote policyRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerService customerService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyMapper policyMapper;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteService quoteService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  ProductService productService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PremiumService premiumService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  ReminderEventPublisher reminderEventPublisher;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  private PolicyOverComingRepository policyOverComingRepository;
+&nbsp;  @Autowired
+&nbsp;  GenericExcelFileUtils fileUtils;
+&nbsp;  @Autowired
+&nbsp;  PolicyRenewalDaysConfig policyRenewalDaysConfig;
+&nbsp;  @Autowired
+&nbsp;  private NotificationClient notificationClient;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyRenewalExecutorConfiguration renewalExecutorConfiguration;
+&nbsp;
+&nbsp;  @Value(&quot;${business.email.recipient.address}&quot;)
+&nbsp;  String destinationEmail;
+&nbsp;
+&nbsp;  @Value(&quot;${business.email.renewal.template}&quot;)
+&nbsp;  String emailBody;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteMapper quoteMapper;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyStatusConfig policyStatusConfig;
+&nbsp;
+&nbsp;  public PolicyOverComingResponseDto policyUpdateDetails(ComingPolicyListRequest request) {
+<b class="nc">&nbsp;    Pageable pageable = PageRequest.of(request.getIndex() == 0 ? request.getIndex() : request.getIndex() - 1, request.getLimit());</b>
+<b class="nc">&nbsp;    Date now = new Date();</b>
+&nbsp;
+<b class="nc">&nbsp;    Date startDate =  request.getStartDate() == null  ? DateUtils.addMonths(now, -1) : request.getStartDate();</b>
+<b class="nc">&nbsp;    Date endDate = request.getEndDate() == null ? DateUtils.addMonths(now, 2) : request.getEndDate();</b>
+<b class="nc">&nbsp;    Page&lt;PolicyOverComingEntity&gt; comingEntityPage = policyOverComingRepository.findAllByRenewalDateBetween(startDate, endDate, pageable);</b>
+&nbsp;    List&lt;PolicyOverComingDto&gt; policyOverComingDtos;
+<b class="nc">&nbsp;    policyOverComingDtos = comingEntityPage.get().map(o -&gt;</b>
+&nbsp;            {
+<b class="nc">&nbsp;              PolicyOverComingDto policy = new PolicyOverComingDto();</b>
+<b class="nc">&nbsp;              BeanUtils.copyProperties(o, policy);</b>
+<b class="nc">&nbsp;              return policy;</b>
+&nbsp;            }
+<b class="nc">&nbsp;    ).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;    return PolicyOverComingResponseDto.builder().total(comingEntityPage.getTotalPages() * request.getLimit()).policyOverComingListDto(policyOverComingDtos).build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public byte[] comingPolicyListInExcel(ComingPolicyListRequestInExcel request) {
+<b class="nc">&nbsp;    List&lt;PolicyOverComingEntity&gt; comingEntityPage = policyOverComingRepository.findAllByRenewalDateBetween(request.getStartDate(), request.getEndDate());</b>
+&nbsp;    List&lt;PolicyOverComingDto&gt; policyOverComingDtos;
+<b class="nc">&nbsp;    policyOverComingDtos = comingEntityPage.stream().map(o -&gt;</b>
+&nbsp;            {
+<b class="nc">&nbsp;              PolicyOverComingDto policy = new PolicyOverComingDto();</b>
+<b class="nc">&nbsp;              BeanUtils.copyProperties(o, policy);</b>
+<b class="nc">&nbsp;              return policy;</b>
+&nbsp;            }
+<b class="nc">&nbsp;    ).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;    if(policyOverComingDtos.isEmpty())</b>
+<b class="nc">&nbsp;      return new byte[0];</b>
+<b class="nc">&nbsp;    return fileUtils.createExcelFile(policyOverComingDtos,&quot;ONCOMING POLICY RENEWAL LIST BETWEEN&quot;+request.getStartDate()+&quot;AND&quot; + request.getEndDate(),&quot;SHEET1&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void renewalsDueIn60Days() {
+<b class="nc">&nbsp;    Date now = new Date();</b>
+<b class="nc">&nbsp;    Calendar calendar = Calendar.getInstance();</b>
+<b class="nc">&nbsp;    calendar.setTime(DateUtils.addMonths(now, 2));</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.HOUR_OF_DAY, 0);</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.MINUTE, 0);</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.SECOND, 0);</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.MILLISECOND, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;    Date startDate = calendar.getTime();</b>
+&nbsp;
+<b class="nc">&nbsp;    calendar.set(Calendar.HOUR_OF_DAY, 23);</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.MINUTE, 59);</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.SECOND, 59);</b>
+<b class="nc">&nbsp;    calendar.set(Calendar.MILLISECOND, 999);</b>
+&nbsp;
+<b class="nc">&nbsp;    Date endDate = calendar.getTime();</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;Start from : {}&quot;, startDate);</b>
+<b class="nc">&nbsp;    logger.info(&quot;end from : {}&quot;, endDate);</b>
+<b class="nc">&nbsp;    byte[] file = comingPolicyListInExcel(ComingPolicyListRequestInExcel.builder().startDate(startDate).endDate(endDate).build());</b>
+<b class="nc">&nbsp;    if(file.length &gt; 0)</b>
+<b class="nc">&nbsp;      notificationClient.sendEmailAttachmentBytes(</b>
+<b class="nc">&nbsp;              new Gson().toJson(</b>
+&nbsp;                      EmailAttachmentBytesDto
+<b class="nc">&nbsp;                      .builder()</b>
+<b class="nc">&nbsp;                      .bytes(file)</b>
+<b class="nc">&nbsp;                      .attachmentName(&quot;ONCOMING POLICY RENEWALS.xlsx&quot;)</b>
+<b class="nc">&nbsp;                      .emailAddress(destinationEmail)</b>
+<b class="nc">&nbsp;                      .text(emailBody)</b>
+<b class="nc">&nbsp;                      .subject(&quot;POLICY(s) RENEWING IN 60 DAYS&quot;)</b>
+<b class="nc">&nbsp;                      .build()</b>
+&nbsp;              )
+&nbsp;      );
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;HealthPolicyListResponse&gt; getCustomerPolicyList(CustomerPolicyListRequest request) {
+<b class="nc">&nbsp;    List&lt;HealthPolicyListResponse&gt; responseList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    CustomerDetailResponse customerDetail = customerService.getCustomer(</b>
+<b class="nc">&nbsp;        CustomerSearchRequest.builder().customerId(request.getCustomerId()).build());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;get policy list, customerId: {}, customerDetail: {}&quot;, request.getCustomerId(),</b>
+&nbsp;        customerDetail);
+<b class="nc">&nbsp;    Long entityId = Optional.ofNullable(customerDetail).map(CustomerDetailResponse::getPrincipal)</b>
+<b class="nc">&nbsp;        .map(Principal::getEntityId).orElse(null);</b>
+<b class="nc">&nbsp;    if (entityId != null) {</b>
+<b class="nc">&nbsp;      request.setEntityId(String.valueOf(entityId));</b>
+<b class="nc">&nbsp;      responseList = this.getPolicyLists(request);</b>
+<b class="nc">&nbsp;      responseList.addAll(this.getUnderwritingQuotes(request));</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      logger.warn(&quot;get policy list, entity id is null&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return responseList;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public List&lt;HealthPolicyListResponse&gt; getUnderwritingQuotes(CustomerPolicyListRequest request){
+<b class="nc">&nbsp;    List&lt;Quote&gt; quotesList = quoteMapper</b>
+<b class="nc">&nbsp;            .getCustomerQuotes(request.getCustomerId(), null,</b>
+<b class="nc">&nbsp;                    PolicyStatus.UNDERWRITING.getValue());</b>
+<b class="nc">&nbsp;    logger.warn(&quot;quotesList  {}&quot;,quotesList);</b>
+<b class="nc">&nbsp;    List&lt;HealthPolicyListResponse&gt; responseQoteList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    quotesList.stream().forEach(quote -&gt; {</b>
+&nbsp;      HealthPolicyListResponse response = HealthPolicyListResponse
+<b class="nc">&nbsp;              .builder()</b>
+<b class="nc">&nbsp;              .productId(String.valueOf(quote.getProductId()))</b>
+<b class="nc">&nbsp;              .productName(ProductEnum.getById(quote.getProductId()).getValue())</b>
+<b class="nc">&nbsp;              .policyNumber(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;              .startDate(quote.getStartDate())</b>
+<b class="nc">&nbsp;              .effectiveDate(quote.getEffectiveDate())</b>
+<b class="nc">&nbsp;              .renewalDate(quote.getRenewalDate())</b>
+<b class="nc">&nbsp;              .status(&quot;U&quot;)</b>
+<b class="nc">&nbsp;              .premium(quote.getPremium().getTotalPremium())</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      responseQoteList.add(response);</b>
+<b class="nc">&nbsp;    });</b>
+<b class="nc">&nbsp;    return responseQoteList;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String getProductName(Integer productId) {
+<b class="nc">&nbsp;    return ProductEnum.getById(productId).getValue();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;HealthPolicyListResponse&gt; getCustomerPolicyList(EntityPolicyListRequest request) {
+<b class="nc">&nbsp;    CustomerPolicyListRequest customerPolicyListRequest = CustomerPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;        .customerId(request.getEntityId()).entityId(request.getEntityId()).build();</b>
+<b class="nc">&nbsp;    return this.getPolicyLists(customerPolicyListRequest);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected List&lt;HealthPolicyListResponse&gt; getPolicyLists(CustomerPolicyListRequest request) {
+<b class="nc">&nbsp;    List&lt;HealthPolicyListResponse&gt; responseList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    List&lt;Policy&gt; policyList = policyRemote.getPolicyLists(request);</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(policyList)) {</b>
+<b class="nc">&nbsp;      List&lt;Integer&gt; policyIds = policyList.stream().map(Policy::getPolicyId)</b>
+<b class="nc">&nbsp;          .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;      List&lt;ApplicationRenewalPolicy&gt; renewedPolicyList = policyMapper</b>
+<b class="nc">&nbsp;          .searchRenewedPolicyList(policyIds);</b>
+<b class="nc">&nbsp;      List&lt;ApplicationRenewalPolicy&gt; statusPolicyList = policyMapper</b>
+<b class="nc">&nbsp;              .searchPolicyList(policyIds);</b>
+<b class="nc">&nbsp;      policyList.stream()</b>
+<b class="nc">&nbsp;          .forEach(p -&gt; {</b>
+<b class="nc">&nbsp;                boolean renewed = false;</b>
+<b class="nc">&nbsp;                    if (CollectionUtils.isNotEmpty(renewedPolicyList)) {</b>
+<b class="nc">&nbsp;                      for (ApplicationRenewalPolicy policy : renewedPolicyList) {</b>
+<b class="nc">&nbsp;                        if (p.getPolicyId().equals(policy.getPolicyId()) &amp;&amp; DateUtils</b>
+<b class="nc">&nbsp;                                .isSameDay(p.getPolicyEffectiveDate(), policy.getEffectiveDate())) {</b>
+<b class="nc">&nbsp;                          renewed = true;</b>
+<b class="nc">&nbsp;                          break;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                      }</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                updatePolicyStatus(statusPolicyList, p);</b>
+<b class="nc">&nbsp;                responseList</b>
+<b class="nc">&nbsp;                    .add(HealthPolicyListResponse.builder().policyNumber(p.getPolicyNumber())</b>
+<b class="nc">&nbsp;                        .productId(String.valueOf(p.getProductId()))</b>
+<b class="nc">&nbsp;                        .productName(this.getProductName(p.getProductId()))</b>
+<b class="nc">&nbsp;                        .effectiveDate(p.getPolicyEffectiveDate())</b>
+<b class="nc">&nbsp;                        .startDate(p.getPolicyStartDate()).renewalDate(p.getPolicyRenewalDate())</b>
+<b class="nc">&nbsp;                        .status(p.getPolicyStatus()).premium(p.getPolicyAmount()).renewed(renewed)</b>
+<b class="nc">&nbsp;                        .build());</b>
+<b class="nc">&nbsp;              }</b>
+&nbsp;          );
+&nbsp;    }
+<b class="nc">&nbsp;    return responseList;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void updatePolicyStatus(List&lt;ApplicationRenewalPolicy&gt; statusPolicyList, Policy p){
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(statusPolicyList)) {</b>
+<b class="nc">&nbsp;      for (ApplicationRenewalPolicy policy : statusPolicyList) {</b>
+<b class="nc">&nbsp;        if (p != null &amp;&amp; p.getPolicyId() != null &amp;&amp; p.getPolicyId().equals(policy.getPolicyId())</b>
+<b class="nc">&nbsp;        &amp;&amp; policy.getStatus().equals(PolicyStatus.UNDERWRITING.getValue())) {</b>
+<b class="nc">&nbsp;          p.setPolicyStatus(policyStatusConfig.getStatusMap().get(policy.getStatus()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean createCustomerPolicyCache(CustomerIdRequest request) {
+<b class="nc">&nbsp;    boolean result = false;</b>
+<b class="nc">&nbsp;    String customerId = request.getCustomerId();</b>
+<b class="nc">&nbsp;    Customer customer = customerService.getCustomer(customerId);</b>
+<b class="nc">&nbsp;    Long entityId = Optional.ofNullable(customer).map(Customer::getEntityId).orElse(null);</b>
+<b class="nc">&nbsp;    if (entityId != null) {</b>
+<b class="nc">&nbsp;      String customerEntityId = String.valueOf(entityId);</b>
+<b class="nc">&nbsp;      CustomerPolicyCache customerPolicyCache = this.getCustomerPolicyCache(customerEntityId);</b>
+<b class="nc">&nbsp;      if (customerPolicyCache == null) {</b>
+<b class="nc">&nbsp;        CustomerPolicyListRequest customerPolicyListRequest = CustomerPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;            .customerId(customerId).entityId(customerEntityId).build();</b>
+<b class="nc">&nbsp;        List&lt;Policy&gt; policyList = policyRemote.getPolicyLists(customerPolicyListRequest);</b>
+<b class="nc">&nbsp;        if (CollectionUtils.isNotEmpty(policyList)) {</b>
+<b class="nc">&nbsp;          result = policyMapper.insertCustomerPolicy(</b>
+<b class="nc">&nbsp;              CustomerPolicyCache.builder().entityId(customerEntityId).policyList(policyList)</b>
+<b class="nc">&nbsp;                  .createTime(new Date()).updateTime(new Date()).build()) == 1;</b>
+&nbsp;        }
+<b class="nc">&nbsp;      } else {</b>
+<b class="nc">&nbsp;        logger.debug(&quot;customer[{}] policy cache already existed&quot;, customerEntityId);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      logger.warn(&quot;create customer[{}] policy cache, entity id is empty&quot;, customerId);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;  @Override
+&nbsp;  public PolicyRenewalResponse renewalPolicyForComingWorker(PolicyRenewalRequest request) {
+<b class="nc">&nbsp;    RenewalPremium premium = null;</b>
+<b class="nc">&nbsp;    String policyNumber = request.getPolicyNumber();</b>
+<b class="nc">&nbsp;    Date effectiveDate = request.getEffectiveDate();</b>
+&nbsp;    // 1. get policy detail
+<b class="nc">&nbsp;    PolicyDetail policyDetail = policyRemote.getPolicyDetail(PolicyNumberRequest.builder().policyNumber(policyNumber).effectiveDate(effectiveDate).build());</b>
+<b class="nc">&nbsp;    logger.debug(&quot;main_2.2. get policy detail: {}&quot;, policyDetail);</b>
+<b class="nc">&nbsp;    if (policyDetail != null) {</b>
+&nbsp;      // 2. get policy beneficiary
+<b class="nc">&nbsp;      CompletableFuture&lt;PolicyBeneficiary&gt; policyBeneficiary = CompletableFuture.supplyAsync(() -&gt; this.getPolicyBeneficiary(policyDetail));</b>
+&nbsp;      // 3. get policy benefit
+<b class="nc">&nbsp;      CompletableFuture&lt;Benefit&gt; benefit = CompletableFuture.supplyAsync(() -&gt; this.getPolicyBenefit(policyDetail));</b>
+&nbsp;      // 4. get policy claim
+<b class="nc">&nbsp;      CompletableFuture&lt;PolicyClaim&gt; policyClaim = CompletableFuture.supplyAsync(() -&gt; this.getPolicyClaim(policyDetail));</b>
+&nbsp;      // 5. getP olicy Adjustment
+<b class="nc">&nbsp;      CompletableFuture&lt;BigDecimal&gt; policyAdjustment = CompletableFuture.supplyAsync(() -&gt; this.getPolicyAdjustment(policyDetail));</b>
+&nbsp;      // 6. calculate Renewal Premium
+<b class="nc">&nbsp;      CompletableFuture&lt;RenewalPremium&gt; premiumFuture = CompletableFuture.allOf(policyBeneficiary, benefit, policyClaim, policyAdjustment).thenApply(</b>
+<b class="nc">&nbsp;                      aVoid -&gt; productService.calcRenewPremiumByTotalPremiumForComingWorker(policyBeneficiary.join(), policyDetail, benefit.join(), policyClaim.join(), policyAdjustment.join()));</b>
+<b class="nc">&nbsp;      premium = premiumFuture.join();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return PolicyRenewalResponse.builder()</b>
+<b class="nc">&nbsp;            .premium(premium)</b>
+<b class="nc">&nbsp;            .balance(premium != null ? premium.getTotalPremium() : BigDecimal.ZERO)</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public PolicyRenewalResponse renewalPolicy(PolicyRenewalRequest request) {
+&nbsp;    RenewalPremium premium;
+<b class="nc">&nbsp;    String policyNumber = request.getPolicyNumber();</b>
+<b class="nc">&nbsp;    Date effectiveDate = request.getEffectiveDate();</b>
+&nbsp;
+<b class="nc">&nbsp;    HealthPolicy policy = this.getPolicy(policyNumber, effectiveDate);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (policy != null) {</b>
+<b class="nc">&nbsp;      return PolicyRenewalResponse.builder()</b>
+<b class="nc">&nbsp;                                  .premium(policy.getRenewalPremium())</b>
+<b class="nc">&nbsp;                                  .balance(policy.getRenewalBalance())</b>
+<b class="nc">&nbsp;                                  .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 1. get policy detail
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    PolicyDetail policyDetail = policyRemote.getPolicyDetail(</b>
+<b class="nc">&nbsp;        PolicyNumberRequest.builder().policyNumber(policyNumber).effectiveDate(effectiveDate).build());</b>
+<b class="nc">&nbsp;    logger.info(&quot;{} *** policyDetail: \n {}&quot;, GlobalConstant.CALCULATE_RENEWAL_PREMIUM, policyDetail);</b>
+<b class="nc">&nbsp;    long endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    logger.info(&quot;1. get policy detail, duration: {} ms&quot;, endTime - startTime);</b>
+<b class="nc">&nbsp;    if (policyDetail != null) {</b>
+<b class="nc">&nbsp;      this.checkRenewalDate(policyDetail.getPolicyRenewalDate());</b>
+&nbsp;      // 2. get policy beneficiary
+<b class="nc">&nbsp;      CompletableFuture&lt;PolicyBeneficiary&gt; policyBeneficiary = CompletableFuture</b>
+<b class="nc">&nbsp;          .supplyAsync(MdcConfig.mdcSupplier(() -&gt; this.getPolicyBeneficiary(policyDetail)));</b>
+&nbsp;      // 3. get policy benefit
+<b class="nc">&nbsp;      CompletableFuture&lt;Benefit&gt; benefit = CompletableFuture</b>
+<b class="nc">&nbsp;          .supplyAsync(MdcConfig.mdcSupplier(() -&gt; this.getPolicyBenefit(policyDetail)));</b>
+&nbsp;      // 4. get policy claim
+<b class="nc">&nbsp;      CompletableFuture&lt;PolicyClaim&gt; policyClaim = CompletableFuture</b>
+<b class="nc">&nbsp;          .supplyAsync(MdcConfig.mdcSupplier(() -&gt; this.getPolicyClaim(policyDetail)));</b>
+&nbsp;      // 5. get policy claim
+<b class="nc">&nbsp;      CompletableFuture&lt;BigDecimal&gt; policyAdjustment = CompletableFuture</b>
+<b class="nc">&nbsp;          .supplyAsync(MdcConfig.mdcSupplier(() -&gt; this.getPolicyAdjustment(policyDetail)));</b>
+&nbsp;      // 6. calculate Renewal Premium
+<b class="nc">&nbsp;      CompletableFuture&lt;RenewalPremium&gt; premiumFuture = CompletableFuture</b>
+<b class="nc">&nbsp;          .allOf(policyBeneficiary, benefit, policyClaim, policyAdjustment).thenApply(</b>
+<b class="nc">&nbsp;              aVoid -&gt; productService.calcRenewPremiumByTotalPremium(policyBeneficiary.join(), policyDetail,</b>
+<b class="nc">&nbsp;                      benefit.join(), policyClaim.join(), policyAdjustment.join()));</b>
+<b class="nc">&nbsp;      premium = premiumFuture.join();</b>
+<b class="nc">&nbsp;      long endTime2 = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;      logger.debug(&quot;6. calculate Renewal Premium, duration: {} ms&quot;, endTime2 - endTime);</b>
+<b class="nc">&nbsp;      String quoteId = quoteService.searchQuoteByPolicyId(policyDetail.getPolicyId(), policyDetail.getPolicyNumber());</b>
+&nbsp;      // 7. insert policy
+<b class="nc">&nbsp;      HealthPolicy healthPolicy = HealthPolicy.builder()</b>
+<b class="nc">&nbsp;          .quoteId(quoteId).policyId(policyDetail.getPolicyId())</b>
+<b class="nc">&nbsp;          .policyNumber(policyDetail.getPolicyNumber()).startDate(policyDetail.getPolicyStartDate())</b>
+<b class="nc">&nbsp;          .effectiveDate(policyDetail.getPolicyEffectiveDate())</b>
+<b class="nc">&nbsp;          .renewalDate(policyDetail.getPolicyRenewalDate())</b>
+<b class="nc">&nbsp;          .policyHolderId(policyDetail.getPolicyHolderEntityId())</b>
+<b class="nc">&nbsp;          .productId(policyDetail.getProductId()).status(policyDetail.getPolicyStatus())</b>
+<b class="nc">&nbsp;          .benefit(benefit.join())</b>
+<b class="nc">&nbsp;          .premium(Premium.builder().totalPremium(policyDetail.getTotalPremium()).build())</b>
+<b class="nc">&nbsp;          .balance(policyDetail.getPremiumLeftToPay())</b>
+<b class="nc">&nbsp;          .renewalPremium(premium)</b>
+<b class="nc">&nbsp;          .renewalBalance(premium.getTotalPremium())</b>
+<b class="nc">&nbsp;          .createTime(new Date()).build();</b>
+<b class="nc">&nbsp;      this.savePolicyRenewalPremium(healthPolicy, policyBeneficiary.join());</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t find the policy&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return PolicyRenewalResponse.builder()</b>
+<b class="nc">&nbsp;                                .premium(premium)</b>
+<b class="nc">&nbsp;                                .balance(premium.getTotalPremium())</b>
+<b class="nc">&nbsp;                                .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean savePolicyRenewalPremium(HealthPolicy healthPolicy,
+&nbsp;      PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    boolean success = policyMapper.insert(healthPolicy) == 1;</b>
+<b class="nc">&nbsp;    String log = new Gson().toJson(policyBeneficiary);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;policyBeneficiary: {}&quot;, log);</b>
+<b class="nc">&nbsp;    if (success) {</b>
+<b class="nc">&nbsp;      premiumService.recordPolicyBeneficiaryPremium(healthPolicy, policyBeneficiary);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return success;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private PolicyClaim getPolicyClaim(PolicyDetail policyDetail) {
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    BigDecimal earnedPremium = policyDetail.getPremiumPaid();</b>
+<b class="nc">&nbsp;    if (earnedPremium == null) {</b>
+<b class="nc">&nbsp;      earnedPremium = BigDecimal.ZERO;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    PolicyClaim policyClaim = PolicyClaim.builder().claimsPaid(BigDecimal.ZERO).earnedPremium(earnedPremium).noClaimYear(0).build();</b>
+<b class="nc">&nbsp;    return CompletableFuture</b>
+<b class="nc">&nbsp;        .supplyAsync(() -&gt; policyRemote.getPolicyClaims(policyDetail.getPolicyId()))</b>
+<b class="nc">&nbsp;        .thenCombine(CompletableFuture.supplyAsync(() -&gt; policyRemote.getPolicyHistoryLists(PolicyIdRequest.builder()</b>
+<b class="nc">&nbsp;                        .policyId(policyDetail.getPolicyId())</b>
+<b class="nc">&nbsp;                        .effectiveDate(policyDetail.getPolicyEffectiveDate()).build())),</b>
+&nbsp;            (claimList, policyHistoryLists) -&gt; {
+<b class="nc">&nbsp;              if (CollectionUtils.isEmpty(claimList)) {</b>
+<b class="nc">&nbsp;                logger.debug(&quot;ClaimList isEmpty &quot;);</b>
+<b class="nc">&nbsp;                int noClaimYear = CollectionUtils.size(policyHistoryLists);</b>
+<b class="nc">&nbsp;                policyClaim.setNoClaimYear(noClaimYear);</b>
+<b class="nc">&nbsp;              } else {</b>
+<b class="nc">&nbsp;                this.setPolicyClaim(policyDetail, policyClaim, claimList, policyHistoryLists);</b>
+&nbsp;              }
+<b class="nc">&nbsp;              long endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;              logger.debug(&quot;4. get policy claim, duration: {} ms&quot;, endTime - startTime);</b>
+<b class="nc">&nbsp;              return policyClaim;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        ).exceptionally(e -&gt; {</b>
+<b class="nc">&nbsp;              logger.info(&quot;{}&quot;, e.getStackTrace());</b>
+<b class="nc">&nbsp;          logger.error(&quot; get policy claim failed, error: {}&quot;, e.getMessage());</b>
+&nbsp;
+<b class="nc">&nbsp;          return null;</b>
+<b class="nc">&nbsp;        }).join();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void setPolicyClaim(PolicyDetail policyDetail, PolicyClaim policyPremium,
+&nbsp;                              List&lt;Claim&gt; claimList, List&lt;Policy&gt; policyHistoryLists) {
+<b class="nc">&nbsp;    Integer noClaimYear = 0;</b>
+<b class="nc">&nbsp;    String claimListLog = new Gson().toJson(claimList);</b>
+<b class="nc">&nbsp;    String policyHistoryListsLog = new Gson().toJson(policyHistoryLists);</b>
+<b class="nc">&nbsp;    String policyPremiumLog = new Gson().toJson(policyPremium);</b>
+<b class="nc">&nbsp;    String policyDetailLog = new Gson().toJson(policyDetail);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim claimList : {}&quot;, claimListLog);</b>
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim policyHistoryLists : {}&quot;, policyHistoryListsLog);</b>
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim policyPremium : {}&quot;, policyPremiumLog);</b>
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim policyDetail : {}&quot;, policyDetailLog);</b>
+&nbsp;
+<b class="nc">&nbsp;    Date startDate = policyDetail.getPolicyStartDate();</b>
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim startDate: {}&quot;, startDate);</b>
+<b class="nc">&nbsp;    BigDecimal claimsPaid = claimList.stream()</b>
+<b class="nc">&nbsp;                                     .filter(c -&gt; c.getTreatmentDate().after(startDate))</b>
+<b class="nc">&nbsp;                                     .map(Claim::getSettledAmount)</b>
+<b class="nc">&nbsp;                                     .reduce(BigDecimal::add)</b>
+<b class="nc">&nbsp;                                     .orElse(BigDecimal.ZERO);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim claimsPaid: {}&quot;, claimsPaid);</b>
+&nbsp;
+<b class="nc">&nbsp;    Optional&lt;Date&gt; claimHistoryDate = claimList.stream()</b>
+<b class="nc">&nbsp;                                               .filter(c -&gt; c.getTreatmentDate().before(startDate))</b>
+<b class="nc">&nbsp;                                               .max(Comparator.comparing(Claim::getTreatmentDate))</b>
+<b class="nc">&nbsp;                                               .map(Claim::getTreatmentDate);</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim claimHistoryDate: {}&quot;, claimHistoryDate);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    if (claimHistoryDate.isPresent() &amp;&amp; CollectionUtils.isNotEmpty(policyHistoryLists)) {</b>
+<b class="nc">&nbsp;      Integer thisYear = 0;</b>
+<b class="nc">&nbsp;      noClaimYear = (int) policyHistoryLists.stream()</b>
+<b class="nc">&nbsp;                                            .filter(p -&gt; p.getPolicyStartDate().after(claimHistoryDate.get()))</b>
+<b class="nc">&nbsp;                                            .count();</b>
+&nbsp;
+<b class="nc">&nbsp;      Optional&lt;Policy&gt; policy = policyHistoryLists.stream()</b>
+<b class="nc">&nbsp;                                                  .filter(o -&gt; eqNowYear(o.getPolicyStartDate()))</b>
+<b class="nc">&nbsp;                                                  .findAny();</b>
+<b class="nc">&nbsp;      if (!policy.isPresent()) {</b>
+<b class="nc">&nbsp;        thisYear = inThisYear(policyDetail, claimHistoryDate.get()) ? 0 : 1;</b>
+&nbsp;      }
+&nbsp;
+<b class="nc">&nbsp;      logger.info(&quot;setPolicyClaim noClaimYear : {}&quot;, noClaimYear);</b>
+<b class="nc">&nbsp;      noClaimYear = Math.min(noClaimYear + thisYear, 6);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim noClaimYear min: {}&quot;, noClaimYear);</b>
+<b class="nc">&nbsp;    logger.info(&quot;setPolicyClaim claimsPaid: {}&quot;, claimsPaid);</b>
+<b class="nc">&nbsp;    policyPremium.setClaimsPaid(claimsPaid);</b>
+<b class="nc">&nbsp;    policyPremium.setNoClaimYear(noClaimYear);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private static boolean eqNowYear(Date policyStartDate) {
+<b class="nc">&nbsp;    Calendar cal = Calendar.getInstance();</b>
+<b class="nc">&nbsp;    int year = cal.get(Calendar.YEAR);</b>
+&nbsp;
+<b class="nc">&nbsp;    Calendar policyStartCalendar = Calendar.getInstance();</b>
+<b class="nc">&nbsp;    policyStartCalendar.setTime(policyStartDate);</b>
+<b class="nc">&nbsp;    int policyStartYear = policyStartCalendar.get(Calendar.YEAR);</b>
+&nbsp;
+<b class="nc">&nbsp;    return year == policyStartYear;</b>
+&nbsp;  }
+&nbsp;  private static boolean inThisYear(PolicyDetail policyDetail, Date claimHistoryDate) {
+<b class="nc">&nbsp;    Date renewalDateLess = HealthDateUtils.getDayEndTime(DateUtils.addMonths(policyDetail.getPolicyRenewalDate(), -2));</b>
+<b class="nc">&nbsp;    Date policyFromStartTime = HealthDateUtils.getDayStartTime(policyDetail.getPolicyStartDate());</b>
+<b class="nc">&nbsp;    return claimHistoryDate.after(policyFromStartTime) &amp;&amp; claimHistoryDate.before(renewalDateLess);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  private PolicyBeneficiary getPolicyBeneficiary(PolicyDetail policyDetail) {
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    List&lt;DependantDetail&gt; dependantDetailList = policyRemote.getPolicyBeneficiary(PolicyIdRequest.builder()</b>
+<b class="nc">&nbsp;                                             .policyId(policyDetail.getPolicyId())</b>
+<b class="nc">&nbsp;                                             .effectiveDate(policyDetail.getPolicyEffectiveDate())</b>
+<b class="nc">&nbsp;                                             .build());</b>
+<b class="nc">&nbsp;    String dependantDetailListString = JsonUtils.objectToJson(dependantDetailList);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;dependantDetailList: \n {}&quot;, dependantDetailListString);</b>
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = this.convertPolicyBeneficiary(dependantDetailList,</b>
+<b class="nc">&nbsp;                                                                        HealthDateUtils.nextDay(policyDetail.getPolicyRenewalDate()),</b>
+<b class="nc">&nbsp;                                                                        String.valueOf(policyDetail.getPolicyId()));</b>
+<b class="nc">&nbsp;    long endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;2. get policy beneficiary, duration: {} ms&quot;, endTime - startTime);</b>
+<b class="nc">&nbsp;    return policyBeneficiary;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private PolicyBeneficiary convertPolicyBeneficiary(List&lt;DependantDetail&gt; dependantDetailList,
+&nbsp;      Date startDate, String policyId) {
+<b class="nc">&nbsp;    PolicyBeneficiary policyBeneficiary = PolicyBeneficiary.builder().id(policyId).build();</b>
+<b class="nc">&nbsp;    List&lt;Beneficiary&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (DependantDetail dependant : dependantDetailList) {</b>
+<b class="nc">&nbsp;      Date dob = dependant.getDateOfBirth();</b>
+<b class="nc">&nbsp;      String gender = dependant.getGender();</b>
+<b class="nc">&nbsp;      String relationship = dependant.getRelationship();</b>
+<b class="nc">&nbsp;      Long entityId = dependant.getEntityId();</b>
+<b class="nc">&nbsp;      String name = dependant.getFirstName() + &quot; &quot; + dependant.getLastName();</b>
+<b class="nc">&nbsp;      if (DependantRelationship.POLICY_HOLDER.getValue()</b>
+<b class="nc">&nbsp;                                             .equals(relationship)) {</b>
+<b class="nc">&nbsp;        Beneficiary beneficiary = Beneficiary.builder()</b>
+<b class="nc">&nbsp;                                             .entityId(entityId)</b>
+<b class="nc">&nbsp;                                             .name(name)</b>
+<b class="nc">&nbsp;                                             .relationship(relationship)</b>
+<b class="nc">&nbsp;                                             .age(HealthDateUtils.calculateAge(dob, startDate))</b>
+<b class="nc">&nbsp;                                             .gender(gender)</b>
+<b class="nc">&nbsp;                                             .build();</b>
+<b class="nc">&nbsp;        policyBeneficiary.setPrincipal(beneficiary);</b>
+<b class="nc">&nbsp;      } else if (DependantRelationship.SPOUSE.getValue().equals(relationship) ||</b>
+<b class="nc">&nbsp;                 DependantRelationship.PARTNER.getValue().equals(relationship)) {</b>
+<b class="nc">&nbsp;        Beneficiary beneficiary = Beneficiary.builder()</b>
+<b class="nc">&nbsp;                                             .entityId(entityId)</b>
+<b class="nc">&nbsp;                                             .name(name)</b>
+<b class="nc">&nbsp;                                             .relationship(relationship)</b>
+<b class="nc">&nbsp;                                             .age(HealthDateUtils.calculateAge(dob, startDate))</b>
+<b class="nc">&nbsp;                                             .gender(gender)</b>
+<b class="nc">&nbsp;                                             .build();</b>
+<b class="nc">&nbsp;        policyBeneficiary.setSpouse(beneficiary);</b>
+<b class="nc">&nbsp;      } else if (</b>
+<b class="nc">&nbsp;          DependantRelationship.UNMARRIED_CHILD.getValue().equals(relationship)</b>
+<b class="nc">&nbsp;          || DependantRelationship.MARRIED_CHILD.getValue().equals(dependant.getRelationship())) {</b>
+<b class="nc">&nbsp;        Beneficiary beneficiary = Beneficiary.builder()</b>
+<b class="nc">&nbsp;                                             .entityId(entityId)</b>
+<b class="nc">&nbsp;                                             .name(name)</b>
+<b class="nc">&nbsp;                                             .relationship(relationship)</b>
+<b class="nc">&nbsp;                                             .age(HealthDateUtils.calculateAge(dob, startDate))</b>
+<b class="nc">&nbsp;                                             .gender(gender)</b>
+<b class="nc">&nbsp;                                             .build();</b>
+<b class="nc">&nbsp;        list.add(beneficiary);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    policyBeneficiary.setChildren(list);</b>
+<b class="nc">&nbsp;    return policyBeneficiary;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private BigDecimal getPolicyAdjustment(PolicyDetail policyDetail) {
+<b class="nc">&nbsp;    BigDecimal adjustment = BigDecimal.ZERO;</b>
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    PolicyIdRequest request = PolicyIdRequest.builder()</b>
+<b class="nc">&nbsp;        .policyId(policyDetail.getPolicyId()).effectiveDate(policyDetail.getPolicyEffectiveDate())</b>
+<b class="nc">&nbsp;        .build();</b>
+<b class="nc">&nbsp;    PolicyAdjustment response = policyRemote.getPolicyAdjustment(request);</b>
+<b class="nc">&nbsp;    long endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;5. get policy adjustment, duration: {} ms&quot;, endTime - startTime);</b>
+<b class="nc">&nbsp;    if (response != null) {</b>
+<b class="nc">&nbsp;      adjustment = response.getAdjustment();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return adjustment;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Benefit getPolicyBenefit(PolicyDetail policyDetail) {
+<b class="nc">&nbsp;    long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    PolicyIdRequest request = PolicyIdRequest.builder()</b>
+<b class="nc">&nbsp;        .policyId(policyDetail.getPolicyId()).effectiveDate(policyDetail.getPolicyEffectiveDate())</b>
+<b class="nc">&nbsp;        .build();</b>
+<b class="nc">&nbsp;    Benefit response = policyRemote.getPolicyBenefit(request);</b>
+<b class="nc">&nbsp;    String log = new Gson().toJson(response);</b>
+<b class="nc">&nbsp;    logger.info(&quot;getPolicyBenefit response: {}&quot;, log);</b>
+<b class="nc">&nbsp;    long endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;    logger.debug(&quot;3. get policy benefit, duration: {} ms&quot;, endTime - startTime);</b>
+<b class="nc">&nbsp;    if (response == null) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t get the benefit&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return response;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void checkRenewalDate(Date renewalDate) {
+<b class="nc">&nbsp;    Date validDate = DateUtils.addMonths(renewalDate, -2);</b>
+<b class="nc">&nbsp;    if (validDate.after(new Date())) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;can&#39;t calculate the renewal premium&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private CustomerPolicyCache getCustomerPolicyCache(String entityId) {
+<b class="nc">&nbsp;    return policyMapper.selectCustomerPolicyCache(entityId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void processUpdateCustomerPolicyCacheTask() {
+<b class="nc">&nbsp;    List&lt;CustomerPolicyCache&gt; policyCaches = policyMapper.selectCustomerPolicyCacheList(new Date());</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(policyCaches)) {</b>
+<b class="nc">&nbsp;      logger.info(&quot;update customer policy cache task, total {} policy&quot;, policyCaches.size());</b>
+<b class="nc">&nbsp;      List&lt;Integer&gt; entityIds = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;      for (int i = 0; i &lt; policyCaches.size(); i++) {</b>
+<b class="nc">&nbsp;        CustomerPolicyCache policyCache = policyCaches.get(i);</b>
+<b class="nc">&nbsp;        entityIds.add(Integer.parseInt(policyCache.getEntityId()));</b>
+<b class="nc">&nbsp;        if (entityIds.size() == 100 || i == policyCaches.size() - 1) {</b>
+<b class="nc">&nbsp;          Map&lt;Long, List&lt;Policy&gt;&gt; policyListMap = policyRemote</b>
+<b class="nc">&nbsp;              .getBatchPolicyLists(CustomerEntityIdsRequest.builder().entityIds(entityIds)</b>
+<b class="nc">&nbsp;                  .build());</b>
+<b class="nc">&nbsp;          policyListMap.forEach((entityId, policyList) -&gt;</b>
+<b class="nc">&nbsp;              policyMapper.updateCustomerPolicyCache(</b>
+<b class="nc">&nbsp;                  CustomerPolicyCache.builder().entityId(String.valueOf(entityId))</b>
+<b class="nc">&nbsp;                      .policyList(policyList)</b>
+<b class="nc">&nbsp;                      .updateTime(new Date()).build())</b>
+&nbsp;          );
+<b class="nc">&nbsp;          entityIds = new ArrayList&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean updatePolicyRenewalBalance(String policyNumber, Date effectiveDate,
+&nbsp;      BigDecimal amount) {
+<b class="nc">&nbsp;    boolean result = false;</b>
+<b class="nc">&nbsp;    HealthPolicy policy = this.getPolicy(policyNumber, effectiveDate);</b>
+<b class="nc">&nbsp;    if (policy != null) {</b>
+<b class="nc">&nbsp;      BigDecimal renewalBalance = policy.getRenewalBalance().subtract(amount);</b>
+<b class="nc">&nbsp;      policy.setRenewalBalance(renewalBalance);</b>
+<b class="nc">&nbsp;      policy.setUpdateTime(new Date());</b>
+<b class="nc">&nbsp;      if (renewalBalance.intValue() &lt;= 0) {</b>
+<b class="nc">&nbsp;        policy.setStatus(PolicyStatus.UNDERWRITING.getValue());</b>
+<b class="nc">&nbsp;        ApplicationRenewalPolicy renewalPolicy = policyMapper</b>
+<b class="nc">&nbsp;            .searchRenewalPolicy(policyNumber, effectiveDate);</b>
+<b class="nc">&nbsp;        ReminderRequest reminderRequest = ReminderRequest.builder()</b>
+<b class="nc">&nbsp;            .customerId(</b>
+<b class="nc">&nbsp;                Optional.ofNullable(renewalPolicy).map(ApplicationRenewalPolicy::getCustomerId)</b>
+<b class="nc">&nbsp;                    .orElse(null))</b>
+<b class="nc">&nbsp;            .quoteId(policy.getQuoteId()).policyNumber(policyNumber)</b>
+<b class="nc">&nbsp;            .effectiveDate(DateFormatUtils.format(effectiveDate, GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;            .type(&quot;health_renewal&quot;)</b>
+<b class="nc">&nbsp;            .build();</b>
+<b class="nc">&nbsp;        reminderEventPublisher.publishReminder(reminderRequest);</b>
+&nbsp;      }
+<b class="nc">&nbsp;      result = policyMapper.updateRenewalBalance(policy) == 1;</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      throw new BusinessException(</b>
+&nbsp;          &quot;can&#39;t find the policy, [policyNumber: &quot; + policyNumber + &quot;, effectiveDate: &quot;
+&nbsp;              + effectiveDate + &quot;]&quot;);
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HealthPolicy getPolicy(String policyNumber, Date effectiveDate) {
+<b class="nc">&nbsp;    return policyMapper.select(policyNumber, effectiveDate);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public ApplicationRenewalPolicyListResponse searchApplicationRenewalPolicyList(
+&nbsp;      ApplicationPolicyListSearchRequest request) {
+<b class="nc">&nbsp;    String sortColumn = &quot;&quot;;</b>
+<b class="nc">&nbsp;    String sortType = request.getSortType();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(sortType)) {</b>
+<b class="nc">&nbsp;      sortColumn = applicationPolicySortTypeMap.get(sortType);</b>
+<b class="nc">&nbsp;      if (sortColumn == null) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;invalid sort type&quot;);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    String sort = request.getSort();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotBlank(sort) &amp;&amp; !&quot;asc&quot;.equalsIgnoreCase(sort) &amp;&amp; !&quot;desc&quot;</b>
+<b class="nc">&nbsp;        .equalsIgnoreCase(sort)) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;invalid sort value, should be &#39;asc&#39; or &#39;desc&#39;&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    ApplicationPolicyListSearchFilter filter = ApplicationPolicyListSearchFilter.builder()</b>
+<b class="nc">&nbsp;        .filter(request.getFilter()).archived(BooleanUtils.toInteger(request.isArchived()))</b>
+<b class="nc">&nbsp;        .paid(request.isPaid()).sortColumn(sortColumn).sort(sort).build();</b>
+<b class="nc">&nbsp;    return CompletableFuture</b>
+<b class="nc">&nbsp;        .supplyAsync(MdcConfig.mdcSupplier(() -&gt; {</b>
+<b class="nc">&nbsp;          int index = request.getIndex();</b>
+<b class="nc">&nbsp;          int limit = request.getLimit();</b>
+<b class="nc">&nbsp;          if (index &gt; 0 &amp;&amp; limit &gt; 0) {</b>
+<b class="nc">&nbsp;            PageMethod.startPage(request.getIndex(), request.getLimit());</b>
+&nbsp;          }
+<b class="nc">&nbsp;          return policyMapper.searchRenewalPolicyList(filter);</b>
+&nbsp;        }))
+<b class="nc">&nbsp;        .thenCombine(CompletableFuture</b>
+<b class="nc">&nbsp;                .supplyAsync(MdcConfig.mdcSupplier(() -&gt; policyMapper.searchRenewalPolicyListCount(filter))),</b>
+<b class="nc">&nbsp;            (list, count) -&gt; ApplicationRenewalPolicyListResponse.builder().list(list).total(count)</b>
+<b class="nc">&nbsp;                .build()</b>
+<b class="nc">&nbsp;        ).exceptionally(e -&gt; {</b>
+<b class="nc">&nbsp;          logger.error(&quot; search renewal policy list failed, error: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;          return null;</b>
+<b class="nc">&nbsp;        }).join();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public ApplicationRenewalPolicy getApplicationRenewalPolicy(PolicyNumberRequest request) {
+<b class="nc">&nbsp;    return policyMapper.searchRenewalPolicy(request.getPolicyNumber(), request.getEffectiveDate());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean archiveApplicationRenewalPolicy(PolicyNumberRequest request) {
+<b class="nc">&nbsp;    HealthPolicy policy = HealthPolicy.builder().policyNumber(request.getPolicyNumber())</b>
+<b class="nc">&nbsp;        .effectiveDate(request.getEffectiveDate()).archived(true).updateTime(new Date()).build();</b>
+<b class="nc">&nbsp;    return policyMapper.archiveApplicationRenewalPolicy(policy) == 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void renewalNotificationPolicies() throws InterruptedException {
+<b class="nc">&nbsp;    List&lt;Integer&gt; renewal = policyRenewalDaysConfig.getRenewal();</b>
+<b class="nc">&nbsp;    List&lt;PolicyOverComingEntity&gt; toBeRenewal = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (Integer days : renewal) {</b>
+<b class="nc">&nbsp;      List&lt;PolicyOverComingEntity&gt; comingEntityPage = policyOverComingRepository.findAllPoliciesDueForRenewalIn(days);</b>
+<b class="nc">&nbsp;      toBeRenewal.addAll(comingEntityPage);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    renewalExecutorConfiguration.sendNotificationsAsync(toBeRenewal, true);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void expiredNotificationPolicies() throws InterruptedException {
+<b class="nc">&nbsp;    List&lt;Integer&gt; expired = policyRenewalDaysConfig.getExpired();</b>
+<b class="nc">&nbsp;    List&lt;PolicyOverComingEntity&gt; toBeRenewal = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (Integer days : expired) {</b>
+<b class="nc">&nbsp;      List&lt;PolicyOverComingEntity&gt; comingEntityPage = policyOverComingRepository.findAllPoliciesDueForRenewalIn(days);</b>
+<b class="nc">&nbsp;      toBeRenewal.addAll(comingEntityPage);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    renewalExecutorConfiguration.sendNotificationsAsync(toBeRenewal, false);</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

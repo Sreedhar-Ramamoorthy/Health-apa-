@@ -1,0 +1,106 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProductService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service</a>
+</div>
+
+<h1>Coverage Summary for Class: ProductService (ke.co.apollo.health.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ProductService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.Benefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.PolicyDetail;
+&nbsp;import ke.co.apollo.health.common.domain.model.Premium;
+&nbsp;import ke.co.apollo.health.common.domain.model.ProductPremium;
+&nbsp;import ke.co.apollo.health.common.domain.model.RenewalPremium;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyClaim;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;
+&nbsp;public interface ProductService {
+&nbsp;
+&nbsp;  ProductPremium getProductPremium();
+&nbsp;
+&nbsp;  BigDecimal calculatePremium(PolicyBeneficiary policyBeneficiary, Integer productId,
+&nbsp;      Benefit benefit, boolean renewal);
+&nbsp;
+&nbsp;  Premium calculateTotalPremium(BigDecimal premium, boolean isNewPolicy);
+&nbsp;
+&nbsp;  Benefit createDefaultBenefit(CustomerDetailResponse customerDetailResponse,
+&nbsp;      ProductEnum productEnum);
+&nbsp;
+&nbsp;  RenewalPremium calculateRenewalPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;      Integer productId, Benefit benefit, PolicyClaim policyClaim, BigDecimal policyAdjustment);
+&nbsp;
+&nbsp;  RenewalPremium calcRenewPremiumByTotalPremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                                PolicyDetail policyDetail, Benefit benefit, PolicyClaim policyClaim, BigDecimal adjustment);
+&nbsp;
+&nbsp;  RenewalPremium calcRenewPremiumByTotalPremiumForComingWorker(PolicyBeneficiary policyBeneficiary,
+&nbsp;                                                PolicyDetail policyDetail, Benefit benefit, PolicyClaim policyClaim, BigDecimal adjustment);
+&nbsp;
+&nbsp;  BigDecimal getTravelInsurancePremium(PolicyBeneficiary policyBeneficiary,
+&nbsp;                            Benefit benefit);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

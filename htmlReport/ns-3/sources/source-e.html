@@ -1,0 +1,694 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PolicyServiceImplTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: PolicyServiceImplTest (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PolicyServiceImplTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/295)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;import static org.junit.Assert.assertEquals;
+&nbsp;import static org.mockito.ArgumentMatchers.any;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.*;
+&nbsp;import ke.co.apollo.health.config.HealthInitializer;
+&nbsp;import ke.co.apollo.health.config.NotificationMessageBuilder;
+&nbsp;import ke.co.apollo.health.config.PolicyRenewalDaysConfig;
+&nbsp;import ke.co.apollo.health.config.PolicyRenewalExecutorConfiguration;
+&nbsp;import ke.co.apollo.health.config.PolicyStatusConfig;
+&nbsp;import ke.co.apollo.health.feign.NotificationClient;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.remote.NotificationRemote;
+&nbsp;import ke.co.apollo.health.utils.GenericExcelFileUtils;
+&nbsp;import org.apache.commons.lang3.time.DateUtils;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.ValueSource;
+&nbsp;import org.mockito.Mockito;
+&nbsp;
+&nbsp;import static org.mockito.ArgumentMatchers.anyString;
+&nbsp;import static org.mockito.Mockito.*;
+&nbsp;import static org.mockito.Mockito.mock;
+&nbsp;import static org.mockito.MockitoAnnotations.initMocks;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.response.HealthPolicyListResponse;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertTrue;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertFalse;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.mockito.InjectMocks;
+&nbsp;import org.mockito.Mock;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.domain.request.TransactionDetailTaskAddRequest;
+&nbsp;import ke.co.apollo.health.mapper.health.TransactionDetailTaskMapper;
+&nbsp;import ke.co.apollo.health.service.PolicyService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.service.CustomerService;
+&nbsp;import ke.co.apollo.health.service.ProductService;
+&nbsp;import ke.co.apollo.health.mapper.health.PolicyMapper;
+&nbsp;import ke.co.apollo.health.repository.PolicyOverComingRepository;
+&nbsp;import ke.co.apollo.health.service.PremiumService;
+&nbsp;import ke.co.apollo.health.service.ProductService;
+&nbsp;import ke.co.apollo.health.event.ReminderEventPublisher;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.PolicyRenewalResponse;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertNotNull;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertThrows;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.PolicyIdRequest;
+&nbsp;import ke.co.apollo.health.domain.entity.PolicyOverComingEntity;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.data.domain.PageImpl;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.PolicyOverComingResponseDto;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.ApplicationRenewalPolicyListResponse;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerIdRequest;
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;class PolicyServiceImplTest {</b>
+&nbsp;
+&nbsp;        @InjectMocks
+&nbsp;        PolicyServiceImpl policyService;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        PolicyRemote policyRemote;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        CustomerService customerService;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        PolicyMapper policyMapper;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        QuoteService quoteService;
+&nbsp;        @Mock
+&nbsp;        private GenericExcelFileUtils fileUtils;
+&nbsp;        @Mock
+&nbsp;        PolicyRenewalDaysConfig policyRenewalDaysConfig;
+&nbsp;        @Mock
+&nbsp;        ProductService productService;
+&nbsp;        @Mock
+&nbsp;        NotificationMessageBuilder notificationMessageBuilder;
+&nbsp;        @Mock
+&nbsp;        PremiumService premiumService;
+&nbsp;        @Mock
+&nbsp;        QuoteMapper quoteMapper;
+&nbsp;        @Mock
+&nbsp;        ReminderEventPublisher reminderEventPublisher;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        PolicyOverComingRepository policyOverComingRepository;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        private NotificationClient notificationClient;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        private NotificationRemote notificationRemote;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        PolicyRenewalExecutorConfiguration renewalExecutorConfiguration;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        PolicyStatusConfig policyStatusConfig;
+&nbsp;
+&nbsp;        @BeforeEach
+&nbsp;        void setUpMocks(){
+<b class="nc">&nbsp;                initMocks(this);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;  
+&nbsp;        @Test
+&nbsp;        void renewalPolicyExceptionTest(){
+&nbsp;
+<b class="nc">&nbsp;                PolicyDetail policyDetail = PolicyDetail.builder()</b>
+<b class="nc">&nbsp;                        .totalPremium(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                        .premiumPaid(new BigDecimal(10))</b>
+<b class="nc">&nbsp;                        .premiumLeftToPay(new BigDecimal(10))</b>
+<b class="nc">&nbsp;                        .policyRenewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyStartDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyEffectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyHolderEntityId(1L)</b>
+<b class="nc">&nbsp;                        .policyStatus(&quot;M&quot;)</b>
+<b class="nc">&nbsp;                        .policyId(123)</b>
+<b class="nc">&nbsp;                        .policyNumber(&quot;123&quot;)</b>
+<b class="nc">&nbsp;                        .policyHolderName(&quot;Test User&quot;)</b>
+<b class="nc">&nbsp;                        .productName(&quot;Test Productt&quot;)</b>
+<b class="nc">&nbsp;                        .principalMember(&quot;Principal&quot;)</b>
+<b class="nc">&nbsp;                        .principalId(1L)</b>
+<b class="nc">&nbsp;                        .principalDob(new Date())</b>
+<b class="nc">&nbsp;                        .paymentStyle(&quot;Style&quot;)</b>
+<b class="nc">&nbsp;                        .productId(1)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                when(policyRemote.getPolicyDetail(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;                when(productService.calcRenewPremiumByTotalPremium(any(),any(),any(),any(),any())).thenReturn(RenewalPremium.builder().build());</b>
+<b class="nc">&nbsp;                when(quoteService.searchQuoteByPolicyId(any(),any())).thenReturn(&quot;QUOTE001&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                PolicyRenewalRequest obj = PolicyRenewalRequest.builder()</b>
+<b class="nc">&nbsp;                                .policyNumber(&quot;123&quot;)</b>
+<b class="nc">&nbsp;                                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                                .build();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;                assertThrows(BusinessException.class, () -&gt; policyService.renewalPolicy(obj));</b>
+&nbsp;
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void renewalPolicyTest(){
+&nbsp;
+<b class="nc">&nbsp;                PolicyDetail policyDetail = PolicyDetail.builder()</b>
+<b class="nc">&nbsp;                        .totalPremium(new BigDecimal(100))</b>
+<b class="nc">&nbsp;                        .premiumPaid(new BigDecimal(10))</b>
+<b class="nc">&nbsp;                        .premiumLeftToPay(new BigDecimal(10))</b>
+<b class="nc">&nbsp;                        .policyRenewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyStartDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyEffectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyHolderEntityId(1L)</b>
+<b class="nc">&nbsp;                        .policyStatus(&quot;M&quot;)</b>
+<b class="nc">&nbsp;                        .policyId(123)</b>
+<b class="nc">&nbsp;                        .policyNumber(&quot;123&quot;)</b>
+<b class="nc">&nbsp;                        .policyHolderName(&quot;Test User&quot;)</b>
+<b class="nc">&nbsp;                        .productName(&quot;Test Productt&quot;)</b>
+<b class="nc">&nbsp;                        .principalMember(&quot;Principal&quot;)</b>
+<b class="nc">&nbsp;                        .principalId(1L)</b>
+<b class="nc">&nbsp;                        .principalDob(new Date())</b>
+<b class="nc">&nbsp;                        .paymentStyle(&quot;Style&quot;)</b>
+<b class="nc">&nbsp;                        .productId(1)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                HealthPolicy hp = HealthPolicy.builder()</b>
+<b class="nc">&nbsp;                        .quoteId(&quot;QUOTE001&quot;)</b>
+<b class="nc">&nbsp;                        .policyId(policyDetail.getPolicyId())</b>
+<b class="nc">&nbsp;                        .policyNumber(policyDetail.getPolicyNumber())</b>
+<b class="nc">&nbsp;                        .startDate(policyDetail.getPolicyStartDate())</b>
+<b class="nc">&nbsp;                        .effectiveDate(policyDetail.getPolicyEffectiveDate())</b>
+<b class="nc">&nbsp;                        .renewalDate(policyDetail.getPolicyRenewalDate())</b>
+<b class="nc">&nbsp;                        .policyHolderId(policyDetail.getPolicyHolderEntityId())</b>
+<b class="nc">&nbsp;                        .productId(policyDetail.getProductId())</b>
+<b class="nc">&nbsp;                        .status(policyDetail.getPolicyStatus())</b>
+<b class="nc">&nbsp;                        .balance(policyDetail.getPremiumLeftToPay())</b>
+<b class="nc">&nbsp;                        .createTime(new Date())</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                when(policyMapper.select(any(),any())).thenReturn(hp);</b>
+<b class="nc">&nbsp;                PolicyRenewalRequest obj = PolicyRenewalRequest.builder()</b>
+<b class="nc">&nbsp;                                .policyNumber(&quot;123&quot;)</b>
+<b class="nc">&nbsp;                                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                                .build();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;                PolicyRenewalResponse resp = policyService.renewalPolicy(obj);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void policyUpdateDetailsTest(){
+<b class="nc">&nbsp;                List&lt;PolicyOverComingEntity&gt; quote = Collections.singletonList(PolicyOverComingEntity.builder().build());</b>
+<b class="nc">&nbsp;                Page&lt;PolicyOverComingEntity&gt; page = new PageImpl&lt;PolicyOverComingEntity&gt;(quote);</b>
+<b class="nc">&nbsp;                when(policyOverComingRepository.findAllByRenewalDateBetween(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(page);</b>
+<b class="nc">&nbsp;                ComingPolicyListRequest obj = ComingPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                                                .index(1)</b>
+<b class="nc">&nbsp;                                                .limit(10)</b>
+<b class="nc">&nbsp;                        .startDate(DateUtils.addMonths(new Date(), -1))</b>
+<b class="nc">&nbsp;                        .endDate(DateUtils.addMonths(new Date(), 2))</b>
+<b class="nc">&nbsp;                                                .build();</b>
+<b class="nc">&nbsp;                PolicyOverComingResponseDto resp = policyService.policyUpdateDetails(obj);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;        @Test
+&nbsp;        void policyUpdateDetailsTestNullDates(){
+<b class="nc">&nbsp;                List&lt;PolicyOverComingEntity&gt; quote = Collections.singletonList(PolicyOverComingEntity.builder().build());</b>
+<b class="nc">&nbsp;                Page&lt;PolicyOverComingEntity&gt; page = new PageImpl&lt;PolicyOverComingEntity&gt;(quote);</b>
+<b class="nc">&nbsp;                when(policyOverComingRepository.findAllByRenewalDateBetween(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(page);</b>
+<b class="nc">&nbsp;                ComingPolicyListRequest obj = ComingPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                        .index(1)</b>
+<b class="nc">&nbsp;                        .limit(10)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                PolicyOverComingResponseDto resp = policyService.policyUpdateDetails(obj);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        @ParameterizedTest
+&nbsp;        @ValueSource(booleans = {true, false} )
+&nbsp;        void comingPolicyListInExcel(boolean list){
+<b class="nc">&nbsp;                List&lt;PolicyOverComingEntity&gt; policyList = new java.util.ArrayList&lt;&gt;(Collections.singletonList(PolicyOverComingEntity.builder().build()));</b>
+<b class="nc">&nbsp;                if(list)</b>
+<b class="nc">&nbsp;                        policyList.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;                byte [] b = new byte[0];</b>
+<b class="nc">&nbsp;                when(policyOverComingRepository.findAllByRenewalDateBetween(Mockito.any(),Mockito.any())).thenReturn(policyList);</b>
+<b class="nc">&nbsp;                when(fileUtils.createExcelFile(any(),anyString(),anyString())).thenReturn(b);</b>
+<b class="nc">&nbsp;                ComingPolicyListRequestInExcel obj = ComingPolicyListRequestInExcel.builder()</b>
+<b class="nc">&nbsp;                                                .startDate(new Date())</b>
+<b class="nc">&nbsp;                                                .endDate(new Date())</b>
+<b class="nc">&nbsp;                                                .build();</b>
+<b class="nc">&nbsp;                byte[] resp = policyService.comingPolicyListInExcel(obj);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;
+&nbsp;        @ParameterizedTest
+&nbsp;        @ValueSource(booleans = {true, false} )
+&nbsp;        void comingPolicyIn60Days(boolean list){
+<b class="nc">&nbsp;                List&lt;PolicyOverComingEntity&gt; policyList = new java.util.ArrayList&lt;&gt;(Collections.singletonList(PolicyOverComingEntity.builder().build()));</b>
+<b class="nc">&nbsp;                if(list)</b>
+<b class="nc">&nbsp;                        policyList.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;                byte [] b = new byte[]{1,2,4,6,8,0,8,9};</b>
+<b class="nc">&nbsp;                when(policyOverComingRepository.findAllByRenewalDateBetween(Mockito.any(),Mockito.any())).thenReturn(policyList);</b>
+<b class="nc">&nbsp;                when(fileUtils.createExcelFile(any(),anyString(),anyString())).thenReturn(b);</b>
+<b class="nc">&nbsp;                ComingPolicyListRequestInExcel obj = ComingPolicyListRequestInExcel.builder()</b>
+<b class="nc">&nbsp;                        .startDate(new Date())</b>
+<b class="nc">&nbsp;                        .endDate(new Date())</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                when(notificationClient.sendEmailAttachmentBytes(anyString())).thenReturn(&quot;&quot;);</b>
+<b class="nc">&nbsp;                policyService.renewalsDueIn60Days();</b>
+<b class="nc">&nbsp;                assertNotNull(obj);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void getCustomerPolicyListNullEntityTest(){
+<b class="nc">&nbsp;                CustomerDetailResponse obj = CustomerDetailResponse.builder()</b>
+<b class="nc">&nbsp;                                        .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                        .quoteId(&quot;2&quot;)</b>
+<b class="nc">&nbsp;                                        .startDate(new Date())</b>
+<b class="nc">&nbsp;                                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                CustomerPolicyListRequest request = CustomerPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                                        .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                when(customerService.getCustomer(any(CustomerSearchRequest.class))).thenReturn(obj);</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;HealthPolicyListResponse&gt; resp = policyService.getCustomerPolicyList(request);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void getCustomerPolicyListTest(){
+<b class="nc">&nbsp;                CustomerDetailResponse obj = CustomerDetailResponse.builder()</b>
+<b class="nc">&nbsp;                                        .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                        .quoteId(&quot;2&quot;)</b>
+<b class="nc">&nbsp;                                        .startDate(new Date())</b>
+<b class="nc">&nbsp;                                        .principal(Principal.builder().firstName(&quot;John&quot;).entityId(1L).build())</b>
+<b class="nc">&nbsp;                                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                CustomerPolicyListRequest request = CustomerPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                                        .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                when(customerService.getCustomer(any(CustomerSearchRequest.class))).thenReturn(obj);</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;HealthPolicyListResponse&gt; resp = policyService.getCustomerPolicyList(request);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void getCustomerPolicyListEntityPolicyListRequestTest(){
+<b class="nc">&nbsp;                EntityPolicyListRequest request = EntityPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                                        .build();</b>
+<b class="nc">&nbsp;                List&lt;HealthPolicyListResponse&gt; resp = policyService.getCustomerPolicyList(request);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void getPolicyListsTest(){
+&nbsp;                
+<b class="nc">&nbsp;                Policy p = Policy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(123)</b>
+<b class="nc">&nbsp;                        .policyEffectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .productId(1)</b>
+<b class="nc">&nbsp;                        .policyStartDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyRenewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyStatus(&quot;A&quot;)</b>
+<b class="nc">&nbsp;                        .policyAmount(BigDecimal.ZERO)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;                                        
+<b class="nc">&nbsp;                when(policyRemote.getPolicyLists(any())).thenReturn(Collections.singletonList(p));</b>
+&nbsp;
+<b class="nc">&nbsp;                ApplicationRenewalPolicy renewalPolicy = ApplicationRenewalPolicy.builder()</b>
+<b class="nc">&nbsp;                                .policyId(123)</b>
+<b class="nc">&nbsp;                                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                when(policyMapper.searchRenewedPolicyList(any())).thenReturn(Collections.singletonList(renewalPolicy));</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;                CustomerPolicyListRequest request = CustomerPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                                        .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;HealthPolicyListResponse&gt; resp = policyService.getPolicyLists(request);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void createCustomerPolicyCacheNullEntityTest(){
+&nbsp;
+<b class="nc">&nbsp;                when(customerService.getCustomer(any(String.class))).thenReturn(null);</b>
+&nbsp;
+<b class="nc">&nbsp;                CustomerIdRequest request = CustomerIdRequest.builder()</b>
+<b class="nc">&nbsp;                                                .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                boolean b = policyService.createCustomerPolicyCache(request);</b>
+<b class="nc">&nbsp;                assertFalse(b);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;        // @Test
+&nbsp;        // void createCustomerPolicyCacheFalseTest(){
+&nbsp;
+&nbsp;        //         Customer cust = Customer.builder()
+&nbsp;        //                 .entityId(1L)
+&nbsp;        //                 .build();
+&nbsp;
+&nbsp;        //         when(customerService.getCustomer(any(String.class))).thenReturn(cust);
+&nbsp;
+&nbsp;        //         Policy p = Policy.builder()
+&nbsp;        //                 .policyId(123)
+&nbsp;        //                 .policyEffectiveDate(new Date())
+&nbsp;        //                 .productId(1)
+&nbsp;        //                 .policyStartDate(new Date())
+&nbsp;        //                 .policyRenewalDate(new Date())
+&nbsp;        //                 .policyStatus(&quot;A&quot;)
+&nbsp;        //                 .policyAmount(BigDecimal.ZERO)
+&nbsp;        //                 .build();
+&nbsp;                                        
+&nbsp;        //         when(policyRemote.getPolicyLists(any())).thenReturn(Collections.singletonList(p));
+&nbsp;
+&nbsp;
+&nbsp;        //         CustomerIdRequest request = CustomerIdRequest.builder()
+&nbsp;        //                                         .customerId(&quot;1&quot;)
+&nbsp;        //                                         .build();
+&nbsp;
+&nbsp;        //         boolean b = policyService.createCustomerPolicyCache(request);
+&nbsp;        //         assertFalse(b);
+&nbsp;        //         }
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void createCustomerPolicyCacheTest(){
+&nbsp;
+<b class="nc">&nbsp;                Customer cust = Customer.builder()</b>
+<b class="nc">&nbsp;                        .entityId(1L)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                when(customerService.getCustomer(any(String.class))).thenReturn(cust);</b>
+&nbsp;
+<b class="nc">&nbsp;                Policy p = Policy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(123)</b>
+<b class="nc">&nbsp;                        .policyEffectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .productId(1)</b>
+<b class="nc">&nbsp;                        .policyStartDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyRenewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyStatus(&quot;A&quot;)</b>
+<b class="nc">&nbsp;                        .policyAmount(BigDecimal.ZERO)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;                                        
+<b class="nc">&nbsp;                when(policyRemote.getPolicyLists(any())).thenReturn(Collections.singletonList(p));</b>
+<b class="nc">&nbsp;                when(policyMapper.insertCustomerPolicy(any())).thenReturn(1);</b>
+&nbsp;
+<b class="nc">&nbsp;                CustomerIdRequest request = CustomerIdRequest.builder()</b>
+<b class="nc">&nbsp;                                                .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                                                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                boolean b = policyService.createCustomerPolicyCache(request);</b>
+<b class="nc">&nbsp;                assertTrue(b);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;        // @Test
+&nbsp;        // void renewalPolicyForComingWorkerTest(){
+&nbsp;
+&nbsp;        //         PolicyDetail policyDetail = PolicyDetail.builder()
+&nbsp;        //                 .totalPremium(new BigDecimal(100))
+&nbsp;        //                 .premiumPaid(new BigDecimal(10))
+&nbsp;        //                 .premiumLeftToPay(new BigDecimal(10))
+&nbsp;        //                 .policyRenewalDate(new Date())
+&nbsp;        //                 .policyStartDate(new Date())
+&nbsp;        //                 .policyEffectiveDate(new Date())
+&nbsp;        //                 .policyHolderEntityId(1L)
+&nbsp;        //                 .policyStatus(&quot;M&quot;)
+&nbsp;        //                 .policyId(123)
+&nbsp;        //                 .policyNumber(&quot;123&quot;)
+&nbsp;        //                 .policyHolderName(&quot;Test User&quot;)
+&nbsp;        //                 .productName(&quot;Test Productt&quot;)
+&nbsp;        //                 .principalMember(&quot;Principal&quot;)
+&nbsp;        //                 .principalId(1L)
+&nbsp;        //                 .principalDob(new Date())
+&nbsp;        //                 .paymentStyle(&quot;Style&quot;)
+&nbsp;        //                 .productId(1)
+&nbsp;        //                 .build();
+&nbsp;
+&nbsp;        //         when(policyRemote.getPolicyDetail(any())).thenReturn(policyDetail);
+&nbsp;
+&nbsp;        //         PolicyRenewalRequest request = PolicyRenewalRequest.builder()
+&nbsp;        //                 .policyNumber(&quot;123&quot;)
+&nbsp;        //                 .effectiveDate(new Date())
+&nbsp;        //                 .build();
+&nbsp;
+&nbsp;        //         PolicyRenewalResponse resp = policyService.renewalPolicyForComingWorker(request);
+&nbsp;        //         assertNotNull(resp);
+&nbsp;
+&nbsp;        //         }
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void testRenewalNotificationPolicies() throws InterruptedException {
+<b class="nc">&nbsp;                List&lt;Integer&gt; renewalDaysList = Arrays.asList(30,15,7,0);</b>
+<b class="nc">&nbsp;                when(policyRenewalDaysConfig.getRenewal()).thenReturn(renewalDaysList);</b>
+<b class="nc">&nbsp;                when(policyOverComingRepository.findAllPoliciesDueForRenewalIn(anyInt()))</b>
+<b class="nc">&nbsp;                        .thenReturn(Collections.emptyList());</b>
+<b class="nc">&nbsp;                policyService.renewalNotificationPolicies();</b>
+<b class="nc">&nbsp;                assertTrue(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        }</b>
+&nbsp;        @Test
+&nbsp;        void testExpiredNotificationPolicies() throws InterruptedException {
+<b class="nc">&nbsp;                List&lt;Integer&gt; renewalDaysList = Arrays.asList(1,7,14,21,30);</b>
+<b class="nc">&nbsp;                when(policyRenewalDaysConfig.getExpired()).thenReturn(renewalDaysList);</b>
+<b class="nc">&nbsp;                when(policyOverComingRepository.findAllPoliciesDueForRenewalIn(anyInt()))</b>
+<b class="nc">&nbsp;                        .thenReturn(Collections.emptyList());</b>
+<b class="nc">&nbsp;                policyService.expiredNotificationPolicies();</b>
+<b class="nc">&nbsp;                assertTrue(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        @Test
+&nbsp;        void testGetUnderwritingQuotes() {
+&nbsp;                CustomerPolicyListRequest request = CustomerPolicyListRequest
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .customerId(&quot;928e9f369d33319a6aba75f58eed1b6d&quot;)</b>
+<b class="nc">&nbsp;                        .entityId(&quot;1707356&quot;)</b>
+<b class="nc">&nbsp;                        .filter(&quot;&quot;)</b>
+<b class="nc">&nbsp;                        .index(1)</b>
+<b class="nc">&nbsp;                        .limit(10)</b>
+<b class="nc">&nbsp;                        .range(&quot;All&quot;)</b>
+<b class="nc">&nbsp;                        .sort(&quot;desc&quot;)</b>
+<b class="nc">&nbsp;                        .sortType(&quot;renewalDate&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;                Quote quote = Quote
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .productId(49)</b>
+<b class="nc">&nbsp;                        .extPolicyNumber(&quot;JPR0115549&quot;)</b>
+<b class="nc">&nbsp;                        .startDate(new Date())</b>
+<b class="nc">&nbsp;                        .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .renewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .status(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .premium(Premium.builder().totalPremium(BigDecimal.valueOf(199867)).build())</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                List&lt;Quote&gt; mockQuotesList = Arrays.asList(quote);</b>
+<b class="nc">&nbsp;                when(quoteMapper.getCustomerQuotes(any(), any(), any())).thenReturn(mockQuotesList);</b>
+<b class="nc">&nbsp;                List&lt;HealthPolicyListResponse&gt; result = policyService.getUnderwritingQuotes(request);</b>
+<b class="nc">&nbsp;                assertEquals(mockQuotesList.size(), result.size());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void getPolicyListsTestWithStatusChanges() {
+<b class="nc">&nbsp;                Policy p = Policy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(1121986)</b>
+<b class="nc">&nbsp;                        .policyEffectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .productId(1)</b>
+<b class="nc">&nbsp;                        .policyStartDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyRenewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyStatus(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .policyAmount(BigDecimal.valueOf(100000))</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                when(policyRemote.getPolicyLists(any())).thenReturn(Collections.singletonList(p));</b>
+<b class="nc">&nbsp;                ApplicationRenewalPolicy renewalPolicy = ApplicationRenewalPolicy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(1121986)</b>
+<b class="nc">&nbsp;                        .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .status(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                when(policyMapper.searchRenewedPolicyList(any())).thenReturn(Collections.singletonList(renewalPolicy));</b>
+<b class="nc">&nbsp;                when(policyMapper.searchPolicyList(any())).thenReturn(Collections.singletonList(renewalPolicy));</b>
+<b class="nc">&nbsp;                CustomerPolicyListRequest request = CustomerPolicyListRequest.builder()</b>
+<b class="nc">&nbsp;                        .customerId(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                List&lt;HealthPolicyListResponse&gt; resp = policyService.getPolicyLists(request);</b>
+<b class="nc">&nbsp;                assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updatePolicyStatusTest() {
+<b class="nc">&nbsp;                Policy p = Policy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(1121986)</b>
+<b class="nc">&nbsp;                        .policyEffectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .productId(1)</b>
+<b class="nc">&nbsp;                        .policyStartDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyRenewalDate(new Date())</b>
+<b class="nc">&nbsp;                        .policyStatus(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .policyAmount(BigDecimal.valueOf(100000))</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                ApplicationRenewalPolicy renewalPolicy = ApplicationRenewalPolicy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(1121986)</b>
+<b class="nc">&nbsp;                        .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .status(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                policyService.updatePolicyStatus(List.of(renewalPolicy), p);</b>
+<b class="nc">&nbsp;                assertTrue(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updatePolicyStatusTestWithPolicyNull() {
+<b class="nc">&nbsp;                ApplicationRenewalPolicy renewalPolicy = ApplicationRenewalPolicy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(1121986)</b>
+<b class="nc">&nbsp;                        .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .status(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                policyService.updatePolicyStatus(List.of(renewalPolicy), null);</b>
+<b class="nc">&nbsp;                assertTrue(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updatePolicyStatusTestWithPolicyIdNull() {
+<b class="nc">&nbsp;                Policy p = Policy.builder()</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                ApplicationRenewalPolicy renewalPolicy = ApplicationRenewalPolicy.builder()</b>
+<b class="nc">&nbsp;                        .policyId(1121986)</b>
+<b class="nc">&nbsp;                        .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .status(&quot;Underwriting&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                policyService.updatePolicyStatus(List.of(renewalPolicy), p);</b>
+<b class="nc">&nbsp;                assertTrue(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

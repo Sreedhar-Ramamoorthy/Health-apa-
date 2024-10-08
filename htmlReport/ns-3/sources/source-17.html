@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TransactionDetailServiceImplTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionDetailServiceImplTest (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionDetailServiceImplTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;import static org.mockito.ArgumentMatchers.any;
+&nbsp;import org.mockito.Mockito;
+&nbsp;import static org.mockito.Mockito.when;
+&nbsp;import static org.mockito.Mockito.doNothing;
+&nbsp;import static org.mockito.MockitoAnnotations.initMocks;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertTrue;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertFalse;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.mockito.InjectMocks;
+&nbsp;import org.mockito.Mock;
+&nbsp;
+&nbsp;import ke.co.apollo.health.domain.request.TransactionDetailTaskAddRequest;
+&nbsp;import ke.co.apollo.health.mapper.health.TransactionDetailTaskMapper;
+&nbsp;import ke.co.apollo.health.common.domain.model.TransactionDetailTask;
+&nbsp;import ke.co.apollo.health.common.domain.model.PaymentHistory;
+&nbsp;import ke.co.apollo.health.service.PolicyService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;
+<b class="nc">&nbsp;class TransactionDetailServiceImplTest {</b>
+&nbsp;
+&nbsp;        @InjectMocks
+&nbsp;        TransactionDetailServiceImpl transactionDetailService;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        TransactionDetailTaskMapper transactionDetailTaskMapper;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        PolicyService policyService;
+&nbsp;
+&nbsp;        @Mock
+&nbsp;        QuoteService quoteService;
+&nbsp;
+&nbsp;        @BeforeEach
+&nbsp;        void setUpMocks(){
+<b class="nc">&nbsp;                initMocks(this);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;  
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void createTransactionDetailTaskTest(){
+<b class="nc">&nbsp;                when(transactionDetailTaskMapper.initTransactionDetail(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;                TransactionDetailTaskAddRequest obj = TransactionDetailTaskAddRequest.builder()</b>
+<b class="nc">&nbsp;                        .checkoutRequestId(&quot;checkoutRequestId&quot;)</b>
+<b class="nc">&nbsp;                        .scheduleTime(new Date())</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                boolean b = transactionDetailService.createTransactionDetailTask(obj);</b>
+<b class="nc">&nbsp;                assertTrue(b);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void createTransactionDetailTaskZeroTest(){
+<b class="nc">&nbsp;                when(transactionDetailTaskMapper.initTransactionDetail(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;                TransactionDetailTaskAddRequest obj = TransactionDetailTaskAddRequest.builder()</b>
+<b class="nc">&nbsp;                        .checkoutRequestId(&quot;checkoutRequestId&quot;)</b>
+<b class="nc">&nbsp;                        .scheduleTime(new Date())</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                boolean b = transactionDetailService.createTransactionDetailTask(obj);</b>
+<b class="nc">&nbsp;                assertFalse(b);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updateTransactionDetailTaskTest(){
+<b class="nc">&nbsp;                when(transactionDetailTaskMapper.updateByPrimaryKey(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;                TransactionDetailTask obj = TransactionDetailTask.builder()</b>
+<b class="nc">&nbsp;                        .taskId(&quot;taskId&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                boolean b = transactionDetailService.updateTransactionDetailTask(obj);</b>
+<b class="nc">&nbsp;                assertTrue(b);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updateTransactionDetailTaskZeroTest(){
+<b class="nc">&nbsp;                when(transactionDetailTaskMapper.updateByPrimaryKey(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;                TransactionDetailTask obj = TransactionDetailTask.builder()</b>
+<b class="nc">&nbsp;                        .taskId(&quot;taskId&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                boolean b = transactionDetailService.updateTransactionDetailTask(obj);</b>
+<b class="nc">&nbsp;                assertFalse(b);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void cancelTransactionDetailTaskTest(){
+&nbsp;
+&nbsp;                //doNothing().when(transactionDetailTaskMapper).deleteByPrimaryKey(any());
+<b class="nc">&nbsp;                when(transactionDetailTaskMapper.deleteByPrimaryKey(any())).thenReturn(1);</b>
+&nbsp;
+<b class="nc">&nbsp;                TransactionDetailTask obj = TransactionDetailTask.builder()</b>
+<b class="nc">&nbsp;                        .taskId(&quot;taskId&quot;)</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;                
+<b class="nc">&nbsp;                boolean b = transactionDetailService.cancelTransactionDetailTask(obj);</b>
+<b class="nc">&nbsp;                assertFalse(b);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updateBalanceRenewalTrueTest(){
+<b class="nc">&nbsp;                when(policyService.updatePolicyRenewalBalance(any(),any(),any())).thenReturn(true);</b>
+<b class="nc">&nbsp;                PaymentHistory obj = PaymentHistory.builder()</b>
+<b class="nc">&nbsp;                                .renewal(true)</b>
+<b class="nc">&nbsp;                                .policyNumber(&quot;xyz&quot;)</b>
+<b class="nc">&nbsp;                                .amount(&quot;0&quot;)</b>
+<b class="nc">&nbsp;                                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                transactionDetailService.updateBalance(obj);</b>
+<b class="nc">&nbsp;                Mockito.verify(policyService, Mockito.times(1)).updatePolicyRenewalBalance(any(), any(), any());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updateBalanceRenewalFalseTest(){
+<b class="nc">&nbsp;                when(quoteService.updateQuoteBalance(any())).thenReturn(true);</b>
+<b class="nc">&nbsp;                PaymentHistory obj = PaymentHistory.builder()</b>
+<b class="nc">&nbsp;                                .renewal(false)</b>
+<b class="nc">&nbsp;                                .policyNumber(&quot;xyz&quot;)</b>
+<b class="nc">&nbsp;                                .amount(&quot;0&quot;)</b>
+<b class="nc">&nbsp;                                .quoteNumber(&quot;123&quot;)</b>
+<b class="nc">&nbsp;                                .customerId(&quot;customerId&quot;)</b>
+<b class="nc">&nbsp;                                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                        .build();</b>
+<b class="nc">&nbsp;                transactionDetailService.updateBalance(obj);</b>
+<b class="nc">&nbsp;                Mockito.verify(quoteService, Mockito.times(1)).updateQuoteBalance(any());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Test
+&nbsp;        void updateBalanceRenewalPaymentIsNullTest(){
+<b class="nc">&nbsp;                when(quoteService.updateQuoteBalance(any())).thenReturn(true);</b>
+<b class="nc">&nbsp;                PaymentHistory obj = null;</b>
+<b class="nc">&nbsp;                transactionDetailService.updateBalance(obj);</b>
+<b class="nc">&nbsp;                Mockito.verify(quoteService, Mockito.times(0)).updateQuoteBalance(any());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

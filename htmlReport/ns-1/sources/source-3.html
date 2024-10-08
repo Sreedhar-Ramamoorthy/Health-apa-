@@ -1,0 +1,967 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CustomerServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomerServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomerServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/145)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/464)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CustomerServiceImpl$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/145)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/465)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import ke.co.apollo.health.domain.entity.HealthStepEntity;
+&nbsp;import ke.co.apollo.health.domain.request.*;
+&nbsp;import ke.co.apollo.health.enums.HealthQuoteStepsEnum;
+&nbsp;import ke.co.apollo.health.enums.UpdateDependentEnum;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.repository.HealthStepRepository;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.time.DateFormatUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.ActBusinessError;
+&nbsp;import ke.co.apollo.health.common.domain.model.Address;
+&nbsp;import ke.co.apollo.health.common.domain.model.Children;
+&nbsp;import ke.co.apollo.health.common.domain.model.ContactDetails;
+&nbsp;import ke.co.apollo.health.common.domain.model.Customer;
+&nbsp;import ke.co.apollo.health.common.domain.model.Dependant;
+&nbsp;import ke.co.apollo.health.common.domain.model.DependantDetails;
+&nbsp;import ke.co.apollo.health.common.domain.model.Phone;
+&nbsp;import ke.co.apollo.health.common.domain.model.Principal;
+&nbsp;import ke.co.apollo.health.common.domain.model.Quote;
+&nbsp;import ke.co.apollo.health.common.domain.model.RoleAdditionalInfo;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddClientEntityRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.AddContactDetailsRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerAddPhoneRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerAddSuperIdRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerCreateRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.CustomerSuperIdRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.GetCustomerByPhoneNoRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.AddClientEntityResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.AddContactDetailsResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.CustomerCreateResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.CustomerCreateResponse.QuoteBean;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.GetCustomerInfoResponse;
+&nbsp;import ke.co.apollo.health.common.enums.DependantRelationship;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerUpdateRequest.PrincipalBean;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.mapper.health.CustomerMapper;
+&nbsp;import ke.co.apollo.health.mapping.CustomerMapping;
+&nbsp;import ke.co.apollo.health.remote.CustomerRemote;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.service.CustomerService;
+&nbsp;import ke.co.apollo.health.service.PolicyService;
+&nbsp;import ke.co.apollo.health.service.QuestionService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;
+&nbsp;import static ke.co.apollo.health.common.enums.DependantRelationship.SPOUSE;
+&nbsp;
+&nbsp;/**
+&nbsp; * Manage customer
+&nbsp; *
+&nbsp; * @author Rick
+&nbsp; * @version 1.0
+&nbsp; * @see
+&nbsp; * @since 9/14/2020
+&nbsp; */
+&nbsp;@Service
+<b class="nc">&nbsp;public class CustomerServiceImpl implements CustomerService {</b>
+&nbsp;
+<b class="nc">&nbsp;  private Logger logger = LoggerFactory.getLogger(getClass());</b>
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerMapper customerMapper;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteMapper quoteMapper;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteService quoteService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyService policyService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyRemote policyRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuestionService questionService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerRemote customerRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  Gson gson;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  HealthStepRepository stepRepository;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String addCustomer(CustomerAddRequest request) {
+<b class="nc">&nbsp;    if (request.getEntityId() != null) {</b>
+<b class="nc">&nbsp;      GetCustomerInfoResponse response = this.getCustomerByEntityId(request.getEntityId());</b>
+<b class="nc">&nbsp;      if (response != null) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;Existing client[entity id:&quot; + request.getEntityId() + &quot;]&quot;);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    Customer customer = CustomerMapping.customerAddRequest2Entity(request);</b>
+<b class="nc">&nbsp;    customerMapper.addCustomer(customer);</b>
+<b class="nc">&nbsp;    return customer.getCustomerId();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public Integer addDependant(DependantAddRequest request) {
+<b class="nc">&nbsp;    int count = customerMapper.addCustomerDependant(request);</b>
+<b class="nc">&nbsp;    quoteService.createInitQuote(request.getCustomerId(), request.getAgentId(), request.getQuoteId(), request.isOnlyChild(), request.getProductId());</b>
+<b class="nc">&nbsp;    return count;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public CustomerDetailResponse getCustomer(CustomerSearchRequest request) {
+&nbsp;
+<b class="nc">&nbsp;    CustomerDetailResponse result = null;</b>
+<b class="nc">&nbsp;    if (request.getCustomerId() != null) {</b>
+<b class="nc">&nbsp;      Customer customer = customerMapper.getCustomerByCustomerId(request.getCustomerId());</b>
+<b class="nc">&nbsp;      logger.info(&quot;---&gt; customer object from getCustomer() = {}&quot;, customer);</b>
+<b class="nc">&nbsp;      if (customer != null) {</b>
+<b class="nc">&nbsp;        Quote quote = quoteService</b>
+<b class="nc">&nbsp;                .getQuoteNoThrowException(request.getQuoteId(), request.getCustomerId(), null);</b>
+<b class="nc">&nbsp;        result = convertCustomer2Response(customer, quote);</b>
+<b class="nc">&nbsp;        List&lt;Dependant&gt; childrenList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        setSpouseAndChildren(request, result, childrenList);</b>
+<b class="nc">&nbsp;        if (quote != null) {</b>
+<b class="nc">&nbsp;          result.setQuoteId(quote.getId());</b>
+<b class="nc">&nbsp;          result.setOnlyChild(quote.isChildrenOnly());</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void setSpouseAndChildren(CustomerSearchRequest request, CustomerDetailResponse result,
+&nbsp;      List&lt;Dependant&gt; childrenList) {
+<b class="nc">&nbsp;    if (request.getQuoteId() != null) {</b>
+<b class="nc">&nbsp;      List&lt;Dependant&gt; list = customerMapper</b>
+<b class="nc">&nbsp;          .getCustomerDependant(request.getCustomerId(), request.getQuoteId());</b>
+<b class="nc">&nbsp;      for (Dependant dependant : list) {</b>
+<b class="nc">&nbsp;        switch (DependantRelationship.getRelationship(dependant.getRelationship())) {</b>
+&nbsp;          case SPOUSE:
+<b class="nc">&nbsp;            result.setSpouse(dependant);</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;          case MARRIED_CHILD:
+&nbsp;          case UNMARRIED_CHILD:
+<b class="nc">&nbsp;            childrenList.add(dependant);</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;          default:
+&nbsp;        }
+<b class="nc">&nbsp;      }</b>
+<b class="nc">&nbsp;      if (result.getChildren() != null) {</b>
+<b class="nc">&nbsp;        result.getChildren().setDetail(childrenList);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  /**
+&nbsp;   * System need add default dependants for customer&#39;s all of quotes when user first time add
+&nbsp;   * dependant. After that, system have to add/update each single quote&#39;s dependant depend on
+&nbsp;   * request param.
+&nbsp;   */
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public CustomerDetailResponse updateCustomer(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;    boolean boolRemoveChildren = request.isDeleteChildrenRequest();</b>
+<b class="nc">&nbsp;    boolean boolUpdateNumberOfChildren = request.isUpdateNumberOfChildren();</b>
+<b class="nc">&nbsp;    boolean boolRemoveSpouse = request.isDeleteSpouse();</b>
+&nbsp;
+<b class="nc">&nbsp;    if (boolRemoveSpouse &amp;&amp; request.getSpouse() != null){</b>
+<b class="nc">&nbsp;      removeSpouse(request);</b>
+<b class="nc">&nbsp;      request.setSpouse(null);</b>
+&nbsp;    }else{
+<b class="nc">&nbsp;      if(request.getSpouse() != null) {</b>
+<b class="nc">&nbsp;        Dependant spouse = request.getSpouse();</b>
+&nbsp;        Customer c = Customer
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .spouseSummary(</b>
+<b class="nc">&nbsp;                        Dependant.builder()</b>
+<b class="nc">&nbsp;                                .gender(spouse.getGender())</b>
+<b class="nc">&nbsp;                                .lastName(spouse.getLastName())</b>
+<b class="nc">&nbsp;                                .firstName(spouse.getFirstName())</b>
+<b class="nc">&nbsp;                                .title(spouse.getTitle())</b>
+<b class="nc">&nbsp;                                .dependantCode(spouse.getDependantCode())</b>
+<b class="nc">&nbsp;                                .dateOfBirth(spouse.getDateOfBirth())</b>
+<b class="nc">&nbsp;                                .build()</b>
+<b class="nc">&nbsp;                ).build();</b>
+<b class="nc">&nbsp;        request.setSpouse(c.getSpouseSummary());</b>
+<b class="nc">&nbsp;        int update = customerMapper.updateSpouseSummary(c.getSpouseSummary(), request.getCustomerId());</b>
+<b class="nc">&nbsp;        logger.info(&quot; Updated spouse : {}&quot; ,update);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if(boolRemoveChildren){</b>
+<b class="nc">&nbsp;      removeChild(request);</b>
+<b class="nc">&nbsp;      request.setChildren(null);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if(boolUpdateNumberOfChildren &amp;&amp; request.getChildren() != null){</b>
+<b class="nc">&nbsp;      updateNumberOfChildren(request);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    customerMapper.updatePrincipalCustomer(prepareUpdatePrincipalParam(request));</b>
+<b class="nc">&nbsp;    Customer existingSpouse  = customerMapper.getSpouseByParentId(request.getCustomerId(), SPOUSE.getValue());</b>
+<b class="nc">&nbsp;    if(existingSpouse == null &amp;&amp; request.getSpouse() != null){</b>
+<b class="nc">&nbsp;      String principalId = request.getCustomerId();</b>
+<b class="nc">&nbsp;      Dependant spouse = request.getSpouse();</b>
+<b class="nc">&nbsp;      String spouseQuoteId = quoteMapper.getSpouseQuoteId(principalId);</b>
+<b class="nc">&nbsp;      Customer customer = Customer.builder()</b>
+<b class="nc">&nbsp;              .gender(spouse.getGender())</b>
+<b class="nc">&nbsp;              .customerId(spouse.getDependantCode())</b>
+<b class="nc">&nbsp;              .relationshipDesc(SPOUSE.getValue())</b>
+<b class="nc">&nbsp;              .dateOfBirth(spouse.getDateOfBirth())</b>
+<b class="nc">&nbsp;              .firstName(spouse.getFirstName())</b>
+<b class="nc">&nbsp;              .lastName(spouse.getLastName())</b>
+<b class="nc">&nbsp;              .title(spouse.getTitle())</b>
+<b class="nc">&nbsp;              .parentId(spouseQuoteId)</b>
+<b class="nc">&nbsp;              .build();</b>
+<b class="nc">&nbsp;      customerMapper.addCustomer(customer);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    List&lt;String&gt; needInitQuote = sortUpQuoteList(request);</b>
+&nbsp;    List&lt;Customer&gt; dependantList;
+&nbsp;    //Follow currently standard business logic if neeInitQuote is not empty it means user update customer details on the first time.
+&nbsp;    //There is no principal&#39;s dependant store in database. Need initialize default dependants for principal&#39;s all quotes.
+<b class="nc">&nbsp;    if (needInitQuote.isEmpty()) {</b>
+<b class="nc">&nbsp;      dependantList = convertRequestToDependantList(request, request.getQuoteId());</b>
+<b class="nc">&nbsp;      List&lt;Customer&gt; newDependants = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;      List&lt;Customer&gt; customers = customerMapper.getCustomerByParentId(request.getCustomerId())</b>
+<b class="nc">&nbsp;              .stream()</b>
+<b class="nc">&nbsp;              .filter(r -&gt; r.getRelationshipDesc().equalsIgnoreCase(SPOUSE.getValue())</b>
+<b class="nc">&nbsp;              ).collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;      if(!customers.isEmpty() &amp;&amp; customers.size() &gt; 1) {</b>
+<b class="nc">&nbsp;        int removed = customerMapper.removeTemporary(request.getCustomerId());</b>
+<b class="nc">&nbsp;        logger.info(&quot; ==== removed customer details : {}&quot;, removed);</b>
+&nbsp;      }
+&nbsp;
+<b class="nc">&nbsp;      for (Customer dependant : dependantList) {</b>
+<b class="nc">&nbsp;        logger.info(&quot; ==== customer details : {}&quot;, gson.toJson(dependant));</b>
+<b class="nc">&nbsp;        if (dependant.getCustomerId() != null &amp;&amp; !dependant.getCustomerId().isEmpty()) {</b>
+<b class="nc">&nbsp;          dependant.setFirstName(dependant.getFirstName());</b>
+<b class="nc">&nbsp;          dependant.setLastName(dependant.getLastName());</b>
+<b class="nc">&nbsp;          customerMapper.updateDependant(dependant);</b>
+<b class="nc">&nbsp;          logger.info(&quot; ==== updated spouse with details : {}&quot;, gson.toJson(dependant));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          newDependants.add(dependant);</b>
+<b class="nc">&nbsp;          logger.info(&quot; ==== added dependants with details : {}&quot;, gson.toJson(dependant));</b>
+&nbsp;        }
+<b class="nc">&nbsp;      }</b>
+&nbsp;
+<b class="nc">&nbsp;      if (!newDependants.isEmpty()) {</b>
+<b class="nc">&nbsp;        customerMapper.addDependant(newDependants);</b>
+<b class="nc">&nbsp;        logger.info(&quot; ==== added dependants with details : {}&quot;, gson.toJson(newDependants));</b>
+&nbsp;
+&nbsp;      }
+&nbsp;
+<b class="nc">&nbsp;      if (request.getChildren() != null || request.getSpouse() != null) {</b>
+<b class="nc">&nbsp;        Customer updatePrincipalWithDependentSummary = prepareChildAndSpouseSummary(request);</b>
+<b class="nc">&nbsp;        customerMapper.updatePrincipalCustomer(updatePrincipalWithDependentSummary);</b>
+&nbsp;      }
+&nbsp;
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      for (String prepareAddQuoteId : needInitQuote) {</b>
+<b class="nc">&nbsp;        dependantList = convertRequestToDependantList(request, prepareAddQuoteId);</b>
+<b class="nc">&nbsp;        if (!CollectionUtils.isEmpty(dependantList)) {</b>
+<b class="nc">&nbsp;          logger.info(&quot;---&gt; dependentList {}&quot;, dependantList);</b>
+<b class="nc">&nbsp;          customerMapper.addDependant(dependantList);</b>
+&nbsp;        }
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (request.getChildren() != null || request.getSpouse() != null) {</b>
+<b class="nc">&nbsp;      Customer updatePrincipalWithDependentSummary = prepareChildAndSpouseSummary(request);</b>
+<b class="nc">&nbsp;      customerMapper.updatePrincipalCustomer(updatePrincipalWithDependentSummary);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    if(boolRemoveSpouse){</b>
+<b class="nc">&nbsp;      List&lt;Dependant&gt; p = customerMapper.getCustomerDependant(request.getCustomerId(), request.getQuoteId());</b>
+<b class="nc">&nbsp;      p.forEach(dependant -&gt; {</b>
+<b class="nc">&nbsp;        if(dependant.getRelationship().equalsIgnoreCase(SPOUSE.getValue())){</b>
+<b class="nc">&nbsp;          customerMapper.deleteDependantsByCustomerId(dependant.getDependantCode());</b>
+&nbsp;        }
+<b class="nc">&nbsp;      });</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    quoteService.updateQuotePremiumByCustomer(request.getQuoteId(), request.getCustomerId(), null);</b>
+<b class="nc">&nbsp;    logger.info(&quot;\n ==== created step {} : for quote {} ==== \n &quot; , HealthQuoteStepsEnum.CUSTOMER_DETAILS, request.getQuoteId());</b>
+<b class="nc">&nbsp;    stepRepository.save(HealthStepEntity</b>
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .quoteOrPolicyId(request.getQuoteId())</b>
+<b class="nc">&nbsp;            .agentId(request.getAgentId())</b>
+<b class="nc">&nbsp;            .customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .step(HealthQuoteStepsEnum.CUSTOMER_DETAILS)</b>
+<b class="nc">&nbsp;            .build());</b>
+&nbsp;
+<b class="nc">&nbsp;    return getCustomer(CustomerSearchRequest.builder().customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .quoteId(request.getQuoteId()).build());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Customer prepareChildAndSpouseSummary(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;    Customer customer = new Customer();</b>
+<b class="nc">&nbsp;    if (request.getChildren() != null) {</b>
+<b class="nc">&nbsp;       customer = Customer.builder()</b>
+<b class="nc">&nbsp;              .childrenSummary(</b>
+<b class="nc">&nbsp;                      Children.builder()</b>
+<b class="nc">&nbsp;                              .count(request.getChildren().getCount())</b>
+<b class="nc">&nbsp;                              .build())</b>
+<b class="nc">&nbsp;              .customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;              .build();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if(request.getSpouse() != null) {</b>
+<b class="nc">&nbsp;      customer =  Customer.builder()</b>
+<b class="nc">&nbsp;              .spouseSummary(Dependant.builder().dateOfBirth(request.getSpouse().getDateOfBirth()).build())</b>
+<b class="nc">&nbsp;              .build();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return customer;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void removeSpouse(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;      customerMapper.deleteDependantsByCustomerId(request.getSpouse().getDependantCode());</b>
+<b class="nc">&nbsp;      customerMapper.removeSpouseFromPrincipal(request.getCustomerId());</b>
+<b class="nc">&nbsp;      CustomerDetailResponse response = getCustomer(CustomerSearchRequest.builder().customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;              .quoteId(request.getQuoteId()).build());</b>
+<b class="nc">&nbsp;      response.setUpdateDependent(UpdateDependentEnum.SPOUSE_REMOVED.getValue());</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private void removeChild(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;    if(request.getChildren() != null){</b>
+<b class="nc">&nbsp;      int childrenCount = request.getChildren().getCount();</b>
+<b class="nc">&nbsp;      List&lt;Dependant&gt; childrenDetails = request.getChildren().getDetail();</b>
+&nbsp;
+<b class="nc">&nbsp;      if (childrenCount &gt; 0) {</b>
+<b class="nc">&nbsp;        request.getChildren().setCount(0);</b>
+<b class="nc">&nbsp;        updateNumberOfChildren(request);</b>
+&nbsp;      }
+<b class="nc">&nbsp;      customerMapper.removeChildFromPrincipal(request.getCustomerId());</b>
+<b class="nc">&nbsp;      if (!childrenDetails.isEmpty()) {</b>
+<b class="nc">&nbsp;        for (Dependant dependant : childrenDetails) {</b>
+<b class="nc">&nbsp;          customerMapper.deleteDependantsByCustomerId(dependant.getDependantCode());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    CustomerDetailResponse response = getCustomer(CustomerSearchRequest.builder().customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .quoteId(request.getQuoteId()).build());</b>
+<b class="nc">&nbsp;    response.setUpdateDependent(UpdateDependentEnum.CHILD_REMOVED.getValue());</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private CustomerDetailResponse updateNumberOfChildren(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;    customerMapper.updateNumberOfChildren(</b>
+<b class="nc">&nbsp;            Children.builder().count(request.getChildren().getCount()).build(),</b>
+<b class="nc">&nbsp;            request.getCustomerId());</b>
+<b class="nc">&nbsp;    CustomerDetailResponse response = getCustomer(CustomerSearchRequest.builder().customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .quoteId(request.getQuoteId()).build());</b>
+<b class="nc">&nbsp;    response.setUpdateDependent(UpdateDependentEnum.CHILDREN_AMENDED.getValue());</b>
+<b class="nc">&nbsp;    return response;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;String&gt; sortUpQuoteList(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;    List&lt;String&gt; customerQuotes = customerMapper</b>
+<b class="nc">&nbsp;        .getCustomerDependantQuoteList(request.getCustomerId()); //will be zero if no dependents and thus groupByDependents is also zero and thus needInitQuote will be NOT BE empty</b>
+<b class="nc">&nbsp;    List&lt;Quote&gt; quotes = quoteService.getQuoteList(</b>
+<b class="nc">&nbsp;        QuoteListRequest.builder().customerId(request.getCustomerId()).build());</b>
+&nbsp;
+<b class="nc">&nbsp;    Map&lt;String, String&gt; groupByDependant = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (String quoteId : customerQuotes) {</b>
+<b class="nc">&nbsp;      groupByDependant.put(quoteId, quoteId);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    List&lt;String&gt; needInitQuote = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (Quote quote : quotes) {</b>
+<b class="nc">&nbsp;      if (!groupByDependant.containsKey(quote.getId())) {</b>
+<b class="nc">&nbsp;        needInitQuote.add(quote.getId());</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    return needInitQuote;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;Customer&gt; convertRequestToDependantList(CustomerUpdateRequest request,
+&nbsp;      String prepareAddQuoteId) {
+<b class="nc">&nbsp;    List&lt;Customer&gt; dependantList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Dependant spouse = request.getSpouse();</b>
+<b class="nc">&nbsp;    prepareAddDependant(request, dependantList, spouse, SPOUSE,</b>
+&nbsp;        prepareAddQuoteId);
+<b class="nc">&nbsp;    Children children = request.getChildren();</b>
+<b class="nc">&nbsp;    if (children != null) {</b>
+<b class="nc">&nbsp;      List&lt;Dependant&gt; dependants = children.getDetail();</b>
+<b class="nc">&nbsp;      for (Dependant dependant : dependants) {</b>
+<b class="nc">&nbsp;        prepareAddDependant(request, dependantList, dependant, DependantRelationship.UNMARRIED_CHILD,</b>
+&nbsp;            prepareAddQuoteId);
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return dependantList;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public int deleteDependant(DependantDeleteRequest request) {
+<b class="nc">&nbsp;    return customerMapper</b>
+<b class="nc">&nbsp;        .deleteDependants(request.getCustomerId(), request.getQuoteId(), request.getAgentId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Extract client and dependant data send to Actisure. And receive response entityId update
+&nbsp;   * correspond customer records.
+&nbsp;   */
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public Long addClientAndDependantToBase(String customerId, String quoteId) {
+<b class="nc">&nbsp;    Long principalEntityId = null;</b>
+<b class="nc">&nbsp;    Customer customer = customerMapper.getCustomerByCustomerId(customerId);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (customer.getEntityId() == null) {</b>
+&nbsp;      //1. Add principal member to Actisure
+<b class="nc">&nbsp;      AddClientEntityRequest request = this.prepareAddClientEntityRequest(customer);</b>
+<b class="nc">&nbsp;      AddClientEntityResponse response = customerRemote.addClientEntity(request);</b>
+<b class="nc">&nbsp;      logger.debug(&quot;1. Add principal member response {}&quot;, response);</b>
+<b class="nc">&nbsp;      principalEntityId = appendEntityIdToCustomer(principalEntityId, response);</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;      principalEntityId = customer.getEntityId();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //2. Add dependant to Actisure -- addClientEntity
+<b class="nc">&nbsp;    List&lt;DependantDetails&gt; dependantDetails = customerMapper.getCustomerDependantDetails(customerId, quoteId);</b>
+&nbsp;
+<b class="nc">&nbsp;    customerMapper.getCustomerByCustomerId(customerId);</b>
+<b class="nc">&nbsp;    List&lt;AddClientEntityRequest&gt; requestList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    for (DependantDetails dependantTemp : dependantDetails) {</b>
+<b class="nc">&nbsp;      if (dependantTemp.getEntityId() == null) {</b>
+<b class="nc">&nbsp;        AddClientEntityRequest dependantRequest = prepareRemoteDependantRequest(principalEntityId, dependantTemp);</b>
+<b class="nc">&nbsp;        requestList.add(dependantRequest);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    List&lt;AddClientEntityResponse&gt; dependants = null;</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(requestList)) {</b>
+<b class="nc">&nbsp;      dependants = customerRemote.addDependant(requestList);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.debug(&quot;2. Add dependant response {}&quot;, dependants);</b>
+&nbsp;
+&nbsp;    //Sync entityId to Health customer records
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(dependants)) {</b>
+<b class="nc">&nbsp;      for (AddClientEntityResponse dependantResponse : dependants) {</b>
+<b class="nc">&nbsp;        if (dependantResponse == null || !dependantResponse.isSuccess()) {</b>
+<b class="nc">&nbsp;          throw new BusinessException(&quot;Add dependant client to base exception!&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        customerMapper.appendEntityIdToCustomer(dependantResponse.getCustomerId(),</b>
+<b class="nc">&nbsp;            dependantResponse.getEntityId());</b>
+<b class="nc">&nbsp;      }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 3. add Client Contact -- addContactDetails
+<b class="nc">&nbsp;    Quote quote = quoteService.getQuote(quoteId, customerId, null);</b>
+<b class="nc">&nbsp;    List&lt;Address&gt; addresses = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Address address1 = Address.builder()</b>
+<b class="nc">&nbsp;                              .territory(GlobalConstant.NATIONALITY_KENYA)</b>
+<b class="nc">&nbsp;                              .addressId(0L)</b>
+<b class="nc">&nbsp;                              .startDate(DateFormatUtils.format(quote.getStartDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;                              .endDate(null)</b>
+<b class="nc">&nbsp;                              .addressLine1(GlobalConstant.ADDRESS_PLACEHOLDER)</b>
+<b class="nc">&nbsp;                              .addressLine2(GlobalConstant.ADDRESS_PLACEHOLDER)</b>
+<b class="nc">&nbsp;                              .addressLine3(GlobalConstant.ADDRESS_PLACEHOLDER)</b>
+<b class="nc">&nbsp;                              .addressLine4(&quot;&quot;)</b>
+<b class="nc">&nbsp;                              .postCode(&quot;00100&quot;)</b>
+<b class="nc">&nbsp;                              .addressType(&quot;Residential&quot;)</b>
+<b class="nc">&nbsp;                              .latitude(0L)</b>
+<b class="nc">&nbsp;                              .longitude(0L)</b>
+<b class="nc">&nbsp;                              .build();</b>
+<b class="nc">&nbsp;    addresses.add(address1);</b>
+<b class="nc">&nbsp;    Address address2 = Address.builder()</b>
+<b class="nc">&nbsp;                              .territory(GlobalConstant.NATIONALITY_KENYA)</b>
+<b class="nc">&nbsp;                              .addressId(0L)</b>
+<b class="nc">&nbsp;                              .startDate(DateFormatUtils.format(quote.getStartDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;                              .endDate(null)</b>
+<b class="nc">&nbsp;                              .addressLine1(customer.getEmail())</b>
+<b class="nc">&nbsp;                              .addressLine2(&quot;&quot;)</b>
+<b class="nc">&nbsp;                              .addressLine3(&quot;&quot;)</b>
+<b class="nc">&nbsp;                              .addressLine4(&quot;&quot;)</b>
+<b class="nc">&nbsp;                              .postCode(&quot;&quot;)</b>
+<b class="nc">&nbsp;                              .addressType(GlobalConstant.LIST_ROLE_ADDITIONAL_INFO_EMAIL)</b>
+<b class="nc">&nbsp;                              .latitude(0L)</b>
+<b class="nc">&nbsp;                              .longitude(0L)</b>
+<b class="nc">&nbsp;                              .build();</b>
+<b class="nc">&nbsp;    addresses.add(address2);</b>
+&nbsp;
+<b class="nc">&nbsp;    List&lt;Phone&gt; phones = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Phone phone = Phone.builder()</b>
+<b class="nc">&nbsp;                       .phoneId(0L)</b>
+<b class="nc">&nbsp;                       .phoneNumber(delCountryDialCodeFromPhone(customer.getPhoneNumber()))</b>
+<b class="nc">&nbsp;                       .countryDialCode(&quot;254&quot;)</b>
+<b class="nc">&nbsp;                       .regionDialCode(&quot;&quot;)</b>
+<b class="nc">&nbsp;                       .phoneType(GlobalConstant.LIST_ROLE_ADDITIONAL_INFO_MOBILE)</b>
+<b class="nc">&nbsp;                       .build();</b>
+<b class="nc">&nbsp;    phones.add(phone);</b>
+&nbsp;
+<b class="nc">&nbsp;    ContactDetails contactDetails = ContactDetails.builder()</b>
+<b class="nc">&nbsp;                                                  .addresses(addresses)</b>
+<b class="nc">&nbsp;                                                  .phones(phones)</b>
+<b class="nc">&nbsp;                                                  .build();</b>
+<b class="nc">&nbsp;    AddContactDetailsRequest request = AddContactDetailsRequest.builder()</b>
+<b class="nc">&nbsp;                                                               .entityId(principalEntityId)</b>
+<b class="nc">&nbsp;                                                               .contactDetails(contactDetails)</b>
+<b class="nc">&nbsp;                                                               .build();</b>
+<b class="nc">&nbsp;    AddContactDetailsResponse response = customerRemote.addClientContact(request);</b>
+<b class="nc">&nbsp;    logger.debug(&quot;3. add Client Contact: {}&quot;, response);</b>
+&nbsp;
+<b class="nc">&nbsp;    if (response == null || !response.isSuccess()) {</b>
+<b class="nc">&nbsp;      String errorMsg = Optional.ofNullable(response)</b>
+<b class="nc">&nbsp;                                .map(AddContactDetailsResponse::getErrorMessage)</b>
+<b class="nc">&nbsp;                                .orElse(null);</b>
+<b class="nc">&nbsp;      List&lt;ActBusinessError&gt; errors = Optional.ofNullable(response)</b>
+<b class="nc">&nbsp;                                              .map(AddContactDetailsResponse::getErrors)</b>
+<b class="nc">&nbsp;                                              .orElse(null);</b>
+<b class="nc">&nbsp;      logger.error(&quot;Add contact details occurred error, response:{} ,errors:{}&quot;, errorMsg, errors);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    logger.info(&quot;Add contact details successfully&quot;);</b>
+<b class="nc">&nbsp;    return principalEntityId;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static String delCountryDialCodeFromPhone(String phoneNumber) {
+<b class="nc">&nbsp;    if (StringUtils.startsWith(phoneNumber, &quot;254&quot;)) {</b>
+<b class="nc">&nbsp;      phoneNumber = StringUtils.removeStart(phoneNumber, &quot;254&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return phoneNumber;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Long appendEntityIdToCustomer(Long principalEntityId, AddClientEntityResponse response) {
+<b class="nc">&nbsp;    boolean callSuccess = false;</b>
+<b class="nc">&nbsp;    if (response != null) {</b>
+<b class="nc">&nbsp;      if (response.isSuccess()) {</b>
+<b class="nc">&nbsp;        principalEntityId = response.getEntityId();</b>
+<b class="nc">&nbsp;        customerMapper.appendEntityIdToCustomer(response.getCustomerId(), response.getEntityId());</b>
+<b class="nc">&nbsp;        callSuccess = true;</b>
+&nbsp;      } else {
+<b class="nc">&nbsp;        logger.error(&quot;Add client entity occurred error , errorMessage:{} ,errors:{}&quot;,</b>
+<b class="nc">&nbsp;            response.getErrorMessage(), response.getErrors());</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    if (!callSuccess) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Add principal client to base exception!&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return principalEntityId;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;Customer&gt; getCustomerAndDependants(String customerId, String quoteId) {
+<b class="nc">&nbsp;    return customerMapper.getCustomerAndDependants(customerId, quoteId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Customer getCustomer(String customerId) {
+<b class="nc">&nbsp;    if (customerId != null) {</b>
+<b class="nc">&nbsp;      return customerMapper.getCustomerByCustomerId(customerId);</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Customer Id is mandatory!&quot;);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;Customer&gt; getCustomerByParentId(String parentId) {
+<b class="nc">&nbsp;    if (parentId != null) {</b>
+<b class="nc">&nbsp;      return customerMapper.getCustomerByParentId(parentId);</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Customer Parent Id is mandatory!&quot;);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;Customer&gt; getCustomerList(CustomerListRequest request) {
+<b class="nc">&nbsp;    return customerMapper.getCustomerList(Customer.builder().agentId(request.getAgentId()).build());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  @Transactional(&quot;healthDataTransactionManager&quot;)
+&nbsp;  public CustomerCreateResponse createCustomerAndQuote(CustomerCreateRequest request) {
+&nbsp;
+<b class="nc">&nbsp;    if (request.isOnlyChild() &amp;&amp; request.getChildren().getCount() &lt; 1) {</b>
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Child only policy needs at least to add one child&quot;);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Customer customer = CustomerMapping.customerCreateRequest2Entity(request);</b>
+<b class="nc">&nbsp;    if (customer.getCustomerId().isEmpty()){</b>
+<b class="nc">&nbsp;      customerMapper.createCustomer(customer);</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      customerMapper.updateCustomer(customer);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    request.setCustomerId(customer.getCustomerId());</b>
+&nbsp;
+<b class="nc">&nbsp;    List&lt;Quote&gt; quotes = quoteService</b>
+<b class="nc">&nbsp;        .createInitQuote(request.getCustomerId(), request.getAgentId(), request.getQuoteId(), request.isOnlyChild(), request.getProductId());</b>
+&nbsp;
+<b class="nc">&nbsp;    logger.info(&quot;==== These are the quotes {}&quot;, quotes);</b>
+<b class="nc">&nbsp;    Optional&lt;Quote&gt; jamiPlus = quotes.stream()</b>
+<b class="nc">&nbsp;        .filter(quote -&gt; ProductEnum.JAMIIPLUS.getId() == quote.getProductId() ||</b>
+<b class="nc">&nbsp;                ProductEnum.JAMIIPLUS_SHARED.getId() == quote.getProductId())</b>
+<b class="nc">&nbsp;        .findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;    return prepareQuote(request, jamiPlus);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private CustomerCreateResponse prepareQuote(CustomerCreateRequest request,
+&nbsp;      Optional&lt;Quote&gt; jamiPlus) {
+<b class="nc">&nbsp;    if (jamiPlus.isPresent()) {</b>
+<b class="nc">&nbsp;      Quote quote = jamiPlus.get();</b>
+<b class="nc">&nbsp;      return CustomerCreateResponse.builder().customerId(request.getCustomerId()).quote(</b>
+<b class="nc">&nbsp;          QuoteBean.builder().quoteId(quote.getId()).quoteNumber(quote.getCode())</b>
+<b class="nc">&nbsp;              .balance(quote.getBalance()).benefit(quote.getBenefit())</b>
+<b class="nc">&nbsp;              .premium(quote.getPremium()).productId(String.valueOf(quote.getProductId()))</b>
+<b class="nc">&nbsp;              .startDate(DateFormatUtils.format(quote.getStartDate(), GlobalConstant.YYYYMMDD))</b>
+<b class="nc">&nbsp;              .status(quote.getStatus()).build()).build();</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      throw new BusinessException(&quot;Can not find Jamiplus product&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean addPhoneForCustomer(CustomerAddPhoneRequest request) {
+&nbsp;
+<b class="nc">&nbsp;    int result = customerMapper</b>
+<b class="nc">&nbsp;        .upgradeCustomer(Customer.builder().customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .phoneNumber(request.getPhoneNumber()).build());</b>
+&nbsp;
+<b class="nc">&nbsp;    stepRepository.save(HealthStepEntity</b>
+<b class="nc">&nbsp;            .builder()</b>
+<b class="nc">&nbsp;            .step(HealthQuoteStepsEnum.AGENT_SEND_TO_PRINCIPAL)</b>
+<b class="nc">&nbsp;            .quoteOrPolicyId(request.getQuoteId())</b>
+<b class="nc">&nbsp;            .agentId(request.getAgentId())</b>
+<b class="nc">&nbsp;            .customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .build());</b>
+&nbsp;
+<b class="nc">&nbsp;    return result == 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean addSuperCustomerIdForCustomer(CustomerAddSuperIdRequest request) {
+&nbsp;
+<b class="nc">&nbsp;    int result = customerMapper</b>
+<b class="nc">&nbsp;        .upgradeCustomer(Customer.builder().customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;            .superCustomerId(request.getSuperCustomerId()).build());</b>
+<b class="nc">&nbsp;    quoteMapper.updateQuotStatus(request.getCustomerId());</b>
+&nbsp;
+<b class="nc">&nbsp;    return result == 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Customer findBySuperCustomerId(CustomerSuperIdRequest request) {
+<b class="nc">&nbsp;    return customerMapper.getCustomerBySuperId(request.getSuperCustomerId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public GetCustomerInfoResponse getCustomerByPhoneNumber(GetCustomerByPhoneNoRequest request) {
+&nbsp;
+<b class="nc">&nbsp;    List&lt;Customer&gt; customers = customerMapper</b>
+<b class="nc">&nbsp;        .getCustomerList(Customer.builder().phoneNumber(request.getPhoneNumber()).build());</b>
+&nbsp;
+<b class="nc">&nbsp;    return fulfillGetCustomerInfoResponse(</b>
+&nbsp;        customers);
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public GetCustomerInfoResponse getCustomerByEntityId(Long entityId) {
+<b class="nc">&nbsp;    GetCustomerInfoResponse result = null;</b>
+<b class="nc">&nbsp;    List&lt;Customer&gt; customers = customerMapper</b>
+<b class="nc">&nbsp;        .getCustomerList(Customer.builder().entityId(entityId).build());</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(customers)) {</b>
+<b class="nc">&nbsp;      if (customers.size() &gt; 1) {</b>
+<b class="nc">&nbsp;        throw new BusinessException(&quot;There are more than one &quot; + entityId + &quot; customer record&quot;);</b>
+&nbsp;      } else {
+<b class="nc">&nbsp;        result = fulfillGetCustomerInfoResponse(customers);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private GetCustomerInfoResponse fulfillGetCustomerInfoResponse(List&lt;Customer&gt; customers) {
+<b class="nc">&nbsp;    GetCustomerInfoResponse result = null;</b>
+<b class="nc">&nbsp;    if (CollectionUtils.isNotEmpty(customers)) {</b>
+<b class="nc">&nbsp;      Customer customer = customers.get(0);</b>
+<b class="nc">&nbsp;      result = GetCustomerInfoResponse.builder().customerId(customer.getCustomerId())</b>
+<b class="nc">&nbsp;          .dateOfBirth(DateFormatUtils.format(customer.getDateOfBirth(),</b>
+<b class="nc">&nbsp;              GlobalConstant.YYYYMMDD)).firstName(customer.getFirstName())</b>
+<b class="nc">&nbsp;          .lastName(customer.getLastName()).gender(customer.getGender())</b>
+<b class="nc">&nbsp;          .title(customer.getTitle()).agentId(customer.getAgentId()).type(&quot;health&quot;).build();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private AddClientEntityRequest prepareRemoteDependantRequest(Long principalEntityId,
+&nbsp;                                                               DependantDetails dependantTemp) {
+&nbsp;
+<b class="nc">&nbsp;    AddClientEntityRequest addClientEntityRequest = AddClientEntityRequest.builder()</b>
+<b class="nc">&nbsp;                                                                          .dateOfBirth(dependantTemp.getDateOfBirth())</b>
+<b class="nc">&nbsp;                                                                          .firstName(dependantTemp.getFirstName())</b>
+<b class="nc">&nbsp;                                                                          .gender(dependantTemp.getGender())</b>
+<b class="nc">&nbsp;                                                                          .nationality(GlobalConstant.NATIONALITY_KENYA)</b>
+<b class="nc">&nbsp;                                                                          .surname(dependantTemp.getLastName())</b>
+<b class="nc">&nbsp;                                                                          .initials(&quot;&quot;)</b>
+<b class="nc">&nbsp;                                                                          .title(dependantTemp.getTitle())</b>
+<b class="nc">&nbsp;                                                                          .occupation(&quot;Other - Not Defined&quot;)</b>
+<b class="nc">&nbsp;                                                                          .relationshipDescription(dependantTemp.getRelationship())</b>
+&nbsp;                                                                          //        .relationshipEffectiveDate(new Date())
+<b class="nc">&nbsp;                                                                          .relationshipEffectiveDate(dependantTemp.getDateOfBirth()) // it should be optional</b>
+<b class="nc">&nbsp;                                                                          .parentId(principalEntityId)</b>
+<b class="nc">&nbsp;                                                                          .customerId(dependantTemp.getDependantCode())</b>
+<b class="nc">&nbsp;                                                                          .build();</b>
+<b class="nc">&nbsp;    if (StringUtils.isNotEmpty(dependantTemp.getEmail())) {</b>
+<b class="nc">&nbsp;      RoleAdditionalInfo roleEmail = RoleAdditionalInfo.builder()</b>
+<b class="nc">&nbsp;                                                                .description(GlobalConstant.LIST_ROLE_ADDITIONAL_INFO_EMAIL)</b>
+<b class="nc">&nbsp;                                                                .value(dependantTemp.getEmail())</b>
+<b class="nc">&nbsp;                                                                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;      addClientEntityRequest.setListRoleAdditionalInfo(Stream.of(roleEmail).collect(Collectors.toList()));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    return addClientEntityRequest;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  private AddClientEntityRequest prepareAddClientEntityRequest(Customer customer) {
+<b class="nc">&nbsp;    AddClientEntityRequest request = AddClientEntityRequest.builder()</b>
+&nbsp;                                                           //        .parentId(0L).relationshipDescription(customer.getRelationshipDesc())
+&nbsp;                                                           //        .relationshipEffectiveDate(new Date())
+<b class="nc">&nbsp;                                                           .title(customer.getTitle())</b>
+<b class="nc">&nbsp;                                                           .firstName(customer.getFirstName())</b>
+<b class="nc">&nbsp;                                                           .surname(customer.getLastName())</b>
+<b class="nc">&nbsp;                                                           .initials(&quot;&quot;)</b>
+<b class="nc">&nbsp;                                                           .gender(customer.getGender())</b>
+<b class="nc">&nbsp;                                                           .dateOfBirth(customer.getDateOfBirth())</b>
+<b class="nc">&nbsp;                                                           .occupation(&quot;Other - Not Defined&quot;)</b>
+<b class="nc">&nbsp;                                                           .nationality(GlobalConstant.NATIONALITY_KENYA)</b>
+<b class="nc">&nbsp;                                                           .customerId(customer.getCustomerId())</b>
+<b class="nc">&nbsp;                                                           .build();</b>
+<b class="nc">&nbsp;    List&lt;RoleAdditionalInfo&gt; listRole = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    listRole.add(</b>
+<b class="nc">&nbsp;        RoleAdditionalInfo.builder()</b>
+<b class="nc">&nbsp;                          .description(GlobalConstant.LIST_ROLE_ADDITIONAL_INFO_KRA_PIN_NO)</b>
+<b class="nc">&nbsp;                          .value(customer.getKraPin())</b>
+<b class="nc">&nbsp;                          .build());</b>
+<b class="nc">&nbsp;    listRole.add(</b>
+<b class="nc">&nbsp;        RoleAdditionalInfo.builder()</b>
+<b class="nc">&nbsp;                          .description(GlobalConstant.LIST_ROLE_ADDITIONAL_INFO_ID_NO)</b>
+<b class="nc">&nbsp;                          .value(customer.getIdNo())</b>
+<b class="nc">&nbsp;                          .build());</b>
+<b class="nc">&nbsp;    listRole.add(</b>
+<b class="nc">&nbsp;        RoleAdditionalInfo.builder()</b>
+<b class="nc">&nbsp;                          .description(GlobalConstant.LIST_ROLE_ADDITIONAL_INFO_EMAIL)</b>
+<b class="nc">&nbsp;                          .value(customer.getEmail())</b>
+<b class="nc">&nbsp;                          .build());</b>
+<b class="nc">&nbsp;    request.setListRoleAdditionalInfo(listRole);</b>
+<b class="nc">&nbsp;    return request;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void prepareAddDependant(CustomerUpdateRequest request, List&lt;Customer&gt; dependantList,
+&nbsp;      Dependant tempDependant, DependantRelationship relationship, String quoteId) {
+<b class="nc">&nbsp;    if (tempDependant != null) {</b>
+<b class="nc">&nbsp;      Customer dependant = Customer.builder().firstName(tempDependant.getFirstName())</b>
+<b class="nc">&nbsp;          .lastName(tempDependant.getLastName()).dateOfBirth(tempDependant.getDateOfBirth())</b>
+<b class="nc">&nbsp;          .title(tempDependant.getTitle()).gender(tempDependant.getGender())</b>
+<b class="nc">&nbsp;          .parentId(request.getCustomerId()).relationshipDesc(relationship.getValue())</b>
+<b class="nc">&nbsp;          .quoteId(quoteId).customerId(tempDependant.getDependantCode()).build();</b>
+<b class="nc">&nbsp;      dependantList.add(dependant);</b>
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private Customer prepareUpdatePrincipalParam(CustomerUpdateRequest request) {
+<b class="nc">&nbsp;    PrincipalBean principal = request.getPrincipal();</b>
+<b class="nc">&nbsp;    return Customer.builder().agentId(null).firstName(principal.getFirstName())</b>
+<b class="nc">&nbsp;        .lastName(principal.getLastName()).dateOfBirth(principal.getDateOfBirth())</b>
+<b class="nc">&nbsp;        .title(principal.getTitle()).gender(principal.getGender())</b>
+<b class="nc">&nbsp;        .phoneNumber(principal.getPhoneNumber()).email(principal.getEmail())</b>
+<b class="nc">&nbsp;        .idNo(principal.getIdNo()).kraPin(principal.getKraPin()).customerId(request.getCustomerId())</b>
+<b class="nc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private CustomerDetailResponse convertCustomer2Response(Customer customer, Quote quote) {
+&nbsp;    CustomerDetailResponse result;
+<b class="nc">&nbsp;    result = new CustomerDetailResponse();</b>
+<b class="nc">&nbsp;    Principal p = new Principal();</b>
+<b class="nc">&nbsp;    p.setDateOfBirth(customer.getDateOfBirth());</b>
+<b class="nc">&nbsp;    p.setEntityId(customer.getEntityId());</b>
+<b class="nc">&nbsp;    p.setEmail(customer.getEmail());</b>
+<b class="nc">&nbsp;    p.setQuoteId(customer.getQuoteId());</b>
+<b class="nc">&nbsp;    p.setFirstName(customer.getFirstName());</b>
+<b class="nc">&nbsp;    p.setLastName(customer.getLastName());</b>
+<b class="nc">&nbsp;    p.setGender(customer.getGender());</b>
+<b class="nc">&nbsp;    p.setPhoneNumber(customer.getPhoneNumber());</b>
+<b class="nc">&nbsp;    p.setTitle(customer.getTitle());</b>
+<b class="nc">&nbsp;    p.setIdNo(customer.getIdNo());</b>
+<b class="nc">&nbsp;    p.setKraPin(customer.getKraPin());</b>
+<b class="nc">&nbsp;    p.setCustomerId(customer.getCustomerId());</b>
+<b class="nc">&nbsp;    result.setPrincipal(p);</b>
+<b class="nc">&nbsp;    result.setQuoteDetails(quote);</b>
+<b class="nc">&nbsp;    result.setCustomerId(customer.getCustomerId());</b>
+<b class="nc">&nbsp;    result.setQuoteId(customer.getQuoteId());</b>
+<b class="nc">&nbsp;    result.setSpouse(customer.getSpouseSummary());</b>
+<b class="nc">&nbsp;    result.setChildren(customer.getChildrenSummary());</b>
+<b class="nc">&nbsp;    result.setBenefit(customer.getBenefit());</b>
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

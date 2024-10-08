@@ -1,0 +1,1072 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > QuoteServiceImplTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: QuoteServiceImplTest (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QuoteServiceImplTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/613)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;import freemarker.cache.ClassTemplateLoader;
+&nbsp;import freemarker.cache.FileTemplateLoader;
+&nbsp;import freemarker.cache.StringTemplateLoader;
+&nbsp;import freemarker.template.Configuration;
+&nbsp;import freemarker.template.Template;
+&nbsp;import freemarker.template.TemplateException;
+&nbsp;import ke.co.apollo.health.common.CommonObjects;
+&nbsp;import ke.co.apollo.health.common.CommonQuote;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.ApiResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.CreatePolicyResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.CustomerResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.HealthQuoteListResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.TransactionValidateResponse;
+&nbsp;import ke.co.apollo.health.common.enums.IntermediaryRole;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.common.enums.QuoteNumberEnum;
+&nbsp;import ke.co.apollo.health.config.HealthInitializer;
+&nbsp;import ke.co.apollo.health.config.PremiumInitializer;
+&nbsp;import ke.co.apollo.health.config.QuestionConfig;
+&nbsp;import ke.co.apollo.health.domain.QuoteListSearchFilter;
+&nbsp;import ke.co.apollo.health.domain.entity.HealthStepEntity;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteBenefitUpdateRequest;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteFinishRequest;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteStepRequest;
+&nbsp;import ke.co.apollo.health.domain.response.AgentBranchDetailsResponse;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.domain.response.QuoteStepResponse;
+&nbsp;import ke.co.apollo.health.enums.HealthQuoteStepsEnum;
+&nbsp;import ke.co.apollo.health.enums.QuoteStatusEnum;
+&nbsp;import ke.co.apollo.health.event.PolicyNotificationEventPublisher;
+&nbsp;import ke.co.apollo.health.mapper.health.CustomerMapper;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.repository.HealthAgentBranchRepository;
+&nbsp;import ke.co.apollo.health.repository.HealthStepRepository;
+&nbsp;import ke.co.apollo.health.service.*;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.*;
+&nbsp;import org.mockito.InjectMocks;
+&nbsp;import org.mockito.Mock;
+&nbsp;import org.mockito.Mockito;
+&nbsp;import ke.co.apollo.health.common.enums.PolicyStatus;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.StringReader;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.*;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import ke.co.apollo.health.domain.request.*;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.test.util.ReflectionTestUtils;
+&nbsp;
+&nbsp;import static ke.co.apollo.health.common.CommonObjects.*;
+&nbsp;import static org.junit.Assert.assertNull;
+&nbsp;import static org.junit.Assert.fail;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertNotNull;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertTrue;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertFalse;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertThrows;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertEquals;
+&nbsp;import static org.mockito.ArgumentMatchers.*;
+&nbsp;
+&nbsp;import static org.mockito.Mockito.*;
+&nbsp;import static org.mockito.MockitoAnnotations.initMocks;
+&nbsp;
+<b class="nc">&nbsp;class QuoteServiceImplTest {</b>
+&nbsp;
+&nbsp;    @InjectMocks
+&nbsp;    QuoteServiceImpl quoteService;
+&nbsp;    @Mock
+&nbsp;    QuoteServiceImpl quoteServiceMock;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    CustomerServiceImpl customerService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    HealthStepRepository healthStepRepository;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    QuoteMapper quoteMapper;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    IntermediaryService intermediaryService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PolicyRemote policyRemote;
+&nbsp;    @Mock
+&nbsp;    BeneficiaryService beneficiaryService;
+&nbsp;    @Mock
+&nbsp;    ProductService productService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    BenefitCategoryMap benefitCategoryMap;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PremiumService premiumService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    QuestionService questionService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    QuestionConfig questionConfig;
+&nbsp;
+<b class="nc">&nbsp;    @Mock</b>
+&nbsp;    Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PolicyNotificationEventPublisher policySMSEventPublisher;
+&nbsp;
+&nbsp;    private static BenefitCategoryMap bcMap;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @BeforeEach
+&nbsp;    void setUpMocks() {
+<b class="nc">&nbsp;        initMocks(this);</b>
+&nbsp;
+&nbsp;        //Shared, to be moved when need arises
+<b class="nc">&nbsp;        when(policyRemote.addBusinessSourceToIndividualPolicy(any())).thenReturn(</b>
+&nbsp;                ApiResponse
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .success(true)</b>
+<b class="nc">&nbsp;                        .errorMessage(&quot;No error&quot;)</b>
+<b class="nc">&nbsp;                        .build()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        HealthInitializer healthInitializer = new HealthInitializer();</b>
+<b class="nc">&nbsp;        bcMap = healthInitializer.initBenefitCategory();</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;customerService&quot;, customerService);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;quoteMapper&quot;, quoteMapper);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;intermediaryService&quot;, intermediaryService);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;policyRemote&quot;, policyRemote);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;stepRepository&quot;, healthStepRepository);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;agentBranchRepository&quot;, agentBranchRepository);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;productService&quot;, productService);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;beneficiaryService&quot;, beneficiaryService);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;benefitCategoryMap&quot;, benefitCategoryMap);</b>
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;premiumService&quot;, premiumService);</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    HealthAgentBranchRepository agentBranchRepository;
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testAddIntermediaryToPolicy() {
+<b class="nc">&nbsp;        when(intermediaryService.getIntermediaryEntityId(anyString())).thenReturn(10);</b>
+<b class="nc">&nbsp;        Quote q = CommonObjects.quote;</b>
+<b class="nc">&nbsp;        AgentBranchDetailsResponse agentBranchDetailsResponse = CommonObjects.agentBranchDetailsResponse;</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(any(), any(), any())).thenReturn(q);</b>
+<b class="nc">&nbsp;        when(policyRemote.addPolicyAdditionalBranchDetails(any())).thenReturn(actisurePolicyBranchDetailsResponse);</b>
+<b class="nc">&nbsp;        when(policyRemote.getAgentBranchDetails(any())).thenReturn(agentBranchDetailsResponse);</b>
+<b class="nc">&nbsp;        when(agentBranchRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        boolean res = quoteService.addIntermediaryToPolicy(&quot;quoteId&quot;, &quot;customerId&quot;, &quot;agentId&quot;);</b>
+<b class="nc">&nbsp;        assertTrue(res);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private static Stream&lt;Arguments&gt; argumentsForTestFinishQuote() {
+<b class="nc">&nbsp;        return Stream.of(</b>
+<b class="nc">&nbsp;                Arguments.of(49, true),</b>
+<b class="nc">&nbsp;                Arguments.of(49, false),</b>
+<b class="nc">&nbsp;                Arguments.of(52, false)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @MethodSource(&quot;argumentsForTestFinishQuote&quot;)
+&nbsp;    void testFinishQuote(int productId, boolean isChildrenOnly) {
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; qcMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        qcMap.put(&quot;key_one&quot;, &quot;value_one&quot;);</b>
+<b class="nc">&nbsp;        qcMap.put(&quot;key_two&quot;, &quot;value_two&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Customer&gt; customerList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        customerList.add(customer);</b>
+&nbsp;
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder().id(&quot;q123&quot;)</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(productId)</b>
+<b class="nc">&nbsp;                .customerId(&quot;agent&quot;)</b>
+<b class="nc">&nbsp;                .benefit(benefit)</b>
+<b class="nc">&nbsp;                .agentId(&quot;agent&quot;)</b>
+<b class="nc">&nbsp;                .quoteStatus(&quot;ACTIVE&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;APPLICATION&quot;)</b>
+<b class="nc">&nbsp;                .isChildrenOnly(isChildrenOnly)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+&nbsp;
+<b class="nc">&nbsp;        when(customerService.addClientAndDependantToBase(any(), any())).thenReturn(1L);</b>
+<b class="nc">&nbsp;        when(beneficiaryService.addBeneficiaryToBase(any(), any(), any(), anyString())).thenReturn(true);</b>
+<b class="nc">&nbsp;        when(customerService.getCustomerAndDependants(any(), any())).thenReturn(customerList);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+&nbsp;
+<b class="nc">&nbsp;        when(customerService.getCustomer(anyString())).thenReturn(null);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.saveAndFlush(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        when(quoteServiceMock.getQuote(anyString(), anyString(), anyString())).thenReturn(null);</b>
+<b class="nc">&nbsp;        when(questionService.getQuoteQuestion(any())).thenReturn(quoteQuestion);</b>
+<b class="nc">&nbsp;        when(questionConfig.getQuestionMap()).thenReturn(qcMap);</b>
+<b class="nc">&nbsp;        when(policyRemote.addBeneficiaryUWQuestions(any())).thenReturn(apiResponse);</b>
+<b class="nc">&nbsp;        when(policyRemote.createPolicy(any())).thenReturn(CreatePolicyResponse</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .policyId(888)</b>
+<b class="nc">&nbsp;                .policyNumber(&quot;PolM&quot;)</b>
+<b class="nc">&nbsp;                .success(true)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(policyRemote.addBenefitsToPolicy(any())).thenReturn(apiResponse);</b>
+<b class="nc">&nbsp;        when(benefitCategoryMap.getInpatient()).thenReturn(bcMap.getInpatient());</b>
+<b class="nc">&nbsp;        when(benefitCategoryMap.getOptionalBenefits()).thenReturn(bcMap.getOptionalBenefits());</b>
+<b class="nc">&nbsp;        when(intermediaryService.getIntermediaryEntityId(any())).thenReturn(agentBranchEntity.getEntityId());</b>
+<b class="nc">&nbsp;        when(policyRemote.getAgentBranchDetails(any())).thenReturn(agentBranchDetailsResponse);</b>
+<b class="nc">&nbsp;        when(agentBranchRepository.save(any())).thenReturn(agentBranchEntity);</b>
+<b class="nc">&nbsp;        when(policyRemote.addPolicyAdditionalBranchDetails(any())).thenReturn(actisurePolicyBranchDetailsResponse);</b>
+<b class="nc">&nbsp;        doNothing().when(policySMSEventPublisher).publishTask(any());</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        QuoteServiceImpl classToTest = Mockito.mock(QuoteServiceImpl.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        doReturn(Quote.builder().build()).when(classToTest).getQuote(anyString(), any(), any());</b>
+<b class="nc">&nbsp;        doReturn(Quote.builder().build()).when(classToTest).getQuoteNoThrowException(anyString(), any(), any());</b>
+&nbsp;
+<b class="nc">&nbsp;        Quote resp = quoteService.finishQuote(</b>
+<b class="nc">&nbsp;                QuoteFinishRequest.builder()</b>
+<b class="nc">&nbsp;                        .quoteId(&quot;q123&quot;)</b>
+<b class="nc">&nbsp;                        .customerId(&quot;agent&quot;)</b>
+<b class="nc">&nbsp;                        .step(&quot;2&quot;)</b>
+<b class="nc">&nbsp;                        .agentId(&quot;agent&quot;)</b>
+<b class="nc">&nbsp;                        .build());</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;New&quot;, &quot;Viewed&quot;})
+&nbsp;    void testFinishQuoteWhenStatusIsNewOrViewed(String status) {
+<b class="nc">&nbsp;        when(customerService.addClientAndDependantToBase(any(), any())).thenReturn(1L);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(customerService.getCustomer(anyString())).thenReturn(null);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.saveAndFlush(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        when(quoteServiceMock.getQuote(anyString(), anyString(), anyString())).thenReturn(null);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(1)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(status)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(policyRemote.createPolicy(any())).thenReturn(CreatePolicyResponse</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .policyId(888)</b>
+<b class="nc">&nbsp;                .policyNumber(&quot;PolM&quot;)</b>
+<b class="nc">&nbsp;                .success(true)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(beneficiaryService.addBeneficiaryToBase(any(), any(), any(), anyString())).thenReturn(true);</b>
+<b class="nc">&nbsp;        QuoteServiceImpl classToTest = Mockito.mock(QuoteServiceImpl.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        doReturn(Quote.builder().build()).when(classToTest).getQuote(anyString(), any(), any());</b>
+<b class="nc">&nbsp;        doReturn(Quote.builder().build()).when(classToTest).getQuoteNoThrowException(anyString(), any(), any());</b>
+&nbsp;
+<b class="nc">&nbsp;        Quote resp = quoteService.finishQuote(</b>
+<b class="nc">&nbsp;                QuoteFinishRequest.builder()</b>
+<b class="nc">&nbsp;                        .quoteId(&quot;quote&quot;)</b>
+<b class="nc">&nbsp;                        .customerId(&quot;agent&quot;)</b>
+<b class="nc">&nbsp;                        .step(&quot;2&quot;)</b>
+<b class="nc">&nbsp;                        .agentId(&quot;agent&quot;)</b>
+<b class="nc">&nbsp;                        .build());</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;&quot;, &quot;customerId&quot;})
+&nbsp;    void testCreateInitQuote(String customerId) {
+<b class="nc">&nbsp;        when(customerService.getCustomer((CustomerSearchRequest) any())).thenReturn(</b>
+&nbsp;
+&nbsp;                CustomerDetailResponse
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .principal(Principal.builder().dateOfBirth(new Date()).firstName(&quot;Test&quot;).gender(&quot;Male&quot;).build())</b>
+<b class="nc">&nbsp;                        .spouse(Dependant.builder().dateOfBirth(new Date()).relationship(&quot;Spouse&quot;).gender(&quot;Female&quot;).build())</b>
+<b class="nc">&nbsp;                        .build()</b>
+&nbsp;
+&nbsp;        );
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(quoteMapper.deleteDependentBenefits(anyString(),any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;APPLICATION&quot;)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        List&lt;Quote&gt; createInitQuote = quoteService.createInitQuote(customerId, &quot;agentId&quot;, &quot;quoteId&quot;, false, 49);</b>
+<b class="nc">&nbsp;        assertNotNull(createInitQuote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @EnumSource(ProductEnum.class)
+&nbsp;    void testCreateInitQuoteWithDifferentProductIds(ProductEnum productEnum) {
+<b class="nc">&nbsp;        when(customerService.getCustomer((CustomerSearchRequest) any())).thenReturn(</b>
+&nbsp;
+&nbsp;                CustomerDetailResponse
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .principal(Principal.builder().dateOfBirth(new Date()).firstName(&quot;Test&quot;).gender(&quot;Male&quot;).build())</b>
+<b class="nc">&nbsp;                        .spouse(Dependant.builder().dateOfBirth(new Date()).relationship(&quot;Spouse&quot;).gender(&quot;Female&quot;).build())</b>
+<b class="nc">&nbsp;                        .build()</b>
+&nbsp;
+&nbsp;        );
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(quoteMapper.deleteDependentBenefits(anyString(),any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;APPLICATION&quot;)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        List&lt;Quote&gt; createInitQuote = quoteService.createInitQuote(&quot;customerId&quot;, &quot;agentId&quot;, &quot;quoteId&quot;, false, productEnum.getId());</b>
+<b class="nc">&nbsp;        assertNotNull(createInitQuote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(ints = {49, 50, 51, 52})
+&nbsp;    void testCreateInitQuoteReturnsQuoteWithDifferentProductCodes(int productId) {
+&nbsp;        Quote quoteResponse = Quote
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(productId)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;APPLICATION&quot;)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        when(customerService.getCustomer((CustomerSearchRequest) any())).thenReturn(</b>
+&nbsp;
+&nbsp;                CustomerDetailResponse
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .principal(Principal.builder().dateOfBirth(new Date()).firstName(&quot;Test&quot;).gender(&quot;Male&quot;).build())</b>
+<b class="nc">&nbsp;                        .spouse(Dependant.builder().dateOfBirth(new Date()).relationship(&quot;Spouse&quot;).gender(&quot;Female&quot;).build())</b>
+<b class="nc">&nbsp;                        .build()</b>
+&nbsp;
+&nbsp;        );
+<b class="nc">&nbsp;        switch (productId) {</b>
+&nbsp;            case 49:
+<b class="nc">&nbsp;                quoteResponse.setCode(&quot;HJ-123&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case 50:
+<b class="nc">&nbsp;                quoteResponse.setCode(&quot;HA-123&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case 51:
+<b class="nc">&nbsp;                quoteResponse.setCode(&quot;HF-123&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case 52:
+<b class="nc">&nbsp;                quoteResponse.setCode(&quot;HS-123&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            default:
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(quoteMapper.deleteDependentBenefits(anyString(),any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(quoteResponse);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        List&lt;Quote&gt; createInitQuote = quoteService.createInitQuote(&quot;customerId&quot;, &quot;agentId&quot;, &quot;quoteId&quot;, false, productId);</b>
+<b class="nc">&nbsp;        assertNotNull(createInitQuote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;Male&quot;, &quot;Female&quot;})
+&nbsp;    void testCreateInitQuoteGender(String gender) {
+&nbsp;        CustomerDetailResponse re =  CustomerDetailResponse
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .principal(Principal.builder().dateOfBirth(new Date()).firstName(&quot;Test&quot;).gender(gender).build())</b>
+<b class="nc">&nbsp;                .spouse(Dependant.builder().dateOfBirth(new Date()).relationship(&quot;Spouse&quot;).gender(&quot;Female&quot;).build())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        when(customerService.getCustomer((CustomerSearchRequest) any())).thenReturn(re);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(quoteMapper.deleteDependentBenefits(anyString(),any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;APPLICATION&quot;)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        List&lt;Quote&gt; createInitQuote = quoteService.createInitQuote(&quot;customerId&quot;, &quot;agentId&quot;, &quot;quoteId&quot;, false, 49);</b>
+<b class="nc">&nbsp;        assertNotNull(createInitQuote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testCreateInitQuoteWhenQuoteEmpty() {
+<b class="nc">&nbsp;        when(customerService.getCustomer((CustomerSearchRequest) any())).thenReturn(CustomerDetailResponse.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;APPLICATION&quot;)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        List&lt;Quote&gt; createInitQuote = quoteService.createInitQuote(&quot;customer&quot;, &quot;agentId&quot;, &quot;&quot;, false, 49);</b>
+<b class="nc">&nbsp;        assertNotNull(createInitQuote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testGetQuoteStep() {
+<b class="nc">&nbsp;        when(healthStepRepository.findById(anyString())).thenReturn(Optional.of(HealthStepEntity.builder().quoteOrPolicyId(&quot;id&quot;)</b>
+<b class="nc">&nbsp;                .step(HealthQuoteStepsEnum.CREATE_QUOTE).build()));</b>
+<b class="nc">&nbsp;        QuoteStepResponse response = quoteService.getQuoteStep(QuoteStepRequest.builder().quoteOrPolicy(&quot;2&quot;).build());</b>
+<b class="nc">&nbsp;        assertNotNull(response);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testGetQuoteStepNull() {
+<b class="nc">&nbsp;        when(healthStepRepository.findById(anyString())).thenReturn(Optional.empty());</b>
+<b class="nc">&nbsp;        QuoteStepResponse response = quoteService.getQuoteStep(QuoteStepRequest.builder().quoteOrPolicy(&quot;2&quot;).build());</b>
+<b class="nc">&nbsp;        assertNotNull(response);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;Viewed&quot;, &quot;Enquiry&quot;, &quot;New&quot;})
+&nbsp;    void testUpdateQuoteBenefitWhenStatusIsViewedOrEnquiryOrNew(String status) {
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+&nbsp;        Customer principal = Customer
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .relationshipDesc(&quot;Policy Holder&quot;)</b>
+<b class="nc">&nbsp;                .gender(&quot;Male&quot;)</b>
+<b class="nc">&nbsp;                .spouseSummary(Dependant.builder().gender(&quot;Male&quot;).relationship(&quot;Policy Holder&quot;).build())</b>
+<b class="nc">&nbsp;                .dateOfBirth(new Date())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;        Customer spouse = Customer
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .relationshipDesc(&quot;Spouse&quot;)</b>
+<b class="nc">&nbsp;                .gender(&quot;Female&quot;)</b>
+<b class="nc">&nbsp;                .spouseSummary(Dependant.builder().gender(&quot;Female&quot;).relationship(&quot;Spouse&quot;).build())</b>
+<b class="nc">&nbsp;                .dateOfBirth(new Date())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        List&lt;Customer&gt; customers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        customers.add(principal);</b>
+<b class="nc">&nbsp;        customers.add(spouse);</b>
+<b class="nc">&nbsp;        when(beneficiaryService.getQuoteBeneficiary(any(), any()))</b>
+<b class="nc">&nbsp;                .thenReturn(customers);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(status)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(premiumService.recordQuoteBeneficiaryPremium(any(), any())).thenReturn(true);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        Quote quote = quoteService.updateQuoteBenefit(QuoteBenefitUpdateRequest</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .customerId(&quot;Cu&quot;)</b>
+<b class="nc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="nc">&nbsp;                .quoteId(&quot;quote&quot;)</b>
+<b class="nc">&nbsp;                .benefit(Benefit.builder().build())</b>
+<b class="nc">&nbsp;                .build());</b>
+&nbsp;
+<b class="nc">&nbsp;        assertNotNull(quote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;Male&quot;, &quot;Female&quot;})
+&nbsp;    void testUpdateQuoteBenefitWhenPrincipalAnd(String gender) {
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+&nbsp;        Customer principal = Customer
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .relationshipDesc(&quot;Policy Holder&quot;)</b>
+<b class="nc">&nbsp;                .gender(gender)</b>
+<b class="nc">&nbsp;                .spouseSummary(Dependant.builder().gender(gender).relationship(&quot;Policy Holder&quot;).build())</b>
+<b class="nc">&nbsp;                .dateOfBirth(new Date())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;        Customer spouse = Customer
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .relationshipDesc(&quot;Spouse&quot;)</b>
+<b class="nc">&nbsp;                .gender(&quot;Female&quot;)</b>
+<b class="nc">&nbsp;                .spouseSummary(Dependant.builder().gender(&quot;Female&quot;).relationship(&quot;Spouse&quot;).build())</b>
+<b class="nc">&nbsp;                .dateOfBirth(new Date())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        List&lt;Customer&gt; customers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        customers.add(principal);</b>
+<b class="nc">&nbsp;        customers.add(spouse);</b>
+<b class="nc">&nbsp;        when(beneficiaryService.getQuoteBeneficiary(any(), any())).thenReturn(customers);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;Enquiry&quot;)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(premiumService.recordQuoteBeneficiaryPremium(any(), any())).thenReturn(true);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;        Quote quote = quoteService.updateQuoteBenefit(QuoteBenefitUpdateRequest</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .customerId(&quot;Cu&quot;)</b>
+<b class="nc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="nc">&nbsp;                .quoteId(&quot;quote&quot;)</b>
+<b class="nc">&nbsp;                .benefit(Benefit.builder().build())</b>
+<b class="nc">&nbsp;                .build());</b>
+&nbsp;
+<b class="nc">&nbsp;        assertNotNull(quote);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testUpdateQuoteBenefitWithIncorrectStatus() {
+<b class="nc">&nbsp;        when(productService.createDefaultBenefit(any(), any())).thenReturn(Benefit.builder().build());</b>
+<b class="nc">&nbsp;        when(productService.calculatePremium(any(), any(), any(), anyBoolean())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(productService.calculateTotalPremium(any(), anyBoolean())).thenReturn(Premium.builder()</b>
+<b class="nc">&nbsp;                .totalPremium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .premium(BigDecimal.TEN)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(productService.getTravelInsurancePremium(any(), any())).thenReturn(BigDecimal.TEN);</b>
+<b class="nc">&nbsp;        when(beneficiaryService.getQuoteBeneficiary(any(), any()))</b>
+<b class="nc">&nbsp;                .thenReturn(Collections.singletonList(Customer</b>
+<b class="nc">&nbsp;                        .builder()</b>
+<b class="nc">&nbsp;                        .build()));</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(Quote</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .effectiveDate(new Date())</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .productId(50)</b>
+<b class="nc">&nbsp;                .entityId(9L)</b>
+<b class="nc">&nbsp;                .agentId(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .status(&quot;None&quot;)</b>
+<b class="nc">&nbsp;                .code(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        when(quoteMapper.insert(any())).thenReturn(0);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(premiumService.recordQuoteBeneficiaryPremium(any(), any())).thenReturn(true);</b>
+<b class="nc">&nbsp;        when(healthStepRepository.save(any())).thenReturn(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        assertThrows(BusinessException.class, () -&gt; {quoteService.updateQuoteBenefit(QuoteBenefitUpdateRequest</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .customerId(&quot;Cu&quot;)</b>
+<b class="nc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="nc">&nbsp;                .quoteId(&quot;quote&quot;)</b>
+<b class="nc">&nbsp;                .benefit(Benefit.builder().build())</b>
+<b class="nc">&nbsp;                .build());</b>
+<b class="nc">&nbsp;        });</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void updateQuoteStartDateTest() {
+<b class="nc">&nbsp;        QuoteStartDateUpdateRequest request = QuoteStartDateUpdateRequest.builder()</b>
+<b class="nc">&nbsp;                .customerId(&quot;Cu&quot;)</b>
+<b class="nc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="nc">&nbsp;                .quoteId(&quot;quote&quot;)</b>
+<b class="nc">&nbsp;                .startDate(new Date())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        Quote quote = Quote.builder()</b>
+<b class="nc">&nbsp;                .id(&quot;1&quot;)</b>
+<b class="nc">&nbsp;                .agentId(&quot;101&quot;)</b>
+<b class="nc">&nbsp;                .customerId(&quot;123&quot;)</b>
+<b class="nc">&nbsp;                .extPolicyId(1)</b>
+<b class="nc">&nbsp;                .productId(1)</b>
+&nbsp;                // .benefit(afBenefit)
+&nbsp;                // .premium(premium1)
+<b class="nc">&nbsp;                .balance(BigDecimal.ZERO)</b>
+<b class="nc">&nbsp;                .status(PolicyStatus.NEW.getValue())</b>
+&nbsp;                // .isChildrenOnly(isChildrenOnly)
+<b class="nc">&nbsp;                .createTime(new Date())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        when(intermediaryService.getIntermediaryEntityId(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.update(any())).thenReturn(1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;        Quote resp = quoteService.updateQuoteStartDate(request);</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testSoftDeleteQuoteByCustomerId() {
+&nbsp;
+<b class="nc">&nbsp;        when(quoteMapper.softDeleteQuoteByCustomerId(anyString())).thenReturn(1);</b>
+<b class="nc">&nbsp;        boolean result = quoteService.softDeleteQuoteByCustomerId(&quot;12345&quot;);</b>
+<b class="nc">&nbsp;        assertTrue(result);</b>
+&nbsp;
+<b class="nc">&nbsp;        doThrow(new BusinessException(&quot;Customer is null test&quot;)).when(quoteMapper).softDeleteQuoteByCustomerId(null);</b>
+<b class="nc">&nbsp;        BusinessException exception = assertThrows(BusinessException.class,</b>
+<b class="nc">&nbsp;                () -&gt; quoteService.softDeleteQuoteByCustomerId(null));</b>
+<b class="nc">&nbsp;        assertEquals(&quot;Customer is null!!&quot;, exception.getMessage());</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(ints = {1, 0})
+&nbsp;    void testSoftDeleteQuoteByCustomerIdWhenNotNull(int returnValue) {
+&nbsp;
+<b class="nc">&nbsp;        when(quoteMapper.softDeleteQuoteByCustomerId(anyString())).thenReturn(returnValue);</b>
+<b class="nc">&nbsp;        boolean result = quoteService.softDeleteQuoteByCustomerId(&quot;12345&quot;);</b>
+<b class="nc">&nbsp;        if (returnValue == 1) {</b>
+<b class="nc">&nbsp;            assertTrue(result);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            assertFalse(result);</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;quoteId123&quot;, &quot;&quot;})
+&nbsp;    void testSoftDeleteQuoteByAgentAndReturnValueIsOne(String quoteId) {
+<b class="nc">&nbsp;        SoftDeleteQuoteByAgentRequest request = new SoftDeleteQuoteByAgentRequest();</b>
+<b class="nc">&nbsp;        request.setQuoteId(quoteId);</b>
+<b class="nc">&nbsp;        doThrow(new BusinessException(&quot;Quote cannot be null test&quot;)).when(quoteMapper).updateQuotStatusToDeleted(null);</b>
+<b class="nc">&nbsp;        BusinessException exception = assertThrows(BusinessException.class,</b>
+<b class="nc">&nbsp;                () -&gt; quoteService.softDeleteQuoteByAgent(null));</b>
+<b class="nc">&nbsp;        assertEquals(&quot;Quote cannot be null!&quot;, exception.getMessage());</b>
+&nbsp;
+<b class="nc">&nbsp;        when(quoteMapper.updateQuotStatusToDeleted(request)).thenReturn(1);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        boolean result = quoteService.softDeleteQuoteByAgent(request);</b>
+<b class="nc">&nbsp;        assertTrue(result,&quot;Is True&quot;);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @ValueSource(strings = {&quot;quoteId123&quot;, &quot;&quot;})
+&nbsp;    void testSoftDeleteQuoteByAgentAndReturnValueIsZero(String quoteId) {
+<b class="nc">&nbsp;        SoftDeleteQuoteByAgentRequest request = new SoftDeleteQuoteByAgentRequest();</b>
+<b class="nc">&nbsp;        request.setQuoteId(quoteId);</b>
+<b class="nc">&nbsp;        doThrow(new BusinessException(&quot;Quote cannot be null test&quot;)).when(quoteMapper).updateQuotStatusToDeleted(null);</b>
+<b class="nc">&nbsp;        BusinessException exception = assertThrows(BusinessException.class,</b>
+<b class="nc">&nbsp;                () -&gt; quoteService.softDeleteQuoteByAgent(null));</b>
+<b class="nc">&nbsp;        assertEquals(&quot;Quote cannot be null!&quot;, exception.getMessage());</b>
+&nbsp;
+<b class="nc">&nbsp;        when(quoteMapper.updateQuotStatusToDeleted(request)).thenReturn(0);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        boolean result = quoteService.softDeleteQuoteByAgent(request);</b>
+<b class="nc">&nbsp;        assertFalse(result, &quot;Is False&quot;);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @NullSource
+&nbsp;    @ValueSource(strings = {&quot;&quot;, &quot;otherStatus&quot;})
+&nbsp;    void testSearchQuoteListWhenSortTypeAndSortAreNotNullAndIndexIsGreaterThanZero(String status) {
+&nbsp;        // Mocking intermediaryService.getIntermediary()
+<b class="nc">&nbsp;        Intermediary intermediary = CommonObjects.intermediary;</b>
+<b class="nc">&nbsp;        intermediary.setRole(IntermediaryRole.ADMIN.getValue());</b>
+<b class="nc">&nbsp;        when(intermediaryService.getIntermediary(&quot;agent123&quot;)).thenReturn(intermediary);</b>
+&nbsp;
+&nbsp;        // Mocking intermediaryService.getUserList()
+<b class="nc">&nbsp;        List&lt;Intermediary&gt; intermediaryList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Intermediary intermediary1 = new Intermediary();</b>
+<b class="nc">&nbsp;        intermediary1.setAgentId(&quot;agent456&quot;);</b>
+<b class="nc">&nbsp;        intermediaryList.add(intermediary1);</b>
+<b class="nc">&nbsp;        when(intermediaryService.getUserList(&quot;agent123&quot;)).thenReturn(intermediaryList);</b>
+&nbsp;
+&nbsp;        // Mocking quoteMapper.searchQuotes()
+<b class="nc">&nbsp;        List&lt;HealthQuote&gt; quotes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        QuoteListSearchFilter quoteListSearchFilter = CommonObjects.quoteListSearchFilter;</b>
+<b class="nc">&nbsp;        HealthQuote quote1 = new HealthQuote();</b>
+<b class="nc">&nbsp;        quote1.setId(&quot;111&quot;);</b>
+<b class="nc">&nbsp;        quotes.add(quote1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.searchQuotes(quoteListSearchFilter)).thenReturn(quotes);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Creating a QuoteListSearchRequest
+<b class="nc">&nbsp;        QuoteListSearchRequest request = new QuoteListSearchRequest();</b>
+<b class="nc">&nbsp;        request.setAgentId(&quot;agent123&quot;);</b>
+<b class="nc">&nbsp;        request.setSortType(&quot;name&quot;);</b>
+<b class="nc">&nbsp;        request.setIndex(1);</b>
+<b class="nc">&nbsp;        if (status == null) {</b>
+<b class="nc">&nbsp;            request.setQuoteStatus(QuoteStatusEnum.ACTIVE);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Calling the method being tested
+<b class="nc">&nbsp;        HealthQuoteListResponse response = quoteService.searchQuoteList(request);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Verifying the results
+<b class="nc">&nbsp;        assertNotNull(response);</b>
+<b class="nc">&nbsp;        assertEquals(0, response.getTotal());</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+&nbsp;    @NullSource
+&nbsp;    @ValueSource(strings = {&quot;&quot;, &quot;otherStatus&quot;})
+&nbsp;    void testSearchQuoteListWhenSortTypeAndSortAreNotNullAndIndexIsZero(String status) {
+&nbsp;        // Mocking intermediaryService.getIntermediary()
+<b class="nc">&nbsp;        Intermediary intermediary = CommonObjects.intermediary;</b>
+<b class="nc">&nbsp;        intermediary.setRole(IntermediaryRole.ADMIN.getValue());</b>
+<b class="nc">&nbsp;        when(intermediaryService.getIntermediary(&quot;agent123&quot;)).thenReturn(intermediary);</b>
+&nbsp;
+&nbsp;        // Mocking intermediaryService.getUserList()
+<b class="nc">&nbsp;        List&lt;Intermediary&gt; intermediaryList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Intermediary intermediary1 = new Intermediary();</b>
+<b class="nc">&nbsp;        intermediary1.setAgentId(&quot;agent456&quot;);</b>
+<b class="nc">&nbsp;        intermediaryList.add(intermediary1);</b>
+<b class="nc">&nbsp;        when(intermediaryService.getUserList(&quot;agent123&quot;)).thenReturn(intermediaryList);</b>
+&nbsp;
+&nbsp;        // Mocking quoteMapper.searchQuotes()
+<b class="nc">&nbsp;        List&lt;HealthQuote&gt; quotes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        QuoteListSearchFilter quoteListSearchFilter = CommonObjects.quoteListSearchFilter;</b>
+<b class="nc">&nbsp;        HealthQuote quote1 = new HealthQuote();</b>
+<b class="nc">&nbsp;        quote1.setId(&quot;111&quot;);</b>
+<b class="nc">&nbsp;        quotes.add(quote1);</b>
+<b class="nc">&nbsp;        when(quoteMapper.searchQuotes(quoteListSearchFilter)).thenReturn(quotes);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Creating a QuoteListSearchRequest
+<b class="nc">&nbsp;        QuoteListSearchRequest request = new QuoteListSearchRequest();</b>
+<b class="nc">&nbsp;        request.setAgentId(&quot;agent123&quot;);</b>
+<b class="nc">&nbsp;        request.setSortType(&quot;name&quot;);</b>
+<b class="nc">&nbsp;        request.setIndex(0);</b>
+<b class="nc">&nbsp;        if (status == null) {</b>
+<b class="nc">&nbsp;            request.setQuoteStatus(QuoteStatusEnum.ACTIVE);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Calling the method being tested
+<b class="nc">&nbsp;        HealthQuoteListResponse response = quoteService.searchQuoteList(request);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Verifying the results
+<b class="nc">&nbsp;        assertNotNull(response);</b>
+<b class="nc">&nbsp;        assertEquals(0, response.getTotal());</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testDownloadQuote() throws IOException, TemplateException {
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;configuration&quot;, configuration);</b>
+<b class="nc">&nbsp;        String templateStr = &quot;Hello Testes&quot;;</b>
+<b class="nc">&nbsp;        Customer customer = CommonQuote.getCustomer();</b>
+<b class="nc">&nbsp;        Quote quote = CommonQuote.getQuote();</b>
+<b class="nc">&nbsp;        HealthQuoteDownloadRequest request = CommonQuote.getHealthQuoteDownloadRequest();</b>
+<b class="nc">&nbsp;        Intermediary intermediary = CommonQuote.getIntermediary();</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="nc">&nbsp;        Mockito.when(quoteMapper.getQuoteByCode(any(), any())).thenReturn(quote);</b>
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="nc">&nbsp;        Configuration configuration1 = new Configuration(Configuration.VERSION_2_3_30);</b>
+<b class="nc">&nbsp;        Template template = new Template(&quot;te&quot;, templateStr, configuration1);</b>
+<b class="nc">&nbsp;        when(configuration.getTemplate(anyString())).thenReturn(template);</b>
+<b class="nc">&nbsp;        byte[] resp = quoteService.downloadQuote(request);</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testDownloadQuoteWithNullAgent() throws IOException, TemplateException {
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;configuration&quot;, configuration);</b>
+<b class="nc">&nbsp;        String templateStr = &quot;Hello Testes&quot;;</b>
+<b class="nc">&nbsp;        Customer customer = CommonQuote.getCustomerWithNullAgent();</b>
+<b class="nc">&nbsp;        Quote quote = CommonQuote.getQuoteWithNull();</b>
+<b class="nc">&nbsp;        HealthQuoteDownloadRequest request = CommonQuote.getHealthQuoteDownloadRequest();</b>
+<b class="nc">&nbsp;        Intermediary intermediary = CommonQuote.getIntermediaryNull();</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="nc">&nbsp;        Mockito.when(quoteMapper.getQuoteByCode(any(), any())).thenReturn(quote);</b>
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="nc">&nbsp;        Configuration configuration1 = new Configuration(Configuration.VERSION_2_3_30);</b>
+<b class="nc">&nbsp;        Template template = new Template(&quot;te&quot;, templateStr, configuration1);</b>
+<b class="nc">&nbsp;        when(configuration.getTemplate(anyString())).thenReturn(template);</b>
+<b class="nc">&nbsp;        byte[] resp = quoteService.downloadQuote(request);</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testDownloadQuoteWithEmptyAgent() throws IOException, TemplateException {
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;configuration&quot;, configuration);</b>
+<b class="nc">&nbsp;        String templateStr = &quot;Hello Testes&quot;;</b>
+<b class="nc">&nbsp;        Customer customer = CommonQuote.getCustomerWithNullAgent();</b>
+<b class="nc">&nbsp;        Quote quote = CommonQuote.getQuoteEmpty();</b>
+<b class="nc">&nbsp;        HealthQuoteDownloadRequest request = CommonQuote.getHealthQuoteDownloadRequest();</b>
+<b class="nc">&nbsp;        Intermediary intermediary = CommonQuote.getIntermediaryEmpty();</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="nc">&nbsp;        Mockito.when(quoteMapper.getQuoteByCode(any(), any())).thenReturn(quote);</b>
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="nc">&nbsp;        Configuration configuration1 = new Configuration(Configuration.VERSION_2_3_30);</b>
+<b class="nc">&nbsp;        Template template = new Template(&quot;te&quot;, templateStr, configuration1);</b>
+<b class="nc">&nbsp;        when(configuration.getTemplate(anyString())).thenReturn(template);</b>
+<b class="nc">&nbsp;        byte[] resp = quoteService.downloadQuote(request);</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;    @Test
+&nbsp;    void testDownloadQuoteWithDepandantsNull() throws IOException, TemplateException {
+<b class="nc">&nbsp;        ReflectionTestUtils.setField(quoteService, &quot;configuration&quot;, configuration);</b>
+<b class="nc">&nbsp;        String templateStr = &quot;Hello Testes&quot;;</b>
+<b class="nc">&nbsp;        Customer customer = CommonQuote.getCustomerWithNullDependants();</b>
+<b class="nc">&nbsp;        Quote quote = CommonQuote.getQuoteEmpty();</b>
+<b class="nc">&nbsp;        HealthQuoteDownloadRequest request = CommonQuote.getHealthQuoteDownloadRequest();</b>
+<b class="nc">&nbsp;        Intermediary intermediary = CommonQuote.getIntermediaryEmpty();</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="nc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="nc">&nbsp;        Mockito.when(quoteMapper.getQuoteByCode(any(), any())).thenReturn(quote);</b>
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testConfigBenefitWithNonNullValues() {
+<b class="nc">&nbsp;        Quote quote = CommonQuote.getQuote();</b>
+<b class="nc">&nbsp;        Benefit result = quoteService.populateBenefitDetails(quote);</b>
+<b class="nc">&nbsp;        assertEquals(quote.getBenefit().getInpatientLimit(), result.getInpatientLimit());</b>
+<b class="nc">&nbsp;        assertEquals(quote.getBenefit().getOutpatientLimit(), result.getOutpatientLimit());</b>
+<b class="nc">&nbsp;        assertEquals(quote.getBenefit().getDentalLimit(), result.getDentalLimit());</b>
+<b class="nc">&nbsp;        assertEquals(quote.getBenefit().getOpticalLimit(), result.getOpticalLimit());</b>
+<b class="nc">&nbsp;        assertEquals(quote.getBenefit().getMaternityLimit(), result.getMaternityLimit());</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testConfigBenefitWithNullValues() {
+<b class="nc">&nbsp;        Quote quote = CommonQuote.getQuoteWithNull();</b>
+<b class="nc">&nbsp;        Benefit result = quoteService.populateBenefitDetails(quote);</b>
+<b class="nc">&nbsp;        assertEquals(0, result.getInpatientLimit());</b>
+<b class="nc">&nbsp;        assertEquals(0, result.getOutpatientLimit());</b>
+<b class="nc">&nbsp;        assertEquals(0, result.getDentalLimit());</b>
+<b class="nc">&nbsp;        assertEquals(0, result.getOpticalLimit());</b>
+<b class="nc">&nbsp;        assertEquals(0, result.getMaternityLimit());</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testPopulateModelWithAgentInfo() {
+<b class="nc">&nbsp;        Intermediary intermediary = CommonQuote.getIntermediary();</b>
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="nc">&nbsp;        quoteService.populateAgentDetails(new HashMap&lt;&gt;(), CommonQuote.getCustomer());</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testPopulateAgentDetailsWithNullIntermediary() {
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(null);</b>
+<b class="nc">&nbsp;        quoteService.populateAgentDetails(new HashMap&lt;&gt;(), Customer.builder().agentId(&quot;0&quot;).build());</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testPopulateDependantDetailsWithNull() {
+<b class="nc">&nbsp;        quoteService.populateDependantDetails(new HashMap&lt;&gt;(),</b>
+<b class="nc">&nbsp;                CommonQuote.getCustomerWithNullDependants().getSpouseSummary(),</b>
+<b class="nc">&nbsp;                CommonQuote.getCustomerWithNullDependants().getChildrenSummary());</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testPopulateAgentDetailsWithNullIntermediaryBranch() {
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(</b>
+<b class="nc">&nbsp;                Intermediary.builder()</b>
+<b class="nc">&nbsp;                        .firstName(&quot;test&quot;)</b>
+<b class="nc">&nbsp;                        .lastName(&quot;te&quot;)</b>
+<b class="nc">&nbsp;                .branchName(null).build());</b>
+<b class="nc">&nbsp;        quoteService.populateAgentDetails(new HashMap&lt;&gt;(), Customer.builder().agentId(&quot;0&quot;).build());</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;    @Test
+&nbsp;    void testPopulateAgentDetailsWithEmptyIntermediaryBranch() {
+<b class="nc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(</b>
+<b class="nc">&nbsp;                Intermediary.builder()</b>
+<b class="nc">&nbsp;                        .firstName(&quot;test&quot;)</b>
+<b class="nc">&nbsp;                        .lastName(&quot;te&quot;)</b>
+<b class="nc">&nbsp;                        .branchName(&quot;&quot;).build());</b>
+<b class="nc">&nbsp;        quoteService.populateAgentDetails(new HashMap&lt;&gt;(), Customer.builder().agentId(&quot;0&quot;).build());</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

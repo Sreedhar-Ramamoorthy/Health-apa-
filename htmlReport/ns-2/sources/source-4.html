@@ -1,0 +1,119 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PolicyService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service</a>
+</div>
+
+<h1>Coverage Summary for Class: PolicyService (ke.co.apollo.health.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">PolicyService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.ApplicationRenewalPolicy;
+&nbsp;// import ke.co.apollo.health.common.domain.model.Commission;
+&nbsp;import ke.co.apollo.health.common.domain.model.HealthPolicy;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.PolicyNumberRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.ApplicationRenewalPolicyListResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.PolicyOverComingResponseDto;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.PolicyRenewalResponse;
+&nbsp;import ke.co.apollo.health.domain.request.ApplicationPolicyListSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerIdRequest;
+&nbsp;import ke.co.apollo.health.domain.response.HealthPolicyListResponse;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public interface PolicyService {
+&nbsp;
+&nbsp;  List&lt;HealthPolicyListResponse&gt; getCustomerPolicyList(CustomerPolicyListRequest request);
+&nbsp;
+&nbsp;  List&lt;HealthPolicyListResponse&gt; getCustomerPolicyList(EntityPolicyListRequest request);
+&nbsp;
+&nbsp;  boolean createCustomerPolicyCache(CustomerIdRequest request);
+&nbsp;
+&nbsp;  void processUpdateCustomerPolicyCacheTask();
+&nbsp;
+&nbsp;  PolicyRenewalResponse renewalPolicy(PolicyRenewalRequest renewalRequest);
+&nbsp;
+&nbsp;  PolicyRenewalResponse renewalPolicyForComingWorker(PolicyRenewalRequest renewalRequest);
+&nbsp;
+&nbsp;  boolean updatePolicyRenewalBalance(String policyNumber, Date effectiveDate, BigDecimal amount);
+&nbsp;
+&nbsp;  HealthPolicy getPolicy(String policyNumber, Date effectiveDate);
+&nbsp;
+&nbsp;  ApplicationRenewalPolicyListResponse searchApplicationRenewalPolicyList(
+&nbsp;      ApplicationPolicyListSearchRequest request);
+&nbsp;
+&nbsp;  ApplicationRenewalPolicy getApplicationRenewalPolicy(PolicyNumberRequest request);
+&nbsp;
+&nbsp;  boolean archiveApplicationRenewalPolicy(PolicyNumberRequest request);
+&nbsp;
+&nbsp;  PolicyOverComingResponseDto policyUpdateDetails(ComingPolicyListRequest request);
+&nbsp;  byte[] comingPolicyListInExcel(ComingPolicyListRequestInExcel request);
+&nbsp;  void renewalsDueIn60Days();
+&nbsp;
+&nbsp;  void renewalNotificationPolicies() throws InterruptedException;
+&nbsp;
+&nbsp;  void expiredNotificationPolicies() throws InterruptedException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

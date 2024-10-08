@@ -1,0 +1,414 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HospitalServiceImplTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: HospitalServiceImplTest (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HospitalServiceImplTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/131)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.Arrays;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.ApiResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.Benefit;
+&nbsp;import ke.co.apollo.health.common.domain.model.Customer;
+&nbsp;import ke.co.apollo.health.common.domain.model.Premium;
+&nbsp;import ke.co.apollo.health.common.domain.model.Quote;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.CreatePolicyResponse;
+&nbsp;import ke.co.apollo.health.domain.entity.HealthStepEntity;
+&nbsp;import ke.co.apollo.health.domain.request.CustomerSearchRequest;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteBenefitUpdateRequest;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteFinishRequest;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteStepRequest;
+&nbsp;import ke.co.apollo.health.domain.response.CustomerDetailResponse;
+&nbsp;import ke.co.apollo.health.domain.response.QuoteStepResponse;
+&nbsp;import ke.co.apollo.health.enums.HealthQuoteStepsEnum;
+&nbsp;import ke.co.apollo.health.mapper.health.CustomerMapper;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.repository.HealthStepRepository;
+&nbsp;import ke.co.apollo.health.service.BeneficiaryService;
+&nbsp;import ke.co.apollo.health.service.PremiumService;
+&nbsp;import ke.co.apollo.health.service.ProductService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;import org.apache.poi.ss.usermodel.*;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.mockito.InjectMocks;
+&nbsp;import org.mockito.Mock;
+&nbsp;import org.mockito.Mockito;
+&nbsp;import ke.co.apollo.health.common.enums.PolicyStatus;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import ke.co.apollo.health.service.IntermediaryService;
+&nbsp;import ke.co.apollo.health.domain.entity.HospitalEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.LocationEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.PaymentEntity;
+&nbsp;import ke.co.apollo.health.domain.entity.ServiceEntity;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.*;
+&nbsp;import ke.co.apollo.health.domain.entity.HealthStepEntity;
+&nbsp;import ke.co.apollo.health.domain.request.*;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertNotNull;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertTrue;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertEquals;
+&nbsp;
+&nbsp;import static org.junit.runner.Request.method;
+&nbsp;import static org.mockito.ArgumentMatchers.*;
+&nbsp;import static org.mockito.Mockito.*;
+&nbsp;import static org.mockito.MockitoAnnotations.initMocks;
+&nbsp;
+&nbsp;import ke.co.apollo.health.domain.response.HospitalInitialResponse;
+&nbsp;
+&nbsp;import static ke.co.apollo.health.common.CommonObjects.*;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.mock.web.MockMultipartFile;
+&nbsp;import ke.co.apollo.health.repository.HospitalRepository;
+&nbsp;import ke.co.apollo.health.repository.LocationRepository;
+&nbsp;import ke.co.apollo.health.repository.PaymentRepository;
+&nbsp;import ke.co.apollo.health.repository.ServiceRepository;
+&nbsp;import org.springframework.web.multipart.MultipartFile;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageImpl;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;
+<b class="nc">&nbsp;class HospitalServiceImplTest {</b>
+&nbsp;
+&nbsp;    @InjectMocks
+&nbsp;    HospitalServiceImpl hospitalService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    HospitalRepository hospitalRepository;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    ServiceRepository serviceRepository;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PaymentRepository paymentRepository;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    LocationRepository locationRepository;
+&nbsp;
+&nbsp;    MockMultipartFile file;
+&nbsp;
+&nbsp;
+&nbsp;    @BeforeEach
+&nbsp;    void setUpMocks(){
+<b class="nc">&nbsp;        initMocks(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        when(paymentRepository.findAll()).thenReturn(Collections.singletonList(paymentEntityObject));</b>
+<b class="nc">&nbsp;        when(serviceRepository.findAll()).thenReturn(Collections.singletonList(serviceEntityObject));</b>
+<b class="nc">&nbsp;        when(hospitalRepository.findAll()).thenReturn(Collections.singletonList(hospitalEntityObject));</b>
+<b class="nc">&nbsp;        when(locationRepository.findAll()).thenReturn(Collections.singletonList(locationEntityObject));</b>
+&nbsp;
+<b class="nc">&nbsp;        doNothing().when(locationRepository).deleteAll();      </b>
+&nbsp;
+<b class="nc">&nbsp;        file </b>
+&nbsp;            = new MockMultipartFile(
+&nbsp;                &quot;file&quot;, 
+&nbsp;                &quot;hello.txt&quot;, 
+&nbsp;                MediaType.TEXT_PLAIN_VALUE, 
+<b class="nc">&nbsp;                &quot;Hello, World!&quot;.getBytes()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Test
+&nbsp;     void getPaymentsTest(){
+<b class="nc">&nbsp;        List&lt;PaymentEntity&gt; resp = hospitalService.getPayments();  //NO SONAR</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;     void getServicesTest(){
+<b class="nc">&nbsp;        List&lt;ServiceEntity&gt; resp = hospitalService.getServices();  //NO SONAR</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;     @Test
+&nbsp;     void getLocationsTest(){
+<b class="nc">&nbsp;        List&lt;LocationEntity&gt; resp = hospitalService.getLocations();  //NO SONAR</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;     @Test
+&nbsp;     void getHospitalsTest(){
+<b class="nc">&nbsp;        List&lt;HospitalEntity&gt; resp = hospitalService.getHospitals();  //NO SONAR</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;     @Test
+&nbsp;     void updateHospitalLocationTest(){
+<b class="nc">&nbsp;        boolean resp = hospitalService.updateHospitalLocation(file);  //NO SONAR</b>
+<b class="nc">&nbsp;        assertEquals(resp,true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        //Page&lt;Quotation&gt; quotationPage = new PageImpl&lt;&gt;(quotations);
+&nbsp;
+&nbsp;    @Test
+&nbsp;     void searchHospitalsTest(){
+&nbsp;       
+<b class="nc">&nbsp;        when(hospitalRepository.findAllByPaymentIdAndServiceIdNative(any(),anyInt(),any(),any())).thenReturn(</b>
+<b class="nc">&nbsp;            new PageImpl&lt;HospitalEntity&gt;(Collections.singletonList(hospitalEntityObject)) </b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;        Page&lt;HospitalEntity&gt; resp = hospitalService.searchHospitals(HospitalSearchRequest.builder()</b>
+<b class="nc">&nbsp;                        .locationId(1)</b>
+<b class="nc">&nbsp;                        .serviceId(Arrays.asList(1,2,3))</b>
+<b class="nc">&nbsp;                        .coPaymentId(Arrays.asList(1,2,3))</b>
+<b class="nc">&nbsp;                        .index(1)</b>
+<b class="nc">&nbsp;                        .limit(1)</b>
+<b class="nc">&nbsp;                        .build());  //NO SONAR</b>
+&nbsp;                        
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;     void searchHospitalsEmptyPaymentIdsAndServiceIdTest(){
+&nbsp;       
+<b class="nc">&nbsp;        when(hospitalRepository.findAllByPaymentIdAndServiceIdNative(any(),anyInt(),any(),any())).thenReturn(</b>
+<b class="nc">&nbsp;            new PageImpl&lt;HospitalEntity&gt;(Collections.singletonList(hospitalEntityObject)) </b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;        Page&lt;HospitalEntity&gt; resp = hospitalService.searchHospitals(HospitalSearchRequest.builder()</b>
+<b class="nc">&nbsp;                        .locationId(1)</b>
+&nbsp;                        // .serviceId(Collections.emptyList())
+&nbsp;                        // .coPaymentId(Arrays.asList(1,2,3))
+<b class="nc">&nbsp;                        .index(1)</b>
+<b class="nc">&nbsp;                        .limit(1)</b>
+<b class="nc">&nbsp;                        .build());  //NO SONAR</b>
+&nbsp;                        
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;     void searchHospitalsEmptyPaymentIdsTest(){
+&nbsp;       
+<b class="nc">&nbsp;        when(hospitalRepository.findAllByPaymentIdAndServiceIdNative(any(),anyInt(),any(),any())).thenReturn(</b>
+<b class="nc">&nbsp;            new PageImpl&lt;HospitalEntity&gt;(Collections.singletonList(hospitalEntityObject)) </b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;        Page&lt;HospitalEntity&gt; resp = hospitalService.searchHospitals(HospitalSearchRequest.builder()</b>
+<b class="nc">&nbsp;                        .locationId(1)</b>
+<b class="nc">&nbsp;                        .serviceId(Arrays.asList(1,2,3))</b>
+&nbsp;                        // .coPaymentId()
+<b class="nc">&nbsp;                        .index(1)</b>
+<b class="nc">&nbsp;                        .limit(1)</b>
+<b class="nc">&nbsp;                        .build());  //NO SONAR</b>
+&nbsp;                        
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void getInitialDataTestt(){
+<b class="nc">&nbsp;        HospitalInitialResponse resp = hospitalService.getInitialData();  //NO SONAR</b>
+<b class="nc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testUpdateHospitalList() throws IOException {
+<b class="nc">&nbsp;        InputStream inputStream = getClass().getResourceAsStream(&quot;/test.xlsx&quot;);</b>
+<b class="nc">&nbsp;        MockMultipartFile mockMultipartFile = new MockMultipartFile(&quot;test.xlsx&quot;, &quot;test.xlsx&quot;,</b>
+&nbsp;                &quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;, inputStream);
+<b class="nc">&nbsp;        Workbook workbookMock = mock(Workbook.class);</b>
+<b class="nc">&nbsp;        doNothing().when(hospitalRepository).updateHospital(any());</b>
+<b class="nc">&nbsp;        Sheet sheetMock = mock(Sheet.class);</b>
+<b class="nc">&nbsp;        when(workbookMock.getSheetAt(0)).thenReturn(sheetMock);</b>
+<b class="nc">&nbsp;        when(workbookMock.getSheetAt(2)).thenReturn(sheetMock);</b>
+<b class="nc">&nbsp;        when(sheetMock.getLastRowNum()).thenReturn(7);</b>
+<b class="nc">&nbsp;        if (workbookMock!=null){</b>
+<b class="nc">&nbsp;            workbookMock.close();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Row rowMock = mock(Row.class);</b>
+<b class="nc">&nbsp;        when(sheetMock.getRow(anyInt())).thenReturn(rowMock);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 0, &quot;HospitalName&quot;);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 1, &quot;Address&quot;);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 3, &quot;PhoneNumber&quot;);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 4, &quot;Email&quot;);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 5, &quot;Location&quot;);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 6, &quot;Yes&quot;);</b>
+<b class="nc">&nbsp;        stubCellWithCellValue(rowMock, 7, &quot;&quot;);</b>
+<b class="nc">&nbsp;        HospitalUpdateRequest hospitalUpdateRequest = HospitalUpdateRequest.builder()</b>
+<b class="nc">&nbsp;                .name(&quot;test&quot;)</b>
+<b class="nc">&nbsp;                .workingHours(&quot;&quot;)</b>
+<b class="nc">&nbsp;                .contact(&quot;test&quot;)</b>
+<b class="nc">&nbsp;                .email(&quot;test@gmail.com&quot;)</b>
+<b class="nc">&nbsp;                .locationId(1)</b>
+<b class="nc">&nbsp;                .paymentId(1)</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        assertNotNull(hospitalUpdateRequest);</b>
+<b class="nc">&nbsp;        doNothing().when(workbookMock).close();</b>
+<b class="nc">&nbsp;        hospitalService.updateHospitalList(mockMultipartFile);</b>
+<b class="nc">&nbsp;        hospitalService.updateHospitalEntityList(workbookMock);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testUpdateHospitalEntityEmptyList() throws IOException {
+<b class="nc">&nbsp;        InputStream inputStream = getClass().getResourceAsStream(&quot;/test.xlsx&quot;);</b>
+<b class="nc">&nbsp;        MockMultipartFile mockMultipartFile = new MockMultipartFile(&quot;test.xlsx&quot;, &quot;test.xlsx&quot;,</b>
+&nbsp;                &quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;, inputStream);
+<b class="nc">&nbsp;        Workbook workbookMock = mock(Workbook.class);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            doNothing().when(hospitalRepository).updateHospital(any());</b>
+<b class="nc">&nbsp;            Sheet sheetMock = mock(Sheet.class);</b>
+<b class="nc">&nbsp;            when(workbookMock.getSheetAt(0)).thenReturn(sheetMock);</b>
+<b class="nc">&nbsp;            when(workbookMock.getSheetAt(2)).thenReturn(sheetMock);</b>
+<b class="nc">&nbsp;            when(sheetMock.getLastRowNum()).thenReturn(7);</b>
+<b class="nc">&nbsp;            Row rowMock = mock(Row.class);</b>
+<b class="nc">&nbsp;            when(sheetMock.getRow(anyInt())).thenReturn(rowMock);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 0, &quot;HospitalName&quot;);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 1, &quot;Address&quot;);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 3, &quot;PhoneNumber&quot;);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 4, &quot;Email&quot;);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 5, &quot;Location&quot;);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 6, &quot;No&quot;);</b>
+<b class="nc">&nbsp;            stubCellWithCellValue(rowMock, 7, &quot;&quot;);</b>
+<b class="nc">&nbsp;            when(serviceRepository.findAll()).thenReturn(Collections.emptyList());</b>
+<b class="nc">&nbsp;            when(locationRepository.findAll()).thenReturn(Collections.emptyList());</b>
+<b class="nc">&nbsp;            when(hospitalRepository.findAllByNameAndAddress(anyString(), anyString())).thenReturn(Collections.singletonList(mock(HospitalEntity.class)));</b>
+<b class="nc">&nbsp;            HospitalUpdateRequest hospitalUpdateRequest = HospitalUpdateRequest.builder()</b>
+<b class="nc">&nbsp;                    .name(&quot;&quot;)</b>
+<b class="nc">&nbsp;                    .workingHours(&quot;&quot;)</b>
+<b class="nc">&nbsp;                    .contact(&quot;&quot;)</b>
+<b class="nc">&nbsp;                    .email(&quot;&quot;)</b>
+<b class="nc">&nbsp;                    .locationId(null)</b>
+<b class="nc">&nbsp;                    .paymentId(null)</b>
+<b class="nc">&nbsp;                    .build();</b>
+<b class="nc">&nbsp;            assertNotNull(hospitalUpdateRequest);</b>
+<b class="nc">&nbsp;            hospitalService.updateHospitalList(mockMultipartFile);</b>
+<b class="nc">&nbsp;            hospitalService.updateHospitalEntityList(workbookMock);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            doNothing().when(hospitalRepository).updateHospital(any());</b>
+<b class="nc">&nbsp;            if (workbookMock != null) {</b>
+<b class="nc">&nbsp;                workbookMock.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (inputStream != null) {</b>
+<b class="nc">&nbsp;                inputStream.close();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    void stubCellWithCellValue(Row rowMock, int cellIndex, String value) {
+<b class="nc">&nbsp;        Cell cellMock = mock(Cell.class);</b>
+<b class="nc">&nbsp;        when(rowMock.getCell(cellIndex)).thenReturn(cellMock);</b>
+<b class="nc">&nbsp;        when(cellMock.getStringCellValue()).thenReturn(value);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

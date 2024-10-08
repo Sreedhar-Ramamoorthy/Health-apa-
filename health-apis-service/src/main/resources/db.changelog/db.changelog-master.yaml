@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: classpath:/db.changelog/changes/001-alter-hospital-workinghours-schema.sql
+  - include:
+      file: classpath:/db.changelog/changes/002-delete-hospital-workinghours-null-schema.sql

@@ -1,0 +1,959 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PaymentServiceImplTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: PaymentServiceImplTest (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaymentServiceImplTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (33/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.9%
+  </span>
+  <span class="absValue">
+    (567/701)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import com.google.gson.GsonBuilder;
+&nbsp;import freemarker.template.Configuration;
+&nbsp;import freemarker.template.Template;
+&nbsp;import freemarker.template.TemplateException;
+&nbsp;import ke.co.apollo.health.common.constants.GlobalConstant;
+&nbsp;import ke.co.apollo.health.common.domain.model.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.*;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.InAppNotificationMessageResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.TransactionCreateResponse;
+&nbsp;import ke.co.apollo.health.common.domain.model.response.TransactionValidateResponse;
+&nbsp;import ke.co.apollo.health.common.enums.PolicyStatus;
+&nbsp;import ke.co.apollo.health.common.enums.ProductEnum;
+&nbsp;import ke.co.apollo.health.common.exception.BusinessException;
+&nbsp;import ke.co.apollo.health.config.NotificationMessageBuilder;
+&nbsp;import ke.co.apollo.health.domain.entity.AgentBranchEntity;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteStartDateUpdateRequest;
+&nbsp;import ke.co.apollo.health.mapper.health.PaymentTransactionMapper;
+&nbsp;import ke.co.apollo.health.mapper.health.QuoteMapper;
+&nbsp;import ke.co.apollo.health.remote.NotificationRemote;
+&nbsp;import ke.co.apollo.health.remote.PaymentRemote;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.repository.HealthAgentBranchRepository;
+&nbsp;import ke.co.apollo.health.repository.HealthStepRepository;
+&nbsp;import ke.co.apollo.health.service.CustomerService;
+&nbsp;import ke.co.apollo.health.service.IntermediaryService;
+&nbsp;import ke.co.apollo.health.service.PolicyService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;import lombok.Value;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.ValueSource;
+&nbsp;import org.mockito.InjectMocks;
+&nbsp;import org.mockito.Mock;
+&nbsp;import org.mockito.Mockito;
+&nbsp;import org.springframework.http.HttpEntity;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.test.util.ReflectionTestUtils;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.StringReader;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.*;
+&nbsp;import static org.mockito.ArgumentMatchers.any;
+&nbsp;import static org.mockito.ArgumentMatchers.anyString;
+&nbsp;import static org.mockito.Mockito.*;
+<b class="fc">&nbsp;import static org.mockito.MockitoAnnotations.initMocks;</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;class PaymentServiceImplTest {</b>
+&nbsp;
+&nbsp;    @InjectMocks
+&nbsp;    PaymentServiceImpl paymentService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PaymentServiceImpl paymentServiceMock;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    HealthAgentBranchRepository agentBranchRepository;
+&nbsp;
+<b class="fc">&nbsp;    @Mock</b>
+&nbsp;    PaymentRemote paymentRemote;
+&nbsp;
+<b class="fc">&nbsp;    @Mock</b>
+&nbsp;    Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
+&nbsp;
+<b class="fc">&nbsp;    private Gson g = new GsonBuilder().create();</b>
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PaymentTransactionMapper paymentTransactionMapper;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    CustomerService customerService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PolicyService policyService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    QuoteService quoteService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    IntermediaryService intermediaryService;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    NotificationRemote notificationRemote;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    PolicyRemote policyRemote;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    HealthStepRepository healthStepRepository;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    QuoteMapper quoteMapper;
+&nbsp;
+&nbsp;    @Mock
+&nbsp;    NotificationMessageBuilder notificationMessageBuilder;
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    @BeforeEach</b>
+<b class="fc">&nbsp;    public void setUp() {</b>
+<b class="fc">&nbsp;        initMocks(this);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;paymentRemote&quot;, paymentRemote);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;paymentTransactionMapper&quot;, paymentTransactionMapper);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;customerService&quot;, customerService);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;policyService&quot;, policyService);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;intermediaryService&quot;, intermediaryService);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;notificationRemote&quot;, notificationRemote);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;quoteService&quot;, quoteService);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;policyRemote&quot;, policyRemote);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;stepRepository&quot;, healthStepRepository);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;agentBranchRepository&quot;, agentBranchRepository);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;g&quot;, g);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;quoteMapper&quot;, quoteMapper);</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;notificationMessageBuilder&quot;, notificationMessageBuilder);</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    TransactionValidateRequest transactionValidateRequest = TransactionValidateRequest.builder()</b>
+<b class="fc">&nbsp;            .applicationType(&quot;health&quot;)</b>
+<b class="fc">&nbsp;            .message(&quot;Message&quot;)</b>
+<b class="fc">&nbsp;            .orderId(&quot;orderId&quot;)</b>
+<b class="fc">&nbsp;            .transactionRef(&quot;request.getTransactionRef()&quot;)</b>
+<b class="fc">&nbsp;            .paymentMethod(&quot;request.getPaymentMethod()&quot;)</b>
+<b class="fc">&nbsp;            .paymentResponse(&quot;request.getPaymentResponse()&quot;)</b>
+<b class="fc">&nbsp;            .success(true)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    TransactionValidateResponse transactionValidateResponse = TransactionValidateResponse</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .message(&quot;Success&quot;)</b>
+<b class="fc">&nbsp;            .success(true)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    Customer customer = Customer</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .customerId(&quot;Customer Id&quot;)</b>
+<b class="fc">&nbsp;            .benefit(DependantBenefit.builder().dental(true).build())</b>
+<b class="fc">&nbsp;            .firstName(&quot;Name&quot;)</b>
+<b class="fc">&nbsp;            .lastName(&quot;Last Name&quot;)</b>
+<b class="fc">&nbsp;            .createTime(new Date())</b>
+<b class="fc">&nbsp;            .agentId(&quot;agent Id&quot;)</b>
+<b class="fc">&nbsp;            .childrenSummary(Children.builder().count(0).build())</b>
+<b class="fc">&nbsp;            .dateOfBirth(new Date())</b>
+<b class="fc">&nbsp;            .email(&quot;email&quot;)</b>
+<b class="fc">&nbsp;            .entityId(1L)</b>
+<b class="fc">&nbsp;            .gender(&quot;M&quot;)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    HealthPolicy policy = HealthPolicy</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .balance(BigDecimal.ONE)</b>
+<b class="fc">&nbsp;            .benefit(Benefit.builder().dentalLimit(80).build())</b>
+<b class="fc">&nbsp;            .policyNumber(&quot;PO NUMBER&quot;)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    Intermediary intermediary = Intermediary</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .agentCode(&quot;Agent Code&quot;)</b>
+<b class="fc">&nbsp;            .agentId(&quot;Id&quot;)</b>
+<b class="fc">&nbsp;            .phoneNumber(&quot;Phone&quot;)</b>
+<b class="fc">&nbsp;            .email(&quot;Email&quot;)</b>
+<b class="fc">&nbsp;            .status(&quot;Active&quot;)</b>
+<b class="fc">&nbsp;            .branchName(&quot;Kisii branj&quot;)</b>
+<b class="fc">&nbsp;            .lastName(&quot;Last Name&quot;)</b>
+<b class="fc">&nbsp;            .firstName(&quot;First Name&quot;)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    PaymentValidateRequest paymentValidateRequest = PaymentValidateRequest</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .customerId(&quot;CustomerId&quot;)</b>
+<b class="fc">&nbsp;            .paymentMethod(&quot;MPESA&quot;)</b>
+<b class="fc">&nbsp;            .orderId(&quot;OrderIs&quot;)</b>
+<b class="fc">&nbsp;            .transactionRef(&quot;TransRef&quot;)</b>
+<b class="fc">&nbsp;            .paymentResponse(&quot;Response&quot;)</b>
+<b class="fc">&nbsp;            .message(&quot;Done&quot;)</b>
+<b class="fc">&nbsp;            .success(true)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    PaymentTransaction transaction = PaymentTransaction</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .amount(BigDecimal.ONE)</b>
+<b class="fc">&nbsp;            .balanceMessage(&quot;Message&quot;)</b>
+<b class="fc">&nbsp;            .balanceResult(true)</b>
+<b class="fc">&nbsp;            .createTime(new Date())</b>
+<b class="fc">&nbsp;            .effectiveDate(new Date())</b>
+<b class="fc">&nbsp;            .clientMessage(&quot;Message&quot;)</b>
+<b class="fc">&nbsp;            .clientResult(true)</b>
+<b class="fc">&nbsp;            .customerId(&quot;customerId&quot;)</b>
+<b class="fc">&nbsp;            .domain(&quot;ISWKE&quot;)</b>
+<b class="fc">&nbsp;            .id(&quot;Test&quot;).currency(&quot;KES&quot;).merchantId(&quot;MERID&quot;).orderId(&quot;ORDER ID&quot;)</b>
+<b class="fc">&nbsp;            .paymentCustomerId(&quot;Mesage&quot;)</b>
+<b class="fc">&nbsp;            .paymentMessage(&quot;message&quot;)</b>
+<b class="fc">&nbsp;            .paymentMethod(&quot;MPESA&quot;)</b>
+<b class="fc">&nbsp;            .policyId(&quot;Pol Id&quot;)</b>
+<b class="fc">&nbsp;            .policyNumber(&quot;PO Num&quot;)</b>
+<b class="fc">&nbsp;            .quoteId(&quot;quote id&quot;)</b>
+<b class="fc">&nbsp;            .quoteNumber(&quot;Number&quot;)</b>
+<b class="fc">&nbsp;            .terminalId(&quot;Terminal&quot;)</b>
+<b class="fc">&nbsp;            .updateTime(new Date())</b>
+<b class="fc">&nbsp;            .transactionRef(&quot;Ref&quot;)</b>
+<b class="fc">&nbsp;            .preauth(&quot;True&quot;)</b>
+<b class="fc">&nbsp;            .status(&quot;Success&quot;)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    Quote quote = Quote</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .customerId(&quot;quoteId&quot;)</b>
+<b class="fc">&nbsp;            .balance(BigDecimal.ONE)</b>
+<b class="fc">&nbsp;            .agentId(&quot;&quot;)</b>
+<b class="fc">&nbsp;            .productId(ProductEnum.JAMIIPLUS.getId())</b>
+<b class="fc">&nbsp;            .code(&quot;&quot;)</b>
+<b class="fc">&nbsp;            .benefit(Benefit.builder().dentalLimit(80).build())</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    PaymentCreateRequest paymentCreateRequest = PaymentCreateRequest</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .policyNumber(&quot;POLNUM&quot;)</b>
+<b class="fc">&nbsp;            .amount(&quot;200000&quot;)</b>
+<b class="fc">&nbsp;            .customerId(&quot;customer&quot;)</b>
+<b class="fc">&nbsp;            .effectiveDate(new Date())</b>
+<b class="fc">&nbsp;            .renewal(true)</b>
+<b class="fc">&nbsp;            .quoteId(&quot;quote&quot;)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;    PolicyDetail policyDetail = PolicyDetail</b>
+<b class="fc">&nbsp;            .builder()</b>
+<b class="fc">&nbsp;            .policyStatus(&quot;L&quot;)</b>
+<b class="fc">&nbsp;            .paymentStyle(&quot;Style&quot;)</b>
+<b class="fc">&nbsp;            .policyNumber(&quot;Pol Number&quot;)</b>
+<b class="fc">&nbsp;            .policyId(8)</b>
+<b class="fc">&nbsp;            .build();</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;    TransactionCreateRequest transactionCreateRequest = TransactionCreateRequest.builder()</b>
+<b class="fc">&nbsp;            .amount(BigDecimal.ONE).applicationCustomerEmail(customer.getEmail())</b>
+<b class="fc">&nbsp;            .applicationPolicyNumber(&quot;policyNumber&quot;).applicationCustomerId(customer.getPhoneNumber())</b>
+<b class="fc">&nbsp;            .applicationScene(&quot;business&quot;)</b>
+<b class="fc">&nbsp;            .applicationType(&quot;health&quot;)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+&nbsp;    void testValidatePaymentTransactionWithSuccessfulPayment() throws TemplateException, IOException {
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+&nbsp;
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Template t = new Template(&quot;name&quot;, new StringReader(templateStr),</b>
+<b class="nc">&nbsp;                new Configuration(Configuration.VERSION_2_3_30));</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(configuration.getTemplate(anyString())).thenReturn(t);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(agentBranchRepository.findAgentBranchEntitiesByEntityId(any())).thenReturn(AgentBranchEntity.builder()</b>
+<b class="fc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="fc">&nbsp;                .entityId(900)</b>
+<b class="fc">&nbsp;                .branchName(&quot;Name&quot;).build());</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getCustomerId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getOrderId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getTransactionRef());</b>
+&nbsp;
+<b class="fc">&nbsp;        TransactionValidateResponse resp = paymentService.validatePaymentTransaction(paymentValidateRequest);  //NO SONAR</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testValidatePaymentTransactionWithSuccessfulPaymentAndIsRenewal() throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction.setRenewal(true);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Template t = new Template(&quot;name&quot;, new StringReader(templateStr),</b>
+<b class="nc">&nbsp;                new Configuration(Configuration.VERSION_2_3_30));</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(configuration.getTemplate(anyString())).thenReturn(t);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getCustomerId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getOrderId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getTransactionRef());</b>
+<b class="fc">&nbsp;        Mockito.when(agentBranchRepository.findAgentBranchEntitiesByEntityId(any())).thenReturn(AgentBranchEntity.builder()</b>
+<b class="fc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="fc">&nbsp;                .entityId(900)</b>
+<b class="fc">&nbsp;                .branchName(&quot;Name&quot;).build());</b>
+&nbsp;
+<b class="fc">&nbsp;        TransactionValidateResponse resp = paymentService.validatePaymentTransaction(paymentValidateRequest);  //NO SONAR</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testValidatePaymentTransactionWithSuccessfulPaymentAndIsRenewalIsNotAgent() throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction.setRenewal(true);</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Template t = new Template(&quot;name&quot;, new StringReader(templateStr),</b>
+<b class="nc">&nbsp;                new Configuration(Configuration.VERSION_2_3_30));</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(configuration.getTemplate(anyString())).thenReturn(t);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getCustomerId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getOrderId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getTransactionRef());</b>
+&nbsp;
+<b class="fc">&nbsp;        TransactionValidateResponse resp = paymentService.validatePaymentTransaction(paymentValidateRequest);  //NO SONAR</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+<b class="nc">&nbsp;    @ValueSource(ints = {0, 40000})</b>
+<b class="nc">&nbsp;    void testValidatePaymentTransactionWithSuccessfulPaymentAndIsRenewalFalse(int travel) throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction.setRenewal(false);</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Template t = new Template(&quot;name&quot;, new StringReader(templateStr),</b>
+<b class="nc">&nbsp;                new Configuration(Configuration.VERSION_2_3_30));</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(configuration.getTemplate(anyString())).thenReturn(t);</b>
+<b class="fc">&nbsp;        quote.getBenefit().setTravelInsurance(travel);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getCustomerId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getOrderId());</b>
+<b class="fc">&nbsp;        System.out.println(&quot; --------------- &quot; + paymentValidateRequest.getTransactionRef());</b>
+&nbsp;
+<b class="fc">&nbsp;        TransactionValidateResponse resp = paymentService.validatePaymentTransaction(paymentValidateRequest);  //NO SONAR</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+<b class="nc">&nbsp;    @ValueSource(booleans = {true, false})</b>
+<b class="nc">&nbsp;    void testValidatePaymentTransactionWithSuccessfulPaymentAndIsRenewalIsNotAgentThrowsException(boolean isRenewal) throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;configuration&quot;, configuration);</b>
+<b class="fc">&nbsp;        transaction.setRenewal(isRenewal);</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello Testes&quot;;</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Configuration configuration1 = new Configuration(Configuration.VERSION_2_3_30);</b>
+<b class="fc">&nbsp;        Template template = new Template(&quot;te&quot;, templateStr, configuration1);</b>
+<b class="fc">&nbsp;        when(configuration.getTemplate(anyString())).thenReturn(template);</b>
+<b class="nc">&nbsp;</b>
+&nbsp;        //add the behavior to throw exception
+<b class="fc">&nbsp;        doThrow(new RuntimeException(&quot;Add operation not implemented&quot;))</b>
+<b class="fc">&nbsp;                .when(paymentServiceMock).sendPaymentNotification(transaction);</b>
+&nbsp;
+<b class="fc">&nbsp;        TransactionValidateResponse resp = paymentService.validatePaymentTransaction(paymentValidateRequest);</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+<b class="nc">&nbsp;    @ValueSource(ints = {0, 40000})</b>
+<b class="nc">&nbsp;    void testValidatePaymentTransactionWithSuccessfulPaymentAndIsRenewalIsAgent(int travel) throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        ReflectionTestUtils.setField(paymentService, &quot;configuration&quot;, configuration);</b>
+<b class="fc">&nbsp;        transaction.setRenewal(true);</b>
+<b class="fc">&nbsp;        customer.setAgentId(&quot;AgentId&quot;);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        policy.getBenefit().setTravelInsurance(travel);</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        quote.getBenefit().setTravelInsurance(travel);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(agentBranchRepository.findAgentBranchEntitiesByEntityId(any())).thenReturn(AgentBranchEntity.builder()</b>
+<b class="fc">&nbsp;                .agentId(&quot;agentId&quot;)</b>
+<b class="fc">&nbsp;                .entityId(900)</b>
+<b class="fc">&nbsp;                .branchName(&quot;Name&quot;).build());</b>
+<b class="fc">&nbsp;        TransactionValidateResponse resp = paymentService.validatePaymentTransaction(paymentValidateRequest);</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testValidatePaymentTransactionWithSuccessfulPaymentAndIsRenewalIsNotAgentThrowsExceptionWhenTransactionIsNull() throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Template t = new Template(&quot;name&quot;, new StringReader(templateStr),</b>
+<b class="nc">&nbsp;                new Configuration(Configuration.VERSION_2_3_30));</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(configuration.getTemplate(anyString())).thenReturn(t);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(RuntimeException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.validatePaymentTransaction(paymentValidateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreatePayment() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        Mockito.when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.createTransaction(any())).thenReturn(TransactionCreateResponse.builder().build());</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.insert(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.updateByPrimaryKey(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(policyRemote.getPolicyDetail(any())).thenReturn(policyDetail);</b>
+<b class="fc">&nbsp;        TransactionCreateResponse resp = paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="fc">&nbsp;        assertNotNull(resp);</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreatePaymentForQuote() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.createTransaction(any())).thenReturn(TransactionCreateResponse.builder().build());</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.insert(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.updateByPrimaryKey(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(policyRemote.getPolicyDetail(any())).thenReturn(policyDetail);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setRenewal(false);</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;quote\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;quote&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testGetProductType() {</b>
+<b class="fc">&nbsp;        Quote q = Quote.builder().productId(ProductEnum.JAMIIPLUS_SHARED.getId()).build();</b>
+<b class="fc">&nbsp;        String shared = paymentService.getProductTypeDescription(q);</b>
+<b class="fc">&nbsp;        assertEquals(&quot;Family shared&quot;.toLowerCase(), shared.toLowerCase());</b>
+<b class="fc">&nbsp;        q.setProductId(ProductEnum.JAMIIPLUS.getId());</b>
+<b class="fc">&nbsp;        String individual = paymentService.getProductTypeDescription(q);</b>
+<b class="fc">&nbsp;        assertEquals(&quot;Individual&quot;.toLowerCase(), individual.toLowerCase());</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreateTransactionWithNullCustomer() throws TemplateException, IOException {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        String templateStr = &quot;Hello ${user}&quot;;</b>
+<b class="fc">&nbsp;        Template t = new Template(&quot;name&quot;, new StringReader(templateStr),</b>
+<b class="nc">&nbsp;                new Configuration(Configuration.VERSION_2_3_30));</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(null);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(configuration.getTemplate(anyString())).thenReturn(t);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;customer\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;customer&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreateTransactionWithNullPolicyNumberThrows() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setPolicyNumber(null);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setRenewal(true);</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;policy\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;policy&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreateTransactionWithNullEffectiveDateThrows() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setEffectiveDate(null);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setRenewal(true);</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;date\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;date&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreateTransactionWithNullPolicyDetailsThrows() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(policyRemote.getPolicyDetail(any())).thenReturn(null);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;find\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;find&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreateTransactionFromQuoteThrowsWithoutQuote() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(policyRemote.getPolicyDetail(any())).thenReturn(null);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setRenewal(false);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setQuoteId(null);</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;mandatory\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;mandatory&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testCreateTransactionFromQuoteThrowsIfQuoteWithoutStatus() {</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        transaction = null;</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.validateTransaction(any())).thenReturn(transactionValidateResponse);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.update(any())).thenReturn(1);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomerByParentId(anyString())).thenReturn(Collections.singletonList(customer));</b>
+<b class="fc">&nbsp;        Mockito.when(policyService.getPolicy(anyString(), any())).thenReturn(policy);</b>
+<b class="fc">&nbsp;        Mockito.when(intermediaryService.getIntermediary(anyString())).thenReturn(intermediary);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentTransactionMapper.select(any(), any(), any())).thenReturn(transaction);</b>
+<b class="fc">&nbsp;        Mockito.when(notificationRemote.sendEmailWithTemplate(any())).thenReturn(true);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuoteByPolicyNumber(anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        policyDetail.setPolicyStatus(null);</b>
+<b class="fc">&nbsp;        Mockito.when(policyRemote.getPolicyDetail(any())).thenReturn(policyDetail);</b>
+<b class="nc">&nbsp;</b>
+<b class="fc">&nbsp;        Throwable exception</b>
+<b class="fc">&nbsp;                = assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="fc">&nbsp;        String excMsg = exception.getMessage();</b>
+<b class="pc">&nbsp;        assert excMsg != null</b>
+<b class="nc">&nbsp;                : &quot;Exception message should not be null&quot;;</b>
+<b class="fc">&nbsp;        String msg</b>
+&nbsp;                = &quot;Exception message should contain the word \&quot;expired\&quot;&quot;;
+<b class="pc">&nbsp;        assert excMsg.toLowerCase().contains(&quot;expired&quot;) : msg;</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @ParameterizedTest
+<b class="nc">&nbsp;    @ValueSource(strings = {&quot;Viewed&quot;, &quot;New&quot;})</b>
+<b class="nc">&nbsp;    void testCreateTransactionThrowsErrorIfStatusIsViewedOrNew(String status) {</b>
+<b class="nc">&nbsp;        // Arrange</b>
+<b class="fc">&nbsp;        configuration = Mockito.mock(Configuration.class);</b>
+<b class="fc">&nbsp;        customer.setAgentId(null);</b>
+<b class="fc">&nbsp;        customer.setParentId(&quot;p123&quot;);</b>
+<b class="fc">&nbsp;        customer.setQuoteId(&quot;q123&quot;);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setQuoteId(&quot;q123&quot;);</b>
+<b class="fc">&nbsp;        Date date = new GregorianCalendar(2023, Calendar.FEBRUARY, 11).getTime();</b>
+<b class="fc">&nbsp;        quote.setStatus(status);</b>
+<b class="fc">&nbsp;        quote.setEffectiveDate(date);</b>
+<b class="fc">&nbsp;        paymentCreateRequest.setRenewal(false);</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(customer);</b>
+<b class="fc">&nbsp;        Mockito.when(policyRemote.getPolicyDetail(any())).thenReturn(policyDetail);</b>
+<b class="fc">&nbsp;        Mockito.when(healthStepRepository.save(any())).thenReturn(null);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteMapper.getQuote(anyString(), anyString(), anyString())).thenReturn(quote);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteService.getQuote(anyString(), anyString(), any())).thenReturn(quote);</b>
+&nbsp;
+<b class="fc">&nbsp;        assertThrows(BusinessException.class, () -&gt; {</b>
+<b class="fc">&nbsp;            paymentService.createPaymentTransaction(paymentCreateRequest);</b>
+<b class="nc">&nbsp;        });</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testUpdateQuoteStartDate() {</b>
+<b class="fc">&nbsp;        Calendar cal1 = Calendar.getInstance();</b>
+<b class="fc">&nbsp;        cal1.setTime(new Date());</b>
+<b class="fc">&nbsp;        cal1.add(Calendar.DATE, -1);</b>
+<b class="fc">&nbsp;        Quote quote = Quote.builder()</b>
+<b class="fc">&nbsp;                .id(&quot;aa5cf15db6907bb167ee584650fe07ab&quot;)</b>
+<b class="fc">&nbsp;                .customerId(&quot;675c83a4b4f70cbfd349967862152128&quot;)</b>
+<b class="fc">&nbsp;                .startDate(cal1.getTime())</b>
+<b class="fc">&nbsp;                .build();</b>
+<b class="fc">&nbsp;        Mockito.when(quoteMapper.getQuote(anyString(), anyString(), any()))</b>
+<b class="fc">&nbsp;                .thenReturn(quote);</b>
+<b class="fc">&nbsp;        paymentService.updateQuoteStartDate(quote.getCustomerId(), quote.getId());</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+&nbsp;    @Test
+<b class="nc">&nbsp;    void testUpdateQuoteStartDateWithQuoteNull() {</b>
+<b class="fc">&nbsp;        Mockito.when(quoteMapper.getQuote(anyString(), anyString(), any())).thenReturn(</b>
+&nbsp;                null);
+<b class="fc">&nbsp;        paymentService.updateQuoteStartDate(null, null);</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testUpdateQuoteStartDateBeforeDate() {</b>
+<b class="fc">&nbsp;        Calendar cal1 = Calendar.getInstance();</b>
+<b class="fc">&nbsp;        cal1.setTime(new Date());</b>
+<b class="fc">&nbsp;        cal1.add(Calendar.DATE, 5);</b>
+<b class="fc">&nbsp;        Mockito.when(quoteMapper.getQuote(anyString(), anyString(), any())).thenReturn(Quote</b>
+<b class="fc">&nbsp;                .builder()</b>
+<b class="fc">&nbsp;                .id(&quot;aa5cf15db6907bb167ee584650fe07ab&quot;)</b>
+<b class="fc">&nbsp;                .customerId(&quot;675c83a4b4f70cbfd349967862152128&quot;)</b>
+<b class="fc">&nbsp;                .startDate(cal1.getTime())</b>
+<b class="fc">&nbsp;                .build());</b>
+<b class="fc">&nbsp;        paymentService.updateQuoteStartDate(&quot;675c83a4b4f70cbfd349967862152128&quot;, &quot;aa5cf15db6907bb167ee584650fe07ab&quot;);</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testSendPaymentInAppNotification() {</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(</b>
+<b class="fc">&nbsp;                Customer.builder()</b>
+<b class="fc">&nbsp;                        .email(&quot;test@gmail.com&quot;)</b>
+<b class="fc">&nbsp;                        .phoneNumber(&quot;254984119158&quot;)</b>
+<b class="fc">&nbsp;                        .idNo(&quot;928e9f369d33319a6aba75f58eed1b6d&quot;)</b>
+<b class="fc">&nbsp;                        .build()</b>
+<b class="nc">&nbsp;        );</b>
+<b class="fc">&nbsp;        paymentService.sendPaymentInAppNotification(PaymentTransaction.builder()</b>
+<b class="fc">&nbsp;                .customerId(&quot;928e9f369d33319a6aba75f58eed1b6d&quot;)</b>
+<b class="fc">&nbsp;                .build(), &quot;Test mssg&quot;);</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testSendPaymentInAppNotificationWithNull() {</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(</b>
+<b class="fc">&nbsp;                Customer.builder()</b>
+<b class="fc">&nbsp;                        .email(&quot;test@gmail.com&quot;)</b>
+<b class="fc">&nbsp;                        .phoneNumber(&quot;254984119158&quot;)</b>
+<b class="fc">&nbsp;                        .idNo(&quot;928e9f369d33319a6aba75f58eed1b6d&quot;)</b>
+<b class="fc">&nbsp;                        .build()</b>
+<b class="nc">&nbsp;        );</b>
+<b class="fc">&nbsp;        paymentService.sendPaymentInAppNotification(PaymentTransaction.builder()</b>
+<b class="fc">&nbsp;                .build(), &quot;Test mssg&quot;);</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;    @Test</b>
+<b class="nc">&nbsp;    void testClearRenewalInAppNotification() {</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(</b>
+<b class="fc">&nbsp;                Customer.builder()</b>
+<b class="fc">&nbsp;                        .email(&quot;test@gmail.com&quot;)</b>
+<b class="fc">&nbsp;                        .phoneNumber(&quot;254752369869&quot;)</b>
+<b class="fc">&nbsp;                        .idNo(&quot;928e9f369d33319a6aba75f58eed1b6d&quot;)</b>
+<b class="fc">&nbsp;                        .build()</b>
+<b class="nc">&nbsp;        );</b>
+<b class="fc">&nbsp;        when(notificationRemote.getAllInAppNotificationList(any(InAppNotificationMessageRequest.class)))</b>
+<b class="fc">&nbsp;                .thenReturn(List.of(InAppNotificationMessageResponse.builder()</b>
+<b class="fc">&nbsp;                        .id(&quot;1&quot;)</b>
+<b class="fc">&nbsp;                        .policyNumber(&quot;JPR001681&quot;)</b>
+<b class="fc">&nbsp;                        .actionStatus(GlobalConstant.HEALTH_RENEWAL_NOTIFICATION_STATUS)</b>
+<b class="fc">&nbsp;                        .build()));</b>
+<b class="fc">&nbsp;        paymentService.clearRenewalInAppNotification(&quot;254752369869&quot;, &quot;JPR001681&quot;);</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;    @Test</b>
+<b class="fc">&nbsp;    void PaymentCreditCardServiceTest() {</b>
+<b class="fc">&nbsp;        CreditCardTransactionRequest cr = new CreditCardTransactionRequest();</b>
+<b class="fc">&nbsp;        HashMap&lt;String, String&gt; hashMap = paymentRemote.createCreditCardPaymentRequest(cr);</b>
+<b class="fc">&nbsp;        hashMap.put(&quot;&quot;, &quot;&quot;);</b>
+<b class="fc">&nbsp;</b>
+<b class="fc">&nbsp;        HttpHeaders headers = new HttpHeaders();</b>
+<b class="fc">&nbsp;        Mockito.when(paymentRemote.createCreditCardPaymentRequest(cr)).thenReturn(hashMap);</b>
+<b class="fc">&nbsp;        Mockito.when(paymentService.createCreditCardPaymentRequest(cr)).thenReturn(any());</b>
+<b class="fc">&nbsp;        paymentService.createCreditCardPaymentRequest(cr);</b>
+<b class="fc">&nbsp;        assertTrue(true);</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    @Test</b>
+<b class="fc">&nbsp;    void testClearRenewalInAppNotificationWithNull() {</b>
+<b class="fc">&nbsp;        Mockito.when(customerService.getCustomer(anyString())).thenReturn(</b>
+<b class="fc">&nbsp;                Customer.builder()</b>
+<b class="nc">&nbsp;                        .email(&quot;test@gmail.com&quot;)</b>
+<b class="nc">&nbsp;                        .phoneNumber(&quot;254752369869&quot;)</b>
+<b class="nc">&nbsp;                        .idNo(&quot;928e9f369d33319a6aba75f58eed1b6d&quot;)</b>
+<b class="nc">&nbsp;                        .build()</b>
+<b class="nc">&nbsp;        );</b>
+<b class="nc">&nbsp;        when(notificationRemote.getAllInAppNotificationList(any(InAppNotificationMessageRequest.class)))</b>
+<b class="nc">&nbsp;                .thenReturn(List.of(InAppNotificationMessageResponse.builder()</b>
+<b class="fc">&nbsp;                        .id(&quot;1&quot;)</b>
+<b class="fc">&nbsp;                        .build()));</b>
+<b class="fc">&nbsp;        paymentService.clearRenewalInAppNotification(&quot;254752369869&quot;, &quot;JPR001681&quot;);</b>
+<b class="nc">&nbsp;        assertTrue(true);</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

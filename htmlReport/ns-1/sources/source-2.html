@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ComplaintServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: ComplaintServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ComplaintServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;import ke.co.apollo.health.common.domain.model.PolicyDetail;
+&nbsp;import ke.co.apollo.health.common.domain.model.Principal;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.PolicyNumberRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.request.EmailRequest;
+&nbsp;import ke.co.apollo.health.config.NotificationMessageBuilder;
+&nbsp;import ke.co.apollo.health.domain.entity.PolicyComplaintEntity;
+&nbsp;import ke.co.apollo.health.domain.request.PolicyComplaintRequest;
+&nbsp;import ke.co.apollo.health.remote.CustomerRemote;
+&nbsp;import ke.co.apollo.health.remote.NotificationRemote;
+&nbsp;import ke.co.apollo.health.remote.PolicyRemote;
+&nbsp;import ke.co.apollo.health.repository.PolicyComplaintRepository;
+&nbsp;import ke.co.apollo.health.service.ComplaintService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class ComplaintServiceImpl implements ComplaintService {</b>
+&nbsp;
+&nbsp;  @Value(&quot;${email.recipient.address}&quot;)
+&nbsp;  private String recipientAddress;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  NotificationMessageBuilder notificationMessageBuilder;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyComplaintRepository policyComplaintRepository;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  NotificationRemote notificationRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyRemote policyRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  CustomerRemote customerRemote;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean submitComplaint(PolicyComplaintRequest request) {
+<b class="nc">&nbsp;    boolean result = false;</b>
+<b class="nc">&nbsp;    String policyNumber = request.getPolicyNumber();</b>
+<b class="nc">&nbsp;    Date effectiveDate = request.getEffectiveDate();</b>
+<b class="nc">&nbsp;    PolicyComplaintEntity entity = PolicyComplaintEntity.builder().policyNumber(</b>
+<b class="nc">&nbsp;        policyNumber).effectiveDate(effectiveDate).agentId(</b>
+<b class="nc">&nbsp;        request.getAgentId()).customerId(request.getCustomerId()).title(request.getTitle()).content(</b>
+<b class="nc">&nbsp;        request.getContent()).createTime(new Date()).updateTime(new Date()).build();</b>
+<b class="nc">&nbsp;    policyComplaintRepository.save(entity);</b>
+&nbsp;
+<b class="nc">&nbsp;    String subject = notificationMessageBuilder</b>
+<b class="nc">&nbsp;        .getMessage(&quot;EMAIL_POLICY_COMPLAINT_SUBJECT&quot;, request.getPolicyNumber());</b>
+<b class="nc">&nbsp;    EmailRequest emailRequest = EmailRequest.builder().build();</b>
+<b class="nc">&nbsp;    emailRequest.setEmailAddress(recipientAddress);</b>
+<b class="nc">&nbsp;    emailRequest.setSubject(subject);</b>
+&nbsp;
+<b class="nc">&nbsp;    PolicyDetail policyDetail = policyRemote.getPolicyDetail(</b>
+<b class="nc">&nbsp;        PolicyNumberRequest.builder().policyNumber(policyNumber).effectiveDate(effectiveDate)</b>
+<b class="nc">&nbsp;            .build());</b>
+<b class="nc">&nbsp;    if (policyDetail != null) {</b>
+<b class="nc">&nbsp;      Principal principal = customerRemote</b>
+<b class="nc">&nbsp;          .getPrincipalByEntityId(policyDetail.getPolicyHolderEntityId());</b>
+<b class="nc">&nbsp;      emailRequest.setText(this.generateText(principal, policyDetail, request));</b>
+<b class="nc">&nbsp;      result = notificationRemote.sendEmail(emailRequest);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return result;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String generateText(Principal principal, PolicyDetail policyDetail,
+&nbsp;      PolicyComplaintRequest request) {
+<b class="nc">&nbsp;    StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;    sb.append(&quot;Full Name: &quot;).append(policyDetail.getPolicyHolderName()).append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;    sb.append(&quot;Policy Number: &quot;).append(policyDetail.getPolicyNumber()).append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;    sb.append(&quot;Email: &quot;).append(principal.getEmail()).append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;    sb.append(&quot;Mobile: &quot;).append(principal.getPhoneNumber()).append(&quot;\n&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    sb.append(&quot;\n&quot;).append(&quot;Name Of Service Provider: &quot;).append(request.getTitle()).append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;    sb.append(&quot;Short Description Of Compliant Details: &quot;).append(request.getContent()).append(&quot;\n&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    return sb.toString();</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:50</div>
+</div>
+</body>
+</html>

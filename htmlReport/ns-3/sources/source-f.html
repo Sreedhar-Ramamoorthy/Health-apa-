@@ -1,0 +1,305 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PremiumServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: PremiumServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PremiumServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/98)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import ke.co.apollo.health.common.domain.model.HealthPolicy;
+&nbsp;import ke.co.apollo.health.common.domain.model.Quote;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.PolicyIdRequest;
+&nbsp;import ke.co.apollo.health.domain.BenefitPremium;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyBeneficiary.Beneficiary;
+&nbsp;import ke.co.apollo.health.domain.PolicyBenefitPremium;
+&nbsp;import ke.co.apollo.health.domain.PolicyBenefitPremium.MemberPremium;
+&nbsp;import ke.co.apollo.health.domain.entity.PolicyPremiumEntity;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteBaseRequest;
+&nbsp;import ke.co.apollo.health.repository.PolicyPremiumRepository;
+&nbsp;import ke.co.apollo.health.service.PremiumService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public class PremiumServiceImpl implements PremiumService {</b>
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  QuoteService quoteService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PolicyPremiumRepository policyPremiumRepository;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean recordQuoteBeneficiaryPremium(Quote quote, PolicyBeneficiary policyBeneficiary) {
+&nbsp;
+<b class="nc">&nbsp;    Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; policyPremiumEntityList = policyPremiumRepository.findAllByQuoteId(quote.getId());</b>
+<b class="nc">&nbsp;    log.debug(&quot;Find PolicyPremiumEntity by quote id: {}&quot;, quote.getId());</b>
+&nbsp;
+<b class="nc">&nbsp;    policyPremiumEntityList.ifPresent(policyPremiumEntities -&gt; log.debug(&quot;Find PolicyPremiumEntity size: {}, will del them all&quot;,</b>
+<b class="nc">&nbsp;                                                                         policyPremiumEntities.size()));</b>
+&nbsp;
+<b class="nc">&nbsp;    policyPremiumEntityList.ifPresent(policyPremiumEntities -&gt; policyPremiumRepository.deleteAll(policyPremiumEntities));</b>
+&nbsp;
+<b class="nc">&nbsp;    log.debug(&quot;Still have PolicyPremiumEntity : {}&quot;, policyPremiumRepository.findAllByQuoteId(quote.getId()).isPresent());</b>
+&nbsp;
+<b class="nc">&nbsp;    Beneficiary principal = policyBeneficiary.getPrincipal();</b>
+<b class="nc">&nbsp;    if (principal != null &amp;&amp; CollectionUtils.isNotEmpty(principal.getBenefitPremiums())) {</b>
+<b class="nc">&nbsp;      this.saveBeneficiaryPremium(quote, principal);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    Beneficiary spouse = policyBeneficiary.getSpouse();</b>
+<b class="nc">&nbsp;    if (spouse != null &amp;&amp; CollectionUtils.isNotEmpty(spouse.getBenefitPremiums())) {</b>
+<b class="nc">&nbsp;      this.saveBeneficiaryPremium(quote, spouse);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    for (Beneficiary beneficiary : policyBeneficiary.getChildren()) {</b>
+<b class="nc">&nbsp;      if (beneficiary != null &amp;&amp; CollectionUtils.isNotEmpty(beneficiary.getBenefitPremiums())) {</b>
+<b class="nc">&nbsp;        this.saveBeneficiaryPremium(quote, beneficiary);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void saveBeneficiaryPremium(Quote quote, Beneficiary beneficiary) {
+<b class="nc">&nbsp;    for (BenefitPremium benefitPremium : beneficiary.getBenefitPremiums()) {</b>
+<b class="nc">&nbsp;      PolicyPremiumEntity entity = PolicyPremiumEntity.builder()</b>
+<b class="nc">&nbsp;          .customerId(beneficiary.getCustomerId()).entityId(beneficiary.getEntityId())</b>
+<b class="nc">&nbsp;          .name(beneficiary.getName()).quoteId(quote.getId())</b>
+<b class="nc">&nbsp;          .policyId(quote.getExtPolicyId()).policyNumber(quote.getExtPolicyNumber())</b>
+<b class="nc">&nbsp;          .effectiveDate(quote.getEffectiveDate()).age(beneficiary.getAge())</b>
+<b class="nc">&nbsp;          .relationship(beneficiary.getRelationship())</b>
+<b class="nc">&nbsp;          .createTime(new Date())</b>
+<b class="nc">&nbsp;          .build();</b>
+<b class="nc">&nbsp;      entity.setBenefitLimit(BigDecimal.valueOf(benefitPremium.getBenefitLimit()));</b>
+<b class="nc">&nbsp;      entity.setBenefitType(benefitPremium.getBenefitType().getValue());</b>
+<b class="nc">&nbsp;      entity.setPremium(benefitPremium.getPremium());</b>
+<b class="nc">&nbsp;      policyPremiumRepository.save(entity);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean recordPolicyBeneficiaryPremium(HealthPolicy policy,
+&nbsp;      PolicyBeneficiary policyBeneficiary) {
+<b class="nc">&nbsp;    policyPremiumRepository.deleteByPolicyIdAndEffectiveDate(policy.getPolicyId(), policy.getEffectiveDate());</b>
+<b class="nc">&nbsp;    Beneficiary principal = policyBeneficiary.getPrincipal();</b>
+<b class="nc">&nbsp;    if (principal != null) {</b>
+<b class="nc">&nbsp;      this.saveBeneficiaryPremium(policy, principal);</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Beneficiary spouse = policyBeneficiary.getSpouse();</b>
+<b class="nc">&nbsp;    if (spouse != null) {</b>
+<b class="nc">&nbsp;      this.saveBeneficiaryPremium(policy, spouse);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    for (Beneficiary beneficiary : policyBeneficiary.getChildren()) {</b>
+<b class="nc">&nbsp;      if (beneficiary != null) {</b>
+<b class="nc">&nbsp;        this.saveBeneficiaryPremium(policy, beneficiary);</b>
+&nbsp;      }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void saveBeneficiaryPremium(HealthPolicy policy, Beneficiary beneficiary) {
+<b class="nc">&nbsp;    for (BenefitPremium benefitPremium : beneficiary.getBenefitPremiums()) {</b>
+<b class="nc">&nbsp;      PolicyPremiumEntity entity = PolicyPremiumEntity.builder()</b>
+<b class="nc">&nbsp;                                                      .customerId(beneficiary.getCustomerId())</b>
+<b class="nc">&nbsp;                                                      .entityId(beneficiary.getEntityId())</b>
+<b class="nc">&nbsp;                                                      .name(beneficiary.getName())</b>
+<b class="nc">&nbsp;                                                      .quoteId(policy.getQuoteId())</b>
+<b class="nc">&nbsp;                                                      .policyId(policy.getPolicyId())</b>
+<b class="nc">&nbsp;                                                      .policyNumber(policy.getPolicyNumber())</b>
+<b class="nc">&nbsp;                                                      .effectiveDate(policy.getEffectiveDate())</b>
+<b class="nc">&nbsp;                                                      .age(beneficiary.getAge())</b>
+<b class="nc">&nbsp;                                                      .relationship(beneficiary.getRelationship())</b>
+<b class="nc">&nbsp;                                                      .createTime(new Date())</b>
+<b class="nc">&nbsp;                                                      .build();</b>
+<b class="nc">&nbsp;      entity.setBenefitLimit(BigDecimal.valueOf(benefitPremium.getBenefitLimit()));</b>
+<b class="nc">&nbsp;      entity.setBenefitType(benefitPremium.getBenefitType().getValue());</b>
+<b class="nc">&nbsp;      entity.setPremium(benefitPremium.getPremium());</b>
+<b class="nc">&nbsp;      policyPremiumRepository.save(entity);</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; getQuotePremiumDetail(QuoteBaseRequest request) {
+<b class="nc">&nbsp;    quoteService.getQuote(request.getQuoteId(), request.getCustomerId(), request.getAgentId());</b>
+<b class="nc">&nbsp;    return policyPremiumRepository.findAllByQuoteId(request.getQuoteId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;PolicyPremiumEntity&gt; getQuotePremium(QuoteBaseRequest request) {
+<b class="nc">&nbsp;    List&lt;PolicyPremiumEntity&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; result = this.getQuotePremiumDetail(request);</b>
+<b class="nc">&nbsp;    if (result.isPresent()) {</b>
+<b class="nc">&nbsp;      list = result.get();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return list;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;PolicyBenefitPremium&gt; getQuoteBenefitPremium(QuoteBaseRequest request) {
+<b class="nc">&nbsp;    Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; result = this.getQuotePremiumDetail(request);</b>
+<b class="nc">&nbsp;    return this.convertPolicyBenefitPremium(result);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;PolicyBenefitPremium&gt; convertPolicyBenefitPremium(
+&nbsp;      Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; premiumEntities) {
+<b class="nc">&nbsp;    List&lt;PolicyBenefitPremium&gt; premiums = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    if (premiumEntities.isPresent()) {</b>
+<b class="nc">&nbsp;      Map&lt;String, List&lt;PolicyPremiumEntity&gt;&gt; map = premiumEntities.get().stream()</b>
+<b class="nc">&nbsp;          .collect(Collectors.groupingBy(PolicyPremiumEntity::getBenefitType));</b>
+<b class="nc">&nbsp;      map.forEach((key, value) -&gt; {</b>
+<b class="nc">&nbsp;        PolicyBenefitPremium premium = PolicyBenefitPremium.builder().benefitType(key)</b>
+<b class="nc">&nbsp;            .benefitLimit(value.stream().findFirst().get().getBenefitLimit()).build();</b>
+<b class="nc">&nbsp;        List&lt;MemberPremium&gt; memberPremiums = value.stream()</b>
+<b class="nc">&nbsp;            .map(v -&gt; MemberPremium.builder().age(v.getAge()).customerId(v.getCustomerId())</b>
+<b class="nc">&nbsp;                .entityId(v.getEntityId()).name(v.getName()).relationship(v.getRelationship())</b>
+<b class="nc">&nbsp;                .premium(v.getPremium()).build()).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        premium.setList(memberPremiums);</b>
+<b class="nc">&nbsp;        premiums.add(premium);</b>
+<b class="nc">&nbsp;      });</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return premiums;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;PolicyPremiumEntity&gt; getPolicyPremium(PolicyIdRequest request) {
+<b class="nc">&nbsp;    List&lt;PolicyPremiumEntity&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; result = policyPremiumRepository</b>
+<b class="nc">&nbsp;        .findAllByPolicyIdAndEffectiveDate(request.getPolicyId(), request.getEffectiveDate());</b>
+<b class="nc">&nbsp;    if (result.isPresent()) {</b>
+<b class="nc">&nbsp;      list = result.get();</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return list;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;PolicyBenefitPremium&gt; getPolicyBenefitPremium(PolicyIdRequest request) {
+<b class="nc">&nbsp;    Optional&lt;List&lt;PolicyPremiumEntity&gt;&gt; result = policyPremiumRepository</b>
+<b class="nc">&nbsp;        .findAllByPolicyIdAndEffectiveDate(request.getPolicyId(), request.getEffectiveDate());</b>
+<b class="nc">&nbsp;    return this.convertPolicyBenefitPremium(result);</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>

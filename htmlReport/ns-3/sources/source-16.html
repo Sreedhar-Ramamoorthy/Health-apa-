@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TransactionDetailServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ke.co.apollo.health.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionDetailServiceImpl (ke.co.apollo.health.service.impl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionDetailServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TransactionDetailServiceImpl$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ke.co.apollo.health.service.impl;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import ke.co.apollo.health.common.domain.model.PaymentHistory;
+&nbsp;import ke.co.apollo.health.common.domain.model.TransactionDetailTask;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.TransactionDetailsRequest;
+&nbsp;import ke.co.apollo.health.common.domain.model.remote.TransactionDetailsResponse;
+&nbsp;import ke.co.apollo.health.common.enums.PaymentStatus;
+&nbsp;import ke.co.apollo.health.domain.request.QuoteBalanceUpdateRequest;
+&nbsp;import ke.co.apollo.health.domain.request.TransactionDetailTaskAddRequest;
+&nbsp;import ke.co.apollo.health.mapper.health.TransactionDetailTaskMapper;
+&nbsp;import ke.co.apollo.health.remote.PaymentRemote;
+&nbsp;import ke.co.apollo.health.service.PaymentService;
+&nbsp;import ke.co.apollo.health.service.PolicyService;
+&nbsp;import ke.co.apollo.health.service.QuoteService;
+&nbsp;import ke.co.apollo.health.service.TransactionDetailService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class TransactionDetailServiceImpl implements TransactionDetailService {</b>
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  TransactionDetailTaskMapper transactionDetailTaskMapper;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  PaymentRemote paymentRemote;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  private PaymentService paymentService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  private QuoteService quoteService;
+&nbsp;
+&nbsp;  @Autowired
+&nbsp;  private PolicyService policyService;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean createTransactionDetailTask(TransactionDetailTaskAddRequest task) {
+<b class="nc">&nbsp;    return transactionDetailTaskMapper.initTransactionDetail(</b>
+<b class="nc">&nbsp;        TransactionDetailTask.builder().checkoutRequestId(task.getCheckoutRequestId())</b>
+<b class="nc">&nbsp;            .scheduleTime(task.getScheduleTime()).build()) == 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean updateTransactionDetailTask(TransactionDetailTask task) {
+<b class="nc">&nbsp;    return transactionDetailTaskMapper.updateByPrimaryKey(task) == 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean cancelTransactionDetailTask(TransactionDetailTask task) {
+<b class="nc">&nbsp;    transactionDetailTaskMapper.deleteByPrimaryKey(task.getTaskId());</b>
+<b class="nc">&nbsp;    return false;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void processTransactionDetailTask() {
+&nbsp;
+<b class="nc">&nbsp;    List&lt;TransactionDetailTask&gt; tasks = transactionDetailTaskMapper</b>
+<b class="nc">&nbsp;        .selectScheduledTasks(new Date(System.currentTimeMillis()));</b>
+&nbsp;
+<b class="nc">&nbsp;    tasks.parallelStream().forEach(task -&gt; {</b>
+<b class="nc">&nbsp;      switch (PaymentStatus.getPaymentStatus(task.getPaymentStatus())) {</b>
+&nbsp;
+&nbsp;        case SUCCESSFUL:
+&nbsp;        case FAILED:
+<b class="nc">&nbsp;          break;</b>
+&nbsp;        case PENDING:
+&nbsp;        default:
+<b class="nc">&nbsp;          TransactionDetailsResponse response = paymentRemote.transactionDetails(</b>
+<b class="nc">&nbsp;              TransactionDetailsRequest.builder().checkoutRequestId(task.getCheckoutRequestId())</b>
+<b class="nc">&nbsp;                  .build());</b>
+<b class="nc">&nbsp;          if (response != null &amp;&amp; response.getResponseCode() != null) {</b>
+<b class="nc">&nbsp;            transactionDetailTaskMapper</b>
+<b class="nc">&nbsp;                .syncTransactionResponse(TransactionDetailTask.builder().taskId(task.getTaskId())</b>
+<b class="nc">&nbsp;                    .checkoutRequestId(task.getCheckoutRequestId()).type(response.getRequestType())</b>
+<b class="nc">&nbsp;                    .amount(String.valueOf(response.getAmount()))</b>
+<b class="nc">&nbsp;                    .paymentStatus(response.getPaymentStatus())</b>
+<b class="nc">&nbsp;                    .responseCode(response.getResponseCode())</b>
+<b class="nc">&nbsp;                    .responseDesc(response.getResponseDescription())</b>
+<b class="nc">&nbsp;                    .resultCode(response.getResultCode())</b>
+<b class="nc">&nbsp;                    .resultDesc(response.getResultDescription())</b>
+<b class="nc">&nbsp;                    .build());</b>
+<b class="nc">&nbsp;            if (response.getResultCode() == 0) {</b>
+<b class="nc">&nbsp;              PaymentHistory paymentHistory = paymentService.selectPHByCheckoutRequestId(</b>
+<b class="nc">&nbsp;                  PaymentHistory.builder().checkoutRequestId(response.getCheckoutRequestId())</b>
+<b class="nc">&nbsp;                      .build());</b>
+<b class="nc">&nbsp;              updateBalance(paymentHistory);</b>
+&nbsp;            }
+&nbsp;          }
+&nbsp;      }
+&nbsp;
+<b class="nc">&nbsp;    });</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  public void updateBalance(PaymentHistory paymentHistory) {
+<b class="nc">&nbsp;    if (paymentHistory != null) {</b>
+<b class="nc">&nbsp;      if (paymentHistory.isRenewal()) {</b>
+<b class="nc">&nbsp;        policyService.updatePolicyRenewalBalance(paymentHistory.getPolicyNumber(),</b>
+<b class="nc">&nbsp;                paymentHistory.getEffectiveDate(),</b>
+<b class="nc">&nbsp;                new BigDecimal(paymentHistory.getAmount()));</b>
+&nbsp;
+&nbsp;      } else {
+<b class="nc">&nbsp;        quoteService.updateQuoteBalance(</b>
+<b class="nc">&nbsp;            QuoteBalanceUpdateRequest.builder().quoteId(paymentHistory.getQuoteNumber())</b>
+<b class="nc">&nbsp;                .customerId(paymentHistory.getCustomerId())</b>
+<b class="nc">&nbsp;                .paidAmount(new BigDecimal(paymentHistory.getAmount()))</b>
+<b class="nc">&nbsp;                .build());</b>
+&nbsp;      }
+&nbsp;    }
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-08 11:48</div>
+</div>
+</body>
+</html>
